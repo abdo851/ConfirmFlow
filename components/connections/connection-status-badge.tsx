@@ -2,9 +2,8 @@ import { Badge } from "@/components/ui/badge";
 import {
   getConnectionStatusLabel,
   getConnectionStatusVariant,
-  type ConnectionStatus,
-  type ConnectionType,
-} from "@/lib/connections";
+} from "@/lib/connections/labels";
+import type { ConnectionStatus, ConnectionType } from "@/lib/connections/types";
 
 interface ConnectionStatusBadgeProps {
   type: ConnectionType;

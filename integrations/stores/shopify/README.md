@@ -1,19 +1,19 @@
 # Shopify Store Adapter
 
-**Status:** M2-A foundation
+**Status:** M2-B OAuth foundation
 
 `ShopifyAdapter` implements the generic `StoreAdapter` contract in `shopify-adapter.ts`.
 
-## M2-A scope
+## M2-B scope
 
-- Provider identity and adapter structure
-- Registry registration via `lib/integrations/stores/registry.ts`
-- UI placeholder for Connect Shopify
+- OAuth connect/callback API routes
+- Signed OAuth state and HMAC validation
+- Encrypted httpOnly cookie session for access tokens
+- UI connect flow on `/onboarding/store`
 
-## Not implemented in M2-A
+## Not implemented in M2-B
 
-- OAuth
-- Shopify Admin API calls
 - Webhooks
 - Order ingestion
-- Credential persistence
+- Shopify Admin API usage beyond token exchange
+- Database persistence

@@ -29,7 +29,7 @@ describe("Shopify integration foundation", () => {
     expect(store.metadata?.provider).toBe("shopify");
   });
 
-  it("does not perform real Shopify connection operations", async () => {
+  it("routes connect through the Shopify OAuth API", async () => {
     const connectResult = await shopifyAdapter.connect({
       storeId: "store_1",
       platform: "shopify",
@@ -37,8 +37,7 @@ describe("Shopify integration foundation", () => {
     });
 
     expect(connectResult.success).toBe(false);
-    expect(connectResult.error).toContain("next Shopify milestone");
-    expect(await shopifyAdapter.verifyConnection("store_1")).toBe(false);
+    expect(connectResult.error).toContain("/api/integrations/shopify/connect");
   });
 
   it("does not verify webhooks in M2-A", async () => {
