@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test("landing page loads", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "ConfirmFlow" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Confirma" })).toBeVisible();
 });
 
 test("health API responds", async ({ request }) => {

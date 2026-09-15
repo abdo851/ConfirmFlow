@@ -1,6 +1,6 @@
 # System Overview
 
-ConfirmFlow is an order confirmation and conversion tracking platform. It connects e-commerce stores, confirmation workflows, and marketing conversion APIs through a unified adapter-based architecture.
+Confirma is an order confirmation and conversion tracking platform. It connects e-commerce stores, confirmation workflows, and marketing conversion APIs through a unified adapter-based architecture.
 
 ## M0 Scope
 

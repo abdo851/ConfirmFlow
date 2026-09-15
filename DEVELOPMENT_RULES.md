@@ -1,4 +1,4 @@
-# ConfirmFlow Development Rules
+# Confirma Development Rules
 
 These rules apply to all contributors and AI agents working on this project.
 

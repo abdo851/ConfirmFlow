@@ -7,7 +7,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
       <header className="border-b border-neutral-200 px-6 py-4 dark:border-neutral-800">
         <nav className="mx-auto flex max-w-6xl items-center justify-between">
           <Link href="/dashboard" className="font-semibold">
-            ConfirmFlow Dashboard
+            Confirma Dashboard
           </Link>
           <Link href="/" className="text-sm">
             Home

@@ -1,4 +1,4 @@
-# ConfirmFlow
+# Confirma
 
 Order confirmation and conversion tracking platform — **M0 foundation scaffold**.
 

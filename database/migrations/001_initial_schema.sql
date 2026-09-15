@@ -1,4 +1,4 @@
--- ConfirmFlow M0 — Initial schema foundation
+-- Confirma M0 — Initial schema foundation
 -- Apply via Supabase migrations or manual execution in non-production environments.
 -- NEVER run destructive reset logic against production.
 

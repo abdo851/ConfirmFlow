@@ -2,7 +2,7 @@
 
 **Status:** Accepted  
 **Date:** M0  
-**Context:** ConfirmFlow integrates with multiple e-commerce platforms (Shopify, WooCommerce, YouCan), confirmation providers, and marketing APIs (Meta, Google, TikTok). Each provider has different APIs, authentication, webhook formats, and error semantics.
+**Context:** Confirma integrates with multiple e-commerce platforms (Shopify, WooCommerce, YouCan), confirmation providers, and marketing APIs (Meta, Google, TikTok). Each provider has different APIs, authentication, webhook formats, and error semantics.
 
 ## Decision
 

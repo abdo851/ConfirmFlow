@@ -1,7 +1,7 @@
 # Folder Structure
 
 ```
-ConfirmFlow/
+confirma/
 ├── app/                    # Next.js App Router
 │   ├── (marketing)/        # Landing / public pages
 │   ├── (auth)/             # Login, signup
