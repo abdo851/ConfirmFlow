@@ -2,7 +2,11 @@ import { test, expect } from "@playwright/test";
 
 test("landing page loads", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Confirma" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "Send Meta only the conversions that matter.",
+    }),
+  ).toBeVisible();
 });
 
 test("health API responds", async ({ request }) => {
