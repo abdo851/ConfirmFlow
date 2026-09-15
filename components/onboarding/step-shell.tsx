@@ -17,11 +17,13 @@ import {
 interface OnboardingStepShellProps {
   currentStep: OnboardingStepNumber;
   children?: ReactNode;
+  connectOverride?: ReactNode;
 }
 
 export function OnboardingStepShell({
   currentStep,
   children,
+  connectOverride,
 }: OnboardingStepShellProps) {
   const step = getOnboardingStep(currentStep);
   const connection = getDefaultConnectionState(step.connectionType);
@@ -56,10 +58,12 @@ export function OnboardingStepShell({
         {children ? <div className="mt-4">{children}</div> : null}
 
         <div className="mt-6">
-          <ConnectPlaceholderButton
-            label={step.connectLabel}
-            message={step.placeholderMessage}
-          />
+          {connectOverride ?? (
+            <ConnectPlaceholderButton
+              label={step.connectLabel}
+              message={step.placeholderMessage}
+            />
+          )}
         </div>
 
         {remainingSteps.length > 0 ? (

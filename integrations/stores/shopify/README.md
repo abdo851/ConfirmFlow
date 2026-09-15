@@ -1,7 +1,19 @@
 # Shopify Store Adapter
 
-**Status:** Placeholder — M0
+**Status:** M2-A foundation
 
-Future milestone will implement `ShopifyAdapter` conforming to `StoreAdapter` in `lib/integrations/adapters/store-adapter.ts`.
+`ShopifyAdapter` implements the generic `StoreAdapter` contract in `shopify-adapter.ts`.
 
-Do not add Shopify API calls in M0.
+## M2-A scope
+
+- Provider identity and adapter structure
+- Registry registration via `lib/integrations/stores/registry.ts`
+- UI placeholder for Connect Shopify
+
+## Not implemented in M2-A
+
+- OAuth
+- Shopify Admin API calls
+- Webhooks
+- Order ingestion
+- Credential persistence

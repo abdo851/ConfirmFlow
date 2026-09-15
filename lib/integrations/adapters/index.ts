@@ -18,5 +18,6 @@ export type {
   ExternalOrder,
   StoreAdapter,
   StoreConnectionConfig,
+  StoreConnectionResult,
   StorePlatform,
 } from "./store-adapter";

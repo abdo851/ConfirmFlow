@@ -9,8 +9,10 @@ export const defaultConnectionStates: ConnectionState[] = [
     type: "store",
     status: "not_connected",
     label: "Store",
-    description:
-      "Your e-commerce platform (Shopify, WooCommerce, or YouCan).",
+    description: "Shopify is the first supported store provider.",
+    metadata: {
+      provider: "shopify",
+    },
   },
   {
     type: "meta",

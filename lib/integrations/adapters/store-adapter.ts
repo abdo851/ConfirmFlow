@@ -18,8 +18,22 @@ export interface ExternalOrder {
   rawPayload: unknown;
 }
 
+export interface StoreConnectionResult {
+  success: boolean;
+  error?: string;
+}
+
 export interface StoreAdapter {
   readonly platform: StorePlatform;
+
+  /** Establish a store connection — real OAuth/API in future milestones */
+  connect(config: StoreConnectionConfig): Promise<StoreConnectionResult>;
+
+  /** Remove a store connection */
+  disconnect(storeId: string): Promise<StoreConnectionResult>;
+
+  /** Verify whether an existing store connection is valid */
+  verifyConnection(storeId: string): Promise<boolean>;
 
   /** Verify incoming store webhook authenticity (provider-specific in future milestones) */
   verifyWebhook(
