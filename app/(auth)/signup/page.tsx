@@ -39,6 +39,14 @@ export default function SignupPage() {
         Authentication is not connected yet. This form is a UI shell for a future
         milestone.
       </p>
+      <div className="mt-4 border-t border-neutral-200 pt-4 dark:border-neutral-800">
+        <Button href="/onboarding" className="w-full">
+          Continue to setup
+        </Button>
+        <p className="mt-2 text-xs text-neutral-500">
+          Proceed to onboarding while account creation is unavailable.
+        </p>
+      </div>
       <p className="mt-4 text-sm">
         <span className="text-neutral-600 dark:text-neutral-400">
           Already have an account?{" "}

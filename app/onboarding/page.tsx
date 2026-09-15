@@ -1,28 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { OnboardingStepNav } from "@/components/onboarding";
-
-const steps = [
-  {
-    number: 1,
-    title: "Connect your store",
-    description: "Link your e-commerce platform to receive order events.",
-    href: "/onboarding/store",
-  },
-  {
-    number: 2,
-    title: "Connect Meta",
-    description: "Add Meta Pixel and Conversions API credentials.",
-    href: "/onboarding/meta",
-  },
-  {
-    number: 3,
-    title: "Configure confirmation",
-    description: "Set how orders are confirmed before conversions are sent.",
-    href: "/onboarding/confirmation",
-  },
-] as const;
+import { OnboardingOverviewSteps, OnboardingStepNav } from "@/components/onboarding";
 
 export default function OnboardingPage() {
   return (
@@ -30,25 +8,27 @@ export default function OnboardingPage() {
       <div className="mb-8">
         <h1 className="text-2xl font-semibold tracking-tight">Setup Confirma</h1>
         <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
-          Complete these three steps to prepare your account for verified
+          Complete these three steps in order to prepare your account for verified
           conversions.
         </p>
       </div>
-      <OnboardingStepNav currentStep={1} />
-      <div className="space-y-4">
-        {steps.map((step) => (
-          <Card key={step.href} title={`Step ${step.number} — ${step.title}`}>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">
-              {step.description}
-            </p>
-            <div className="mt-4">
-              <Button href={step.href} variant="outline">
-                Open step
-              </Button>
-            </div>
-          </Card>
-        ))}
+
+      <OnboardingStepNav />
+
+      <div className="mb-8 rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-4 dark:border-neutral-800 dark:bg-neutral-950">
+        <p className="text-sm font-medium">Setup sequence</p>
+        <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-neutral-600 dark:text-neutral-400">
+          <li>Connect your store</li>
+          <li>Connect Meta</li>
+          <li>Configure confirmation</li>
+        </ol>
+        <div className="mt-4">
+          <Button href="/onboarding/store">Start with Step 1</Button>
+        </div>
       </div>
+
+      <OnboardingOverviewSteps />
+
       <p className="mt-8 text-sm">
         <Link href="/dashboard" className="underline">
           Back to dashboard

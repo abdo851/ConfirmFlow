@@ -17,12 +17,12 @@ export function SetupProgress() {
   return (
     <Card
       title="Setup progress"
-      description="Complete onboarding to start sending verified conversions."
+      description="Complete onboarding to configure integrations. None are connected yet."
     >
       <div className="mb-4">
         <div className="mb-2 flex items-center justify-between text-sm">
           <span className="text-neutral-600 dark:text-neutral-400">
-            {completedCount} of {steps.length} steps complete
+            {completedCount} of {steps.length} integrations configured
           </span>
           <span className="font-medium">{Math.round((completedCount / steps.length) * 100)}%</span>
         </div>
