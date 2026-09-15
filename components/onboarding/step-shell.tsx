@@ -1,8 +1,9 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Badge } from "@/components/ui/badge";
+import { ConnectionStatusBadge } from "@/components/connections";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { getDefaultConnectionState } from "@/lib/connections";
 import { ConnectPlaceholderButton } from "./connect-placeholder-button";
 import { OnboardingStepNav } from "./step-nav";
 import {
@@ -23,6 +24,7 @@ export function OnboardingStepShell({
   children,
 }: OnboardingStepShellProps) {
   const step = getOnboardingStep(currentStep);
+  const connection = getDefaultConnectionState(step.connectionType);
   const backHref = getPreviousStepHref(currentStep);
   const nextHref = getNextStepHref(currentStep) ?? "/dashboard";
   const nextLabel =
@@ -45,7 +47,10 @@ export function OnboardingStepShell({
               No real integration is connected in this milestone.
             </p>
           </div>
-          <Badge variant="warning">{step.statusLabel}</Badge>
+          <ConnectionStatusBadge
+            type={connection.type}
+            status={connection.status}
+          />
         </div>
 
         {children ? <div className="mt-4">{children}</div> : null}
