@@ -15,6 +15,7 @@ import {
   markMetaPurchaseDeliveryNotEligible,
   markMetaPurchaseDeliverySent,
 } from "./persistence";
+import { isStaleSendingDelivery } from "./stale-sending";
 import type {
   MetaConversionDeliveryRecord,
   MetaPurchaseDeliveryOutcome,
@@ -66,6 +67,7 @@ async function attemptMetaPurchaseSend(input: {
   userId: string;
   db?: SupabaseClient;
   transport?: MetaCapiTransport;
+  now?: number;
 }): Promise<MetaPurchaseDeliveryOutcome> {
   const eligibility = await loadEligibleMetaConnectionForStore({
     userId: input.userId,
@@ -106,6 +108,7 @@ async function attemptMetaPurchaseSend(input: {
 
   const claimed = await claimMetaPurchaseDelivery({
     deliveryId: input.delivery.id,
+    now: input.now,
     db: input.db,
   });
 
@@ -162,9 +165,11 @@ async function attemptMetaPurchaseSend(input: {
 export async function processMetaPurchaseDelivery(input: {
   orderId: string;
   userId: string;
-  createIfMissing: boolean;
+  /** @deprecated Reconciliation now occurs for any confirmed order missing a delivery row. */
+  createIfMissing?: boolean;
   db?: SupabaseClient;
   transport?: MetaCapiTransport;
+  now?: number;
 }): Promise<MetaPurchaseDeliveryOutcome | null> {
   const orderResult = await loadOrderForPurchaseDelivery({
     orderId: input.orderId,
@@ -181,7 +186,7 @@ export async function processMetaPurchaseDelivery(input: {
     db: input.db,
   });
 
-  if (!delivery && input.createIfMissing) {
+  if (!delivery) {
     delivery = await ensureMetaPurchaseDeliveryRecord({
       storeId: orderResult.order.store_id,
       orderId: input.orderId,
@@ -189,15 +194,14 @@ export async function processMetaPurchaseDelivery(input: {
     });
   }
 
-  if (!delivery) {
-    return null;
-  }
-
   if (delivery.status === "sent") {
     return mapDeliveryRecordToOutcome(delivery);
   }
 
-  if (delivery.status === "sending") {
+  if (
+    delivery.status === "sending" &&
+    !isStaleSendingDelivery(delivery, input.now)
+  ) {
     return mapDeliveryRecordToOutcome(delivery);
   }
 
@@ -207,5 +211,6 @@ export async function processMetaPurchaseDelivery(input: {
     userId: input.userId,
     db: input.db,
     transport: input.transport,
+    now: input.now,
   });
 }

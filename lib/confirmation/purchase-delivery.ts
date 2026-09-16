@@ -8,9 +8,9 @@ import type { MetaPurchaseDeliveryOutcome } from "@/lib/integrations/meta/delive
 export async function dispatchPurchaseDeliveryAfterConfirmation(input: {
   orderId: string;
   userId: string;
-  createIfMissing: boolean;
   db?: SupabaseClient;
   transport?: MetaCapiTransport;
+  now?: number;
 }): Promise<MetaPurchaseDeliveryOutcome | null> {
   return processMetaPurchaseDelivery(input);
 }

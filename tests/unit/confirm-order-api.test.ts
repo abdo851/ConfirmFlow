@@ -71,8 +71,59 @@ describe("POST /api/orders/[id]/confirm", () => {
     expect(mockDispatchPurchaseDeliveryAfterConfirmation).toHaveBeenCalledWith({
       orderId: ORDER_ID,
       userId: "user_1",
-      createIfMissing: true,
     });
+  });
+
+  it("returns confirmed with failed delivery when delivery processing throws", async () => {
+    const { getAuthenticatedUser } = await import("@/lib/auth/session");
+
+    vi.mocked(getAuthenticatedUser).mockResolvedValue({
+      id: "user_1",
+    } as never);
+    mockConfirmOrder.mockResolvedValue({
+      status: "confirmed",
+      orderId: ORDER_ID,
+      confirmedAt: "2024-06-02T10:00:00.000Z",
+    });
+    mockDispatchPurchaseDeliveryAfterConfirmation.mockRejectedValue(
+      new Error("delivery persistence failed"),
+    );
+
+    const response = await POST(new Request("http://localhost"), {
+      params: Promise.resolve({ id: ORDER_ID }),
+    });
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.status).toBe("confirmed");
+    expect(body.metaPurchaseDelivery).toEqual({
+      status: "failed",
+      message: "Meta Purchase delivery could not be completed.",
+    });
+    expect(body.error).toBeUndefined();
+  });
+
+  it("returns confirmed with failed delivery when delivery returns null", async () => {
+    const { getAuthenticatedUser } = await import("@/lib/auth/session");
+
+    vi.mocked(getAuthenticatedUser).mockResolvedValue({
+      id: "user_1",
+    } as never);
+    mockConfirmOrder.mockResolvedValue({
+      status: "confirmed",
+      orderId: ORDER_ID,
+      confirmedAt: "2024-06-02T10:00:00.000Z",
+    });
+    mockDispatchPurchaseDeliveryAfterConfirmation.mockResolvedValue(null);
+
+    const response = await POST(new Request("http://localhost"), {
+      params: Promise.resolve({ id: ORDER_ID }),
+    });
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.status).toBe("confirmed");
+    expect(body.metaPurchaseDelivery?.status).toBe("failed");
   });
 
   it("does not accept confirmation_status or confirmed_at from the client body", async () => {

@@ -1,11 +1,15 @@
--- Confirma M4-D — Meta Purchase delivery records
+-- Confirma M4-D / M4-F — Meta Purchase delivery records
 -- Durable, idempotent Purchase delivery state for Meta CAPI.
 -- Does NOT store access tokens, raw Meta responses, or sensitive user data.
 
+-- Enforce composite order identity for delivery integrity (M4-F).
+ALTER TABLE public.orders
+  ADD CONSTRAINT orders_id_store_id_unique UNIQUE (id, store_id);
+
 CREATE TABLE IF NOT EXISTS public.meta_conversion_deliveries (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  store_id UUID NOT NULL REFERENCES public.stores(id) ON DELETE CASCADE,
-  order_id UUID NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
+  store_id UUID NOT NULL,
+  order_id UUID NOT NULL,
   provider TEXT NOT NULL CHECK (provider IN ('meta')),
   event_type TEXT NOT NULL CHECK (event_type IN ('Purchase')),
   event_id TEXT NOT NULL,
@@ -17,6 +21,9 @@ CREATE TABLE IF NOT EXISTS public.meta_conversion_deliveries (
   last_error TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT meta_conversion_deliveries_order_store_fkey
+    FOREIGN KEY (order_id, store_id)
+    REFERENCES public.orders(id, store_id) ON DELETE CASCADE,
   CONSTRAINT meta_conversion_deliveries_event_id_unique UNIQUE (event_id),
   CONSTRAINT meta_conversion_deliveries_order_provider_event_unique
     UNIQUE (order_id, provider, event_type)

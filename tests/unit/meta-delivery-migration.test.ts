@@ -34,3 +34,27 @@ describe("M4-D meta purchase delivery migration SQL", () => {
     expect(sql).not.toMatch(/CREATE POLICY meta_conversion_deliveries_.*INSERT/i);
   });
 });
+
+describe("M4-F meta purchase delivery integrity SQL", () => {
+  const sql = readMigrationSql();
+
+  it("adds composite order identity on orders", () => {
+    expect(sql).toContain("orders_id_store_id_unique");
+    expect(sql).toContain("UNIQUE (id, store_id)");
+  });
+
+  it("enforces delivery store_id matches the referenced order store", () => {
+    expect(sql).toContain("meta_conversion_deliveries_order_store_fkey");
+    expect(sql).toContain("FOREIGN KEY (order_id, store_id)");
+    expect(sql).toContain("REFERENCES public.orders(id, store_id)");
+  });
+
+  it("does not allow inconsistent store_id/order_id pairs at the schema level", () => {
+    expect(sql).not.toMatch(
+      /order_id UUID NOT NULL REFERENCES public\.orders\(id\) ON DELETE CASCADE/,
+    );
+    expect(sql).not.toMatch(
+      /store_id UUID NOT NULL REFERENCES public\.stores\(id\) ON DELETE CASCADE/,
+    );
+  });
+});

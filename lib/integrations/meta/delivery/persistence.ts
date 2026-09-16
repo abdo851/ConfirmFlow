@@ -3,6 +3,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createDatabaseClient } from "@/lib/database/client";
 import { buildPurchaseEventId } from "@/lib/conversions/event-id";
+import { getStaleSendingCutoffIso, isStaleSendingDelivery } from "./stale-sending";
 import type { MetaConversionDeliveryRecord } from "./types";
 
 export class MetaDeliveryPersistenceError extends Error {
@@ -70,30 +71,18 @@ export async function ensureMetaPurchaseDeliveryRecord(input: {
   return existing;
 }
 
-export async function claimMetaPurchaseDelivery(input: {
+async function claimPendingOrFailedDelivery(input: {
   deliveryId: string;
-  db?: SupabaseClient;
+  attempts: number;
+  attemptedAt: string;
+  db: SupabaseClient;
 }): Promise<MetaConversionDeliveryRecord | null> {
-  const db = await getDatabaseClient(input.db);
-  const existing = await db
-    .from("meta_conversion_deliveries")
-    .select("*")
-    .eq("id", input.deliveryId)
-    .maybeSingle();
-
-  if (existing.error || !existing.data) {
-    throw new MetaDeliveryPersistenceError("Unable to claim Meta delivery record.");
-  }
-
-  const record = existing.data as MetaConversionDeliveryRecord;
-  const attemptedAt = new Date().toISOString();
-
-  const { data, error } = await db
+  const { data, error } = await input.db
     .from("meta_conversion_deliveries")
     .update({
       status: "sending",
-      attempts: record.attempts + 1,
-      last_attempted_at: attemptedAt,
+      attempts: input.attempts + 1,
+      last_attempted_at: input.attemptedAt,
       last_error: null,
     })
     .eq("id", input.deliveryId)
@@ -106,6 +95,90 @@ export async function claimMetaPurchaseDelivery(input: {
   }
 
   return (data as MetaConversionDeliveryRecord | null) ?? null;
+}
+
+async function reclaimStaleSendingDelivery(input: {
+  deliveryId: string;
+  attempts: number;
+  attemptedAt: string;
+  staleBeforeIso: string;
+  hasLastAttemptedAt: boolean;
+  db: SupabaseClient;
+}): Promise<MetaConversionDeliveryRecord | null> {
+  let query = input.db
+    .from("meta_conversion_deliveries")
+    .update({
+      status: "sending",
+      attempts: input.attempts + 1,
+      last_attempted_at: input.attemptedAt,
+      last_error: null,
+    })
+    .eq("id", input.deliveryId)
+    .eq("status", "sending");
+
+  if (input.hasLastAttemptedAt) {
+    query = query.lt("last_attempted_at", input.staleBeforeIso);
+  } else {
+    query = query.is("last_attempted_at", null);
+  }
+
+  const { data, error } = await query.select("*").maybeSingle();
+
+  if (error) {
+    throw new MetaDeliveryPersistenceError("Unable to reclaim stale Meta delivery record.");
+  }
+
+  return (data as MetaConversionDeliveryRecord | null) ?? null;
+}
+
+/**
+ * Atomically claims a delivery for send.
+ * Reclaims stale sending rows using the same event_id (Meta deduplicates by event_id).
+ */
+export async function claimMetaPurchaseDelivery(input: {
+  deliveryId: string;
+  now?: number;
+  db?: SupabaseClient;
+}): Promise<MetaConversionDeliveryRecord | null> {
+  const db = await getDatabaseClient(input.db);
+  const now = input.now ?? Date.now();
+  const attemptedAt = new Date(now).toISOString();
+
+  const existing = await db
+    .from("meta_conversion_deliveries")
+    .select("*")
+    .eq("id", input.deliveryId)
+    .maybeSingle();
+
+  if (existing.error || !existing.data) {
+    throw new MetaDeliveryPersistenceError("Unable to claim Meta delivery record.");
+  }
+
+  const record = existing.data as MetaConversionDeliveryRecord;
+
+  const claimed = await claimPendingOrFailedDelivery({
+    deliveryId: input.deliveryId,
+    attempts: record.attempts,
+    attemptedAt,
+    db,
+  });
+
+  if (claimed) {
+    return claimed;
+  }
+
+  if (!isStaleSendingDelivery(record, now)) {
+    return null;
+  }
+
+  return reclaimStaleSendingDelivery({
+    deliveryId: input.deliveryId,
+    attempts: record.attempts,
+    attemptedAt,
+    staleBeforeIso: getStaleSendingCutoffIso(now),
+    hasLastAttemptedAt: record.last_attempted_at !== null,
+    db,
+  });
 }
 
 export async function markMetaPurchaseDeliverySent(input: {

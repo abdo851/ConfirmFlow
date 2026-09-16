@@ -7,6 +7,12 @@ const METHOD_NOT_ALLOWED = NextResponse.json(
   { status: 405 },
 );
 
+const DELIVERY_PROCESSING_FAILED_MESSAGE =
+  "Meta Purchase delivery could not be completed.";
+
+const DELIVERY_RECONCILE_FAILED_MESSAGE =
+  "Meta Purchase delivery record could not be reconciled.";
+
 type PurchaseDeliveryOutcome = NonNullable<
   Awaited<ReturnType<typeof dispatchPurchaseDeliveryAfterConfirmation>>
 >;
@@ -61,6 +67,32 @@ function mapConfirmResultToResponse(
   }
 }
 
+async function runPurchaseDeliveryAfterConfirmation(input: {
+  orderId: string;
+  userId: string;
+}): Promise<PurchaseDeliveryOutcome> {
+  try {
+    const delivery = await dispatchPurchaseDeliveryAfterConfirmation({
+      orderId: input.orderId,
+      userId: input.userId,
+    });
+
+    if (delivery) {
+      return delivery;
+    }
+
+    return {
+      status: "failed",
+      message: DELIVERY_RECONCILE_FAILED_MESSAGE,
+    };
+  } catch {
+    return {
+      status: "failed",
+      message: DELIVERY_PROCESSING_FAILED_MESSAGE,
+    };
+  }
+}
+
 export async function POST(
   _request: Request,
   context: { params: Promise<{ id: string }> },
@@ -75,25 +107,25 @@ export async function POST(
     return NextResponse.json({ error: "Invalid order ID" }, { status: 400 });
   }
 
+  let result: Awaited<ReturnType<typeof confirmOrder>>;
   try {
-    const result = await confirmOrder({
+    result = await confirmOrder({
       orderId: orderId.trim(),
       actor: { userId: user.id },
     });
-
-    let delivery: PurchaseDeliveryOutcome | null = null;
-    if (result.status === "confirmed" || result.status === "already_confirmed") {
-      delivery = await dispatchPurchaseDeliveryAfterConfirmation({
-        orderId: result.orderId ?? orderId.trim(),
-        userId: user.id,
-        createIfMissing: result.status === "confirmed",
-      });
-    }
-
-    return mapConfirmResultToResponse(result, delivery);
   } catch {
     return NextResponse.json({ error: "Unable to confirm order" }, { status: 500 });
   }
+
+  let delivery: PurchaseDeliveryOutcome | null = null;
+  if (result.status === "confirmed" || result.status === "already_confirmed") {
+    delivery = await runPurchaseDeliveryAfterConfirmation({
+      orderId: result.orderId ?? orderId.trim(),
+      userId: user.id,
+    });
+  }
+
+  return mapConfirmResultToResponse(result, delivery);
 }
 
 export async function GET() {
