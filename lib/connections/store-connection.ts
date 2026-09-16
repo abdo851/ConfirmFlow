@@ -11,11 +11,9 @@ export async function getStoreConnectionState(): Promise<ConnectionState> {
   return {
     ...base,
     status: shopify.status,
-    description: shopify.shop
-      ? `Connected to ${shopify.shop}`
-      : base.description,
     metadata: {
       provider: "shopify",
+      shopDomain: shopify.shop,
       errorMessage: shopify.errorMessage,
     },
   };

@@ -9,7 +9,10 @@ describe("Auth route protection", () => {
     expect(isProtectedAppPath("/dashboard")).toBe(true);
     expect(isProtectedAppPath("/dashboard/connections")).toBe(true);
     expect(isProtectedAppPath("/onboarding/store")).toBe(true);
-    expect(isProtectedAppPath("/login")).toBe(false);
+    expect(isProtectedAppPath("/en/dashboard")).toBe(true);
+    expect(isProtectedAppPath("/ar/dashboard/connections")).toBe(true);
+    expect(isProtectedAppPath("/ar/onboarding/store")).toBe(true);
+    expect(isProtectedAppPath("/en/login")).toBe(false);
     expect(isProtectedAppPath("/")).toBe(false);
   });
 

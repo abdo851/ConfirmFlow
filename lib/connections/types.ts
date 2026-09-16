@@ -14,6 +14,8 @@ export type ConnectionStatus =
 export interface ConnectionMetadata {
   /** Optional provider identifier for future use (e.g. shopify, meta) */
   provider?: string;
+  /** Optional connected shop domain for store integrations */
+  shopDomain?: string;
   /** Optional human-readable error when status is error */
   errorMessage?: string;
 }

@@ -1,0 +1,37 @@
+{
+  "types": {
+    "store": {
+      "label": "Store",
+      "description": "Shopify is the first supported store provider."
+    },
+    "meta": {
+      "label": "Meta",
+      "description": "Meta Pixel and Conversions API for verified purchase events."
+    },
+    "confirmation": {
+      "label": "Confirmation",
+      "description": "How orders are confirmed before conversions are sent."
+    }
+  },
+  "status": {
+    "not_connected": "Not connected",
+    "not_configured": "Not configured",
+    "connecting": "Connecting",
+    "connected": "Connected",
+    "error": "Error"
+  },
+  "loadingShopify": "Loading Shopify connection...",
+  "storeProvider": "Store provider",
+  "storeProviderLabel": "Store provider: {provider}",
+  "connectedToShop": "Connected to {shop}",
+  "shopify": {
+    "shopDomainLabel": "Shopify shop domain",
+    "shopDomainPlaceholder": "your-store.myshopify.com",
+    "connect": "Connect Shopify",
+    "disconnect": "Disconnect Shopify",
+    "connectedSuccess": "Shopify connected successfully.",
+    "disconnectedSuccess": "Shopify disconnected.",
+    "disconnectFailed": "Unable to disconnect Shopify.",
+    "connectionFailed": "Shopify connection failed. Please try again."
+  }
+}

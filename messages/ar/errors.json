@@ -1,0 +1,12 @@
+{
+  "shopify": {
+    "invalid_shop": "أدخل نطاق متجر Shopify صالحاً.",
+    "invalid_state": "تعذر التحقق من التفويض. يرجى المحاولة مرة أخرى.",
+    "invalid_hmac": "فشل التحقق من استجابة Shopify.",
+    "token_exchange_failed": "فشل تبادل رمز Shopify.",
+    "configuration": "إعداد OAuth لـ Shopify غير صحيح.",
+    "persistence_failed": "تعذر حفظ اتصال Shopify. يرجى المحاولة مرة أخرى.",
+    "unauthorized": "غير مصرح",
+    "statusReadFailed": "تعذر قراءة حالة اتصال Shopify."
+  }
+}

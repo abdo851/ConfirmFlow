@@ -1,8 +1,8 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
-import {
-  getConnectionStatusLabel,
-  getConnectionStatusVariant,
-} from "@/lib/connections/labels";
+import { getConnectionStatusVariant } from "@/lib/connections/labels";
 import type { ConnectionStatus, ConnectionType } from "@/lib/connections/types";
 
 interface ConnectionStatusBadgeProps {
@@ -17,7 +17,11 @@ export function ConnectionStatusBadge({
   type,
   status,
 }: ConnectionStatusBadgeProps) {
-  const label = getConnectionStatusLabel(type, status);
+  const t = useTranslations("connections.status");
+  const label =
+    status === "not_connected" && type === "confirmation"
+      ? t("not_configured")
+      : t(status);
   const variant = getConnectionStatusVariant(status);
 
   if (variant === "error") {

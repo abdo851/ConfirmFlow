@@ -1,19 +1,20 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-
-const navItems = [
-  { label: "Overview", href: "/dashboard" },
-  { label: "Connections", href: "/dashboard/connections" },
-  { label: "Onboarding", href: "/onboarding" },
-] as const;
+import { useTranslations } from "next-intl";
+import { Link, usePathname } from "@/i18n/navigation";
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const t = useTranslations("navigation");
+
+  const navItems = [
+    { label: t("overview"), href: "/dashboard" as const },
+    { label: t("connections"), href: "/dashboard/connections" as const },
+    { label: t("onboarding"), href: "/onboarding" as const },
+  ];
 
   return (
-    <aside className="w-full shrink-0 border-b border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-950 md:w-56 md:border-b-0 md:border-r">
+    <aside className="w-full shrink-0 border-b border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-950 md:w-56 md:border-b-0 md:border-e">
       <nav className="flex gap-1 p-4 md:flex-col">
         {navItems.map((item) => {
           const isActive =

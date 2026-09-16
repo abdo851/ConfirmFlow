@@ -1,6 +1,10 @@
+import { stripLocalePrefix } from "@/lib/i18n/paths";
+
 export function isProtectedAppPath(pathname: string): boolean {
+  const normalized = stripLocalePrefix(pathname);
   return (
-    pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding")
+    normalized.startsWith("/dashboard") ||
+    normalized.startsWith("/onboarding")
   );
 }
 

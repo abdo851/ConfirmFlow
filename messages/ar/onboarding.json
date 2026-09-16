@@ -1,0 +1,53 @@
+{
+  "title": "إعداد Confirma",
+  "description": "أكمل هذه الخطوات الثلاث بالترتيب لتحضير حسابك للتحويلات الموثقة.",
+  "setupSequence": "تسلسل الإعداد",
+  "sequenceSteps": {
+    "store": "اربط متجرك",
+    "meta": "اربط Meta",
+    "confirmation": "إعداد التأكيد"
+  },
+  "startStep1": "ابدأ بالخطوة 1",
+  "openStep": "فتح الخطوة {number}",
+  "backToDashboard": "العودة إلى لوحة التحكم",
+  "stepNavAria": "تقدم الإعداد",
+  "stepNumber": "الخطوة {number}",
+  "stepStates": {
+    "current": "الحالية",
+    "visited": "تمت زيارتها",
+    "upcoming": "قادمة",
+    "notStarted": "لم تبدأ"
+  },
+  "visitedHint": "«تمت زيارتها» تعني أنك فتحت هذه الخطوة. لا تعني أن التكامل متصل.",
+  "connectionStatus": "حالة الاتصال",
+  "noRealIntegration": "لا يوجد تكامل حقيقي متصل في هذه المرحلة.",
+  "whatRemains": "ما تبقى",
+  "remainingStep": "الخطوة {number}: {label}",
+  "finalStepNote": "بعد مراجعة هذه الخطوة، تابع إلى لوحة التحكم. ستظل التكاملات غير متاحة حتى مراحل لاحقة.",
+  "continueToDashboard": "متابعة إلى لوحة التحكم",
+  "steps": {
+    "store": {
+      "label": "اربط متجرك",
+      "shortLabel": "المتجر",
+      "description": "اربط منصة التجارة الإلكترونية لاستقبال أحداث الطلبات.",
+      "connectLabel": "ربط المتجر",
+      "placeholderMessage": "سيكون ربط المتجر متاحاً في مرحلة لاحقة."
+    },
+    "meta": {
+      "label": "اربط Meta",
+      "shortLabel": "Meta",
+      "description": "أضف بيانات Meta Pixel وConversions API.",
+      "connectLabel": "ربط Meta",
+      "placeholderMessage": "سيكون ربط Meta متاحاً في مرحلة لاحقة."
+    },
+    "confirmation": {
+      "label": "إعداد التأكيد",
+      "shortLabel": "التأكيد",
+      "description": "حدد كيفية تأكيد الطلبات قبل إرسال التحويلات.",
+      "connectLabel": "إعداد التأكيد",
+      "placeholderMessage": "سيكون إعداد التأكيد متاحاً في مرحلة لاحقة."
+    }
+  },
+  "overviewTitle": "نظرة عامة على خطوات الإعداد",
+  "overviewDescription": "كل خطوة تُعد جزءاً من مسار Confirma. التكاملات placeholders حتى مراحل لاحقة."
+}

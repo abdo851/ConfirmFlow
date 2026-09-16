@@ -1,30 +1,35 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { Card } from "@/components/ui/card";
 
-const steps = [
-  { label: "Connect store", href: "/onboarding/store", complete: false },
-  { label: "Connect Meta", href: "/onboarding/meta", complete: false },
-  {
-    label: "Configure confirmation",
-    href: "/onboarding/confirmation",
-    complete: false,
-  },
-] as const;
+export async function SetupProgress() {
+  const t = await getTranslations("dashboard");
 
-export function SetupProgress() {
+  const steps = [
+    { label: t("setupSteps.store"), href: "/onboarding/store", complete: false },
+    { label: t("setupSteps.meta"), href: "/onboarding/meta", complete: false },
+    {
+      label: t("setupSteps.confirmation"),
+      href: "/onboarding/confirmation",
+      complete: false,
+    },
+  ] as const;
+
   const completedCount = steps.filter((step) => step.complete).length;
 
   return (
-    <Card
-      title="Setup progress"
-      description="Complete onboarding to configure integrations. None are connected yet."
-    >
+    <Card title={t("setupProgressTitle")} description={t("setupProgressDescription")}>
       <div className="mb-4">
         <div className="mb-2 flex items-center justify-between text-sm">
           <span className="text-neutral-600 dark:text-neutral-400">
-            {completedCount} of {steps.length} integrations configured
+            {t("integrationsConfigured", {
+              completed: completedCount,
+              total: steps.length,
+            })}
           </span>
-          <span className="font-medium">{Math.round((completedCount / steps.length) * 100)}%</span>
+          <span className="font-medium">
+            {Math.round((completedCount / steps.length) * 100)}%
+          </span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
           <div

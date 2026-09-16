@@ -1,0 +1,24 @@
+{
+  "tagline": "Confirma",
+  "heroTitle": "Send Meta only the conversions that matter.",
+  "heroDescription": "Confirma sits between your store and Meta. Only confirmed orders become conversion events — so your ad optimization reflects real purchases, not abandoned checkouts.",
+  "howItWorks": "How it works",
+  "stepsTitle": "Three steps to get started",
+  "stepLabel": "Step {number}",
+  "flowSteps": {
+    "store": "Store",
+    "orderCreated": "Order created",
+    "orderConfirmed": "Order confirmed",
+    "confirma": "Confirma",
+    "metaCapi": "Meta Conversion API"
+  },
+  "setupSteps": {
+    "storeTitle": "Connect your store",
+    "storeDescription": "Link Shopify, WooCommerce, or YouCan to receive orders.",
+    "metaTitle": "Connect Meta",
+    "metaDescription": "Add your Meta Pixel and Conversions API credentials.",
+    "confirmationTitle": "Configure confirmation",
+    "confirmationDescription": "Define how orders are confirmed before conversions are sent."
+  },
+  "footer": "Confirma — verified conversions for Meta"
+}

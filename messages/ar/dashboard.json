@@ -1,0 +1,18 @@
+{
+  "overviewTitle": "نظرة عامة",
+  "overviewDescription": "راقب تقدم الإعداد وحالة الاتصالات لحساب Confirma.",
+  "connectionsTitle": "الاتصالات",
+  "connectionsDescription": "حالة التكاملات لحسابك.",
+  "connectionsManageDescription": "إدارة تكاملات المتجر وMeta والتأكيد.",
+  "setupProgressTitle": "تقدم الإعداد",
+  "setupProgressDescription": "أكمل الإعداد لتكوين التكاملات. لا يوجد أي اتصال بعد.",
+  "integrationsConfigured": "{completed} من {total} تكاملات مُعدّة",
+  "setupSteps": {
+    "store": "ربط المتجر",
+    "meta": "ربط Meta",
+    "confirmation": "إعداد التأكيد"
+  },
+  "recentEventsTitle": "الأحداث الأخيرة",
+  "recentEventsDescription": "ستظهر نشاطات الطلبات والتحويلات هنا في مراحل لاحقة.",
+  "recentEventsEmpty": "لا توجد أحداث بعد."
+}

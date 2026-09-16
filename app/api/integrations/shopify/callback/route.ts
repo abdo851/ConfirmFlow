@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth/session";
+import { getLocalizedPath } from "@/lib/i18n/server-locale";
 import { getShopifyOAuthEnv } from "@/lib/integrations/shopify/env";
 import {
   SHOPIFY_OAUTH_STATE_COOKIE,
@@ -17,11 +18,12 @@ import {
   clearShopifyConnectingFlag,
 } from "@/lib/integrations/shopify/session";
 
-function redirectWithCleanup(
+async function redirectWithCleanup(
   request: Request,
   path: string,
-): NextResponse {
-  const response = NextResponse.redirect(new URL(path, request.url));
+): Promise<NextResponse> {
+  const localizedPath = await getLocalizedPath(path);
+  const response = NextResponse.redirect(new URL(localizedPath, request.url));
   response.cookies.delete(SHOPIFY_OAUTH_STATE_COOKIE);
   return response;
 }

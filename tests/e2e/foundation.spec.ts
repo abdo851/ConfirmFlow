@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test("landing page loads", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/en");
   await expect(
     page.getByRole("heading", {
       name: "Send Meta only the conversions that matter.",

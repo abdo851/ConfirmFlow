@@ -1,6 +1,7 @@
 import "server-only";
 
 import { z } from "zod";
+import { getShopifyOAuthCallbackUrl } from "@/lib/config/urls";
 
 const shopifyOAuthEnvSchema = z.object({
   SHOPIFY_API_KEY: z.string().min(1),
@@ -24,6 +25,5 @@ export function getShopifyOAuthEnv(): ShopifyOAuthEnv {
 }
 
 export function getShopifyRedirectUri(): string {
-  const env = getShopifyOAuthEnv();
-  return `${env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "")}/api/integrations/shopify/callback`;
+  return getShopifyOAuthCallbackUrl();
 }

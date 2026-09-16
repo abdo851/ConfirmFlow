@@ -1,11 +1,10 @@
-import Link from "next/link";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { Link } from "@/i18n/navigation";
 
 type ButtonVariant = "default" | "outline";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
-  asChild?: boolean;
   href?: string;
   children: ReactNode;
 }
@@ -25,6 +24,7 @@ export function Button({
   className = "",
   href,
   children,
+  type = "button",
   ...props
 }: ButtonProps) {
   const classes = `${baseClasses} ${variantClasses[variant]} ${className}`.trim();
@@ -38,7 +38,7 @@ export function Button({
   }
 
   return (
-    <button type="button" className={classes} {...props}>
+    <button type={type} className={classes} {...props}>
       {children}
     </button>
   );

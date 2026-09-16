@@ -1,4 +1,7 @@
-import Link from "next/link";
+"use client";
+
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { onboardingSteps, type OnboardingStepNumber } from "./steps";
 
 type StepVisualState = "current" | "visited" | "upcoming" | "not-started";
@@ -26,16 +29,18 @@ function getStepState(
   return "upcoming";
 }
 
-const stateLabels: Record<StepVisualState, string> = {
-  current: "Current",
-  visited: "Visited",
-  upcoming: "Upcoming",
-  "not-started": "Not started",
-};
-
 export function OnboardingStepNav({ currentStep }: OnboardingStepNavProps) {
+  const t = useTranslations("onboarding");
+
+  const stateLabels = {
+    current: t("stepStates.current"),
+    visited: t("stepStates.visited"),
+    upcoming: t("stepStates.upcoming"),
+    "not-started": t("stepStates.notStarted"),
+  };
+
   return (
-    <nav aria-label="Onboarding progress" className="mb-8">
+    <nav aria-label={t("stepNavAria")} className="mb-8">
       <ol className="grid gap-3 sm:grid-cols-3">
         {onboardingSteps.map((step) => {
           const state = getStepState(step.number, currentStep);
@@ -52,7 +57,7 @@ export function OnboardingStepNav({ currentStep }: OnboardingStepNavProps) {
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
-                    Step {step.number}
+                    {t("stepNumber", { number: step.number })}
                   </p>
                   <Link
                     href={step.href}
@@ -60,7 +65,7 @@ export function OnboardingStepNav({ currentStep }: OnboardingStepNavProps) {
                       state === "current" ? "font-semibold" : "font-medium"
                     }`}
                   >
-                    {step.label}
+                    {t(`steps.${step.stepKey}.label`)}
                   </Link>
                 </div>
                 <span
@@ -80,10 +85,7 @@ export function OnboardingStepNav({ currentStep }: OnboardingStepNavProps) {
         })}
       </ol>
       {currentStep ? (
-        <p className="mt-3 text-xs text-neutral-500">
-          &quot;Visited&quot; means you opened this step. It does not mean the
-          integration is connected.
-        </p>
+        <p className="mt-3 text-xs text-neutral-500">{t("visitedHint")}</p>
       ) : null}
     </nav>
   );

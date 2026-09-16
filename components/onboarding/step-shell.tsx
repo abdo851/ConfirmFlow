@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import type { ReactNode } from "react";
 import { ConnectionStatusBadge } from "@/components/connections";
 import { Button } from "@/components/ui/button";
@@ -20,17 +21,19 @@ interface OnboardingStepShellProps {
   connectOverride?: ReactNode;
 }
 
-export function OnboardingStepShell({
+export async function OnboardingStepShell({
   currentStep,
   children,
   connectOverride,
 }: OnboardingStepShellProps) {
+  const t = await getTranslations("onboarding");
+  const common = await getTranslations("common");
   const step = getOnboardingStep(currentStep);
   const connection = getDefaultConnectionState(step.connectionType);
   const backHref = getPreviousStepHref(currentStep);
   const nextHref = getNextStepHref(currentStep) ?? "/dashboard";
-  const nextLabel =
-    currentStep === 3 ? "Continue to dashboard" : "Continue";
+  const continueLabel =
+    currentStep === 3 ? t("continueToDashboard") : common("continue");
   const remainingSteps = onboardingSteps.filter(
     (item) => item.number > currentStep,
   );
@@ -39,14 +42,14 @@ export function OnboardingStepShell({
     <div>
       <OnboardingStepNav currentStep={currentStep} />
       <Card
-        title={`Step ${step.number} — ${step.label}`}
-        description={step.description}
+        title={`${t("stepNumber", { number: step.number })} — ${t(`steps.${step.stepKey}.label`)}`}
+        description={t(`steps.${step.stepKey}.description`)}
       >
         <div className="flex items-start justify-between gap-4 rounded-md border border-neutral-200 px-4 py-3 dark:border-neutral-800">
           <div>
-            <p className="text-sm font-medium">Connection status</p>
+            <p className="text-sm font-medium">{t("connectionStatus")}</p>
             <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-              No real integration is connected in this milestone.
+              {t("noRealIntegration")}
             </p>
           </div>
           <ConnectionStatusBadge
@@ -60,19 +63,22 @@ export function OnboardingStepShell({
         <div className="mt-6">
           {connectOverride ?? (
             <ConnectPlaceholderButton
-              label={step.connectLabel}
-              message={step.placeholderMessage}
+              label={t(`steps.${step.stepKey}.connectLabel`)}
+              message={t(`steps.${step.stepKey}.placeholderMessage`)}
             />
           )}
         </div>
 
         {remainingSteps.length > 0 ? (
           <div className="mt-6 rounded-md border border-dashed border-neutral-300 px-4 py-3 dark:border-neutral-700">
-            <p className="text-sm font-medium">What remains</p>
+            <p className="text-sm font-medium">{t("whatRemains")}</p>
             <ul className="mt-2 space-y-1 text-sm text-neutral-600 dark:text-neutral-400">
               {remainingSteps.map((item) => (
                 <li key={item.href}>
-                  Step {item.number}: {item.label}
+                  {t("remainingStep", {
+                    number: item.number,
+                    label: t(`steps.${item.stepKey}.label`),
+                  })}
                 </li>
               ))}
             </ul>
@@ -80,17 +86,16 @@ export function OnboardingStepShell({
         ) : (
           <div className="mt-6 rounded-md border border-dashed border-neutral-300 px-4 py-3 dark:border-neutral-700">
             <p className="text-sm text-neutral-600 dark:text-neutral-400">
-              After reviewing this step, continue to your dashboard. Integrations
-              will remain unavailable until future milestones.
+              {t("finalStepNote")}
             </p>
           </div>
         )}
 
         <div className="mt-8 flex items-center justify-between gap-4 border-t border-neutral-200 pt-6 dark:border-neutral-800">
           <Link href={backHref} className="text-sm underline">
-            Back
+            {common("back")}
           </Link>
-          <Button href={nextHref}>{nextLabel}</Button>
+          <Button href={nextHref}>{continueLabel}</Button>
         </div>
       </Card>
     </div>

@@ -1,0 +1,37 @@
+{
+  "types": {
+    "store": {
+      "label": "المتجر",
+      "description": "Shopify هو أول مزود متجر مدعوم."
+    },
+    "meta": {
+      "label": "Meta",
+      "description": "Meta Pixel وConversions API لأحداث الشراء الموثقة."
+    },
+    "confirmation": {
+      "label": "التأكيد",
+      "description": "كيفية تأكيد الطلبات قبل إرسال التحويلات."
+    }
+  },
+  "status": {
+    "not_connected": "غير متصل",
+    "not_configured": "غير مُعد",
+    "connecting": "جارٍ الاتصال",
+    "connected": "متصل",
+    "error": "خطأ"
+  },
+  "loadingShopify": "جارٍ تحميل اتصال Shopify...",
+  "storeProvider": "مزود المتجر",
+  "storeProviderLabel": "مزود المتجر: {provider}",
+  "connectedToShop": "متصل بـ {shop}",
+  "shopify": {
+    "shopDomainLabel": "نطاق متجر Shopify",
+    "shopDomainPlaceholder": "your-store.myshopify.com",
+    "connect": "ربط Shopify",
+    "disconnect": "قطع اتصال Shopify",
+    "connectedSuccess": "تم ربط Shopify بنجاح.",
+    "disconnectedSuccess": "تم قطع اتصال Shopify.",
+    "disconnectFailed": "تعذر قطع اتصال Shopify.",
+    "connectionFailed": "فشل ربط Shopify. يرجى المحاولة مرة أخرى."
+  }
+}

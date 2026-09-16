@@ -3,36 +3,21 @@ import type { ConnectionType } from "@/lib/connections";
 export const onboardingSteps = [
   {
     number: 1 as const,
-    label: "Connect your store",
-    shortLabel: "Store",
+    stepKey: "store",
     connectionType: "store" as ConnectionType,
-    description: "Link your e-commerce platform to receive order events.",
     href: "/onboarding/store",
-    connectLabel: "Connect store",
-    placeholderMessage:
-      "Store connection will be available in a future milestone.",
   },
   {
     number: 2 as const,
-    label: "Connect Meta",
-    shortLabel: "Meta",
+    stepKey: "meta",
     connectionType: "meta" as ConnectionType,
-    description: "Add Meta Pixel and Conversions API credentials.",
     href: "/onboarding/meta",
-    connectLabel: "Connect Meta",
-    placeholderMessage:
-      "Meta connection will be available in a future milestone.",
   },
   {
     number: 3 as const,
-    label: "Configure confirmation",
-    shortLabel: "Confirmation",
+    stepKey: "confirmation",
     connectionType: "confirmation" as ConnectionType,
-    description: "Set how orders are confirmed before conversions are sent.",
     href: "/onboarding/confirmation",
-    connectLabel: "Configure confirmation",
-    placeholderMessage:
-      "Confirmation setup will be available in a future milestone.",
   },
 ] as const;
 
@@ -47,9 +32,7 @@ export function getNextStepHref(stepNumber: OnboardingStepNumber): string | null
   return next?.href ?? null;
 }
 
-export function getPreviousStepHref(
-  stepNumber: OnboardingStepNumber,
-): string {
+export function getPreviousStepHref(stepNumber: OnboardingStepNumber): string {
   if (stepNumber === 1) {
     return "/onboarding";
   }

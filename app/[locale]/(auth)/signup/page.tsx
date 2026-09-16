@@ -1,14 +1,9 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { signupAction } from "@/lib/auth/actions";
-
-const ERROR_MESSAGES: Record<string, string> = {
-  missing_fields: "All fields are required.",
-  password_mismatch: "Passwords do not match.",
-  signup_failed: "Unable to create account. Please try again.",
-};
 
 export default async function SignupPage({
   searchParams,
@@ -16,42 +11,43 @@ export default async function SignupPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const params = await searchParams;
+  const t = await getTranslations("auth");
+
   const errorMessage = params.error
-    ? (ERROR_MESSAGES[params.error] ?? "Unable to create account.")
+    ? t(`errors.${params.error}` as "errors.missing_fields", {
+        default: t("errors.genericSignup"),
+      })
     : null;
 
   return (
-    <Card
-      title="Create account"
-      description="Start sending verified conversions to Meta."
-    >
+    <Card title={t("signupTitle")} description={t("signupDescription")}>
       <form
         action={signupAction}
         className="space-y-4"
-        aria-label="Create account form"
+        aria-label={t("signupTitle")}
       >
         <Input
-          label="Email"
+          label={t("email")}
           type="email"
           name="email"
           autoComplete="email"
-          placeholder="you@company.com"
+          placeholder={t("emailPlaceholder")}
           required
         />
         <Input
-          label="Password"
+          label={t("password")}
           type="password"
           name="password"
           autoComplete="new-password"
-          placeholder="••••••••"
+          placeholder={t("passwordPlaceholder")}
           required
         />
         <Input
-          label="Confirm password"
+          label={t("confirmPassword")}
           type="password"
           name="confirmPassword"
           autoComplete="new-password"
-          placeholder="••••••••"
+          placeholder={t("passwordPlaceholder")}
           required
         />
         {errorMessage ? (
@@ -60,15 +56,15 @@ export default async function SignupPage({
           </p>
         ) : null}
         <Button type="submit" className="w-full">
-          Create account
+          {t("createAccount")}
         </Button>
       </form>
       <p className="mt-4 text-sm">
         <span className="text-neutral-600 dark:text-neutral-400">
-          Already have an account?{" "}
+          {t("hasAccount")}{" "}
         </span>
         <Link href="/login" className="underline">
-          Sign in
+          {t("signIn")}
         </Link>
       </p>
     </Card>

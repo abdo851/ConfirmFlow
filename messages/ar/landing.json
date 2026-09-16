@@ -1,0 +1,24 @@
+{
+  "tagline": "Confirma",
+  "heroTitle": "أرسل إلى Meta التحويلات المهمة فقط.",
+  "heroDescription": "Confirma تقف بين متجرك وMeta. فقط الطلبات المؤكدة تصبح أحداث تحويل — لتحسين إعلاناتك بناءً على مشتريات حقيقية وليس سلات متروكة.",
+  "howItWorks": "كيف يعمل",
+  "stepsTitle": "ثلاث خطوات للبدء",
+  "stepLabel": "الخطوة {number}",
+  "flowSteps": {
+    "store": "المتجر",
+    "orderCreated": "إنشاء الطلب",
+    "orderConfirmed": "تأكيد الطلب",
+    "confirma": "Confirma",
+    "metaCapi": "Meta Conversion API"
+  },
+  "setupSteps": {
+    "storeTitle": "اربط متجرك",
+    "storeDescription": "اربط Shopify أو WooCommerce أو YouCan لاستقبال الطلبات.",
+    "metaTitle": "اربط Meta",
+    "metaDescription": "أضف بيانات Meta Pixel وConversions API.",
+    "confirmationTitle": "إعداد التأكيد",
+    "confirmationDescription": "حدد كيفية تأكيد الطلبات قبل إرسال التحويلات."
+  },
+  "footer": "Confirma — تحويلات موثقة لـ Meta"
+}

@@ -1,0 +1,53 @@
+{
+  "title": "Setup Confirma",
+  "description": "Complete these three steps in order to prepare your account for verified conversions.",
+  "setupSequence": "Setup sequence",
+  "sequenceSteps": {
+    "store": "Connect your store",
+    "meta": "Connect Meta",
+    "confirmation": "Configure confirmation"
+  },
+  "startStep1": "Start with Step 1",
+  "openStep": "Open step {number}",
+  "backToDashboard": "Back to dashboard",
+  "stepNavAria": "Onboarding progress",
+  "stepNumber": "Step {number}",
+  "stepStates": {
+    "current": "Current",
+    "visited": "Visited",
+    "upcoming": "Upcoming",
+    "notStarted": "Not started"
+  },
+  "visitedHint": "\"Visited\" means you opened this step. It does not mean the integration is connected.",
+  "connectionStatus": "Connection status",
+  "noRealIntegration": "No real integration is connected in this milestone.",
+  "whatRemains": "What remains",
+  "remainingStep": "Step {number}: {label}",
+  "finalStepNote": "After reviewing this step, continue to your dashboard. Integrations will remain unavailable until future milestones.",
+  "continueToDashboard": "Continue to dashboard",
+  "steps": {
+    "store": {
+      "label": "Connect your store",
+      "shortLabel": "Store",
+      "description": "Link your e-commerce platform to receive order events.",
+      "connectLabel": "Connect store",
+      "placeholderMessage": "Store connection will be available in a future milestone."
+    },
+    "meta": {
+      "label": "Connect Meta",
+      "shortLabel": "Meta",
+      "description": "Add Meta Pixel and Conversions API credentials.",
+      "connectLabel": "Connect Meta",
+      "placeholderMessage": "Meta connection will be available in a future milestone."
+    },
+    "confirmation": {
+      "label": "Configure confirmation",
+      "shortLabel": "Confirmation",
+      "description": "Set how orders are confirmed before conversions are sent.",
+      "connectLabel": "Configure confirmation",
+      "placeholderMessage": "Confirmation setup will be available in a future milestone."
+    }
+  },
+  "overviewTitle": "Overview of setup steps",
+  "overviewDescription": "Each step prepares a part of the Confirma pipeline. Integrations are placeholders until future milestones."
+}

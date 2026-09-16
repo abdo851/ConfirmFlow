@@ -1,0 +1,12 @@
+{
+  "shopify": {
+    "invalid_shop": "Enter a valid Shopify shop domain.",
+    "invalid_state": "Authorization could not be verified. Please try again.",
+    "invalid_hmac": "Shopify callback verification failed.",
+    "token_exchange_failed": "Shopify token exchange failed.",
+    "configuration": "Shopify OAuth is not configured correctly.",
+    "persistence_failed": "Shopify connection could not be saved. Please try again.",
+    "unauthorized": "Unauthorized",
+    "statusReadFailed": "Unable to read Shopify connection status."
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "brand": "Confirma",
+  "back": "Back",
+  "continue": "Continue",
+  "home": "Home",
+  "language": {
+    "english": "English",
+    "arabic": "العربية",
+    "switchLabel": "Language"
+  }
+}
