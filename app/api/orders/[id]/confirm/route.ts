@@ -1,13 +1,34 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth/session";
-import { confirmOrder } from "@/lib/confirmation";
+import { confirmOrder, dispatchPurchaseDeliveryAfterConfirmation } from "@/lib/confirmation";
 
 const METHOD_NOT_ALLOWED = NextResponse.json(
   { error: "Method not allowed" },
   { status: 405 },
 );
 
-function mapConfirmResultToResponse(result: Awaited<ReturnType<typeof confirmOrder>>) {
+type PurchaseDeliveryOutcome = NonNullable<
+  Awaited<ReturnType<typeof dispatchPurchaseDeliveryAfterConfirmation>>
+>;
+
+function buildMetaPurchaseDeliveryResponse(delivery: PurchaseDeliveryOutcome | null) {
+  if (!delivery) {
+    return undefined;
+  }
+
+  return {
+    status: delivery.status,
+    eventId: delivery.eventId,
+    message: delivery.message,
+  };
+}
+
+function mapConfirmResultToResponse(
+  result: Awaited<ReturnType<typeof confirmOrder>>,
+  delivery: PurchaseDeliveryOutcome | null,
+) {
+  const metaPurchaseDelivery = buildMetaPurchaseDeliveryResponse(delivery);
+
   switch (result.status) {
     case "confirmed":
       return NextResponse.json(
@@ -15,6 +36,7 @@ function mapConfirmResultToResponse(result: Awaited<ReturnType<typeof confirmOrd
           status: result.status,
           orderId: result.orderId,
           confirmedAt: result.confirmedAt,
+          metaPurchaseDelivery,
         },
         { status: 200 },
       );
@@ -24,6 +46,7 @@ function mapConfirmResultToResponse(result: Awaited<ReturnType<typeof confirmOrd
           status: result.status,
           orderId: result.orderId,
           confirmedAt: result.confirmedAt,
+          metaPurchaseDelivery,
         },
         { status: 200 },
       );
@@ -58,7 +81,16 @@ export async function POST(
       actor: { userId: user.id },
     });
 
-    return mapConfirmResultToResponse(result);
+    let delivery: PurchaseDeliveryOutcome | null = null;
+    if (result.status === "confirmed" || result.status === "already_confirmed") {
+      delivery = await dispatchPurchaseDeliveryAfterConfirmation({
+        orderId: result.orderId ?? orderId.trim(),
+        userId: user.id,
+        createIfMissing: result.status === "confirmed",
+      });
+    }
+
+    return mapConfirmResultToResponse(result, delivery);
   } catch {
     return NextResponse.json({ error: "Unable to confirm order" }, { status: 500 });
   }

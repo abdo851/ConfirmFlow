@@ -90,7 +90,13 @@ describe("M2-C2 MVP migration SQL", () => {
 describe("Database table constants", () => {
   it("matches MVP table names", () => {
     expect(Object.values(DB_TABLES).sort()).toEqual(
-      [...MVP_TABLES, ...META_TABLES, "store_webhook_events", "orders"].sort(),
+      [
+        ...MVP_TABLES,
+        ...META_TABLES,
+        "meta_conversion_deliveries",
+        "store_webhook_events",
+        "orders",
+      ].sort(),
     );
   });
 

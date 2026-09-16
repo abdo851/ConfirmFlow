@@ -3,17 +3,23 @@ import { POST } from "@/app/api/orders/[id]/confirm/route";
 
 const ORDER_ID = "11111111-1111-1111-1111-111111111111";
 
+const mockConfirmOrder = vi.fn();
+const mockDispatchPurchaseDeliveryAfterConfirmation = vi.fn();
+
 vi.mock("@/lib/auth/session", () => ({
   getAuthenticatedUser: vi.fn(),
 }));
 
-vi.mock("@/lib/confirmation/confirm-order", () => ({
-  confirmOrder: vi.fn(),
+vi.mock("@/lib/confirmation", () => ({
+  confirmOrder: (...args: unknown[]) => mockConfirmOrder(...args),
+  dispatchPurchaseDeliveryAfterConfirmation: (...args: unknown[]) =>
+    mockDispatchPurchaseDeliveryAfterConfirmation(...args),
 }));
 
 describe("POST /api/orders/[id]/confirm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockDispatchPurchaseDeliveryAfterConfirmation.mockResolvedValue(null);
   });
 
   it("rejects unauthenticated confirmation requests", async () => {
@@ -29,15 +35,18 @@ describe("POST /api/orders/[id]/confirm", () => {
 
   it("returns confirmed for a successful merchant confirmation", async () => {
     const { getAuthenticatedUser } = await import("@/lib/auth/session");
-    const { confirmOrder } = await import("@/lib/confirmation/confirm-order");
 
     vi.mocked(getAuthenticatedUser).mockResolvedValue({
       id: "user_1",
     } as never);
-    vi.mocked(confirmOrder).mockResolvedValue({
+    mockConfirmOrder.mockResolvedValue({
       status: "confirmed",
       orderId: ORDER_ID,
       confirmedAt: "2024-06-02T10:00:00.000Z",
+    });
+    mockDispatchPurchaseDeliveryAfterConfirmation.mockResolvedValue({
+      status: "sent",
+      eventId: `purchase:${ORDER_ID}`,
     });
 
     const response = await POST(new Request("http://localhost"), {
@@ -50,21 +59,29 @@ describe("POST /api/orders/[id]/confirm", () => {
       status: "confirmed",
       orderId: ORDER_ID,
       confirmedAt: "2024-06-02T10:00:00.000Z",
+      metaPurchaseDelivery: {
+        status: "sent",
+        eventId: `purchase:${ORDER_ID}`,
+      },
     });
-    expect(confirmOrder).toHaveBeenCalledWith({
+    expect(mockConfirmOrder).toHaveBeenCalledWith({
       orderId: ORDER_ID,
       actor: { userId: "user_1" },
+    });
+    expect(mockDispatchPurchaseDeliveryAfterConfirmation).toHaveBeenCalledWith({
+      orderId: ORDER_ID,
+      userId: "user_1",
+      createIfMissing: true,
     });
   });
 
   it("does not accept confirmation_status or confirmed_at from the client body", async () => {
     const { getAuthenticatedUser } = await import("@/lib/auth/session");
-    const { confirmOrder } = await import("@/lib/confirmation/confirm-order");
 
     vi.mocked(getAuthenticatedUser).mockResolvedValue({
       id: "user_1",
     } as never);
-    vi.mocked(confirmOrder).mockResolvedValue({
+    mockConfirmOrder.mockResolvedValue({
       status: "confirmed",
       orderId: ORDER_ID,
       confirmedAt: "2024-06-02T10:00:00.000Z",
@@ -84,7 +101,7 @@ describe("POST /api/orders/[id]/confirm", () => {
       },
     );
 
-    expect(confirmOrder).toHaveBeenCalledWith({
+    expect(mockConfirmOrder).toHaveBeenCalledWith({
       orderId: ORDER_ID,
       actor: { userId: "user_1" },
     });

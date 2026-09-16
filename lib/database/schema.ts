@@ -25,6 +25,10 @@ export const META_TABLES = [
   "meta_connection_secrets",
 ] as const;
 
+export const META_DELIVERY_MIGRATION_FILE = "008_meta_purchase_delivery.sql";
+
+export const META_DELIVERY_TABLES = ["meta_conversion_deliveries"] as const;
+
 export const SERVER_ONLY_TABLES = [
   "shopify_connection_secrets",
   "meta_connection_secrets",

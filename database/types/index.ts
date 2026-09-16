@@ -88,6 +88,23 @@ export interface MetaConnection {
   updated_at: string;
 }
 
+/** Meta Purchase delivery record — no access tokens or raw responses */
+export interface MetaConversionDelivery {
+  id: string;
+  store_id: string;
+  order_id: string;
+  provider: "meta";
+  event_type: "Purchase";
+  event_id: string;
+  status: "pending" | "sending" | "sent" | "failed";
+  attempts: number;
+  last_attempted_at: string | null;
+  sent_at: string | null;
+  last_error: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 /** Server-only encrypted Meta token storage */
 export interface MetaConnectionSecret {
   store_connection_id: string;

@@ -22,6 +22,12 @@ export {
   persistMetaConnectionForUser,
   persistMetaVerificationResult,
 } from "./persistence";
+export { processMetaPurchaseDelivery } from "./delivery/deliver-purchase";
+export type {
+  MetaConversionDeliveryStatus,
+  MetaPurchaseDeliveryOutcome,
+  MetaPurchaseDeliveryOutcomeStatus,
+} from "./delivery/types";
 export { verifyMetaConnectionForUser } from "./verification/verify-connection";
 export { verifyMetaCredentials } from "./verification/verify-credentials";
 export type {

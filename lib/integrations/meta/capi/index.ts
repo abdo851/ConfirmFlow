@@ -1,5 +1,6 @@
 export { META_GRAPH_API_VERSION, buildMetaCapiEventsUrl } from "./config";
 export { MetaCapiClient, type MetaCapiTransport } from "./client";
+export { defaultMetaCapiTransport } from "./transport";
 export {
   hashConversionUserDataForMeta,
   hashMetaEmail,
