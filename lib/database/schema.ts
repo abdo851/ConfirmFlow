@@ -27,6 +27,12 @@ export const WEBHOOK_MIGRATION_FILE = "003_shopify_webhook_ingestion.sql";
 
 export const WEBHOOK_TABLES = ["store_webhook_events"] as const;
 
+export const ORDER_MIGRATION_FILE = "004_shopify_order_ingestion.sql";
+
+export const ORDER_TABLES = ["orders"] as const;
+
+export const USER_READABLE_ORDER_TABLES = ["orders"] as const;
+
 export function readMvpMigrationSql(): string {
   return readFileSync(
     join(process.cwd(), "database", "migrations", MVP_MIGRATION_FILE),

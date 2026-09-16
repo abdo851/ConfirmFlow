@@ -18,14 +18,14 @@ export type PersistWebhookEventOutcome =
   | { outcome: "created"; eventId: string }
   | { outcome: "duplicate"; eventId: string };
 
-export async function persistWebhookEvent(
+export async function findExistingWebhookEvent(
   db: SupabaseClient,
-  input: PersistWebhookEventInput,
-): Promise<PersistWebhookEventOutcome> {
-  const receivedAt = (input.receivedAt ?? new Date()).toISOString();
-  const processedAt = input.processedAt?.toISOString() ?? receivedAt;
-
-  const { data: existing, error: existingError } = await db
+  input: Pick<
+    PersistWebhookEventInput,
+    "storeId" | "provider" | "externalEventId"
+  >,
+): Promise<string | null> {
+  const { data: existing, error } = await db
     .from("store_webhook_events")
     .select("id")
     .eq("store_id", input.storeId)
@@ -33,12 +33,28 @@ export async function persistWebhookEvent(
     .eq("external_event_id", input.externalEventId)
     .maybeSingle();
 
-  if (existingError) {
+  if (error) {
     throw new Error("Unable to verify webhook idempotency.");
   }
 
-  if (existing) {
-    return { outcome: "duplicate", eventId: existing.id };
+  return existing?.id ?? null;
+}
+
+export async function persistWebhookEvent(
+  db: SupabaseClient,
+  input: PersistWebhookEventInput,
+): Promise<PersistWebhookEventOutcome> {
+  const receivedAt = (input.receivedAt ?? new Date()).toISOString();
+  const processedAt = input.processedAt?.toISOString() ?? receivedAt;
+
+  const existingEventId = await findExistingWebhookEvent(db, {
+    storeId: input.storeId,
+    provider: input.provider,
+    externalEventId: input.externalEventId,
+  });
+
+  if (existingEventId) {
+    return { outcome: "duplicate", eventId: existingEventId };
   }
 
   const { data: inserted, error: insertError } = await db

@@ -6,11 +6,13 @@ import { ingestShopifyWebhook } from "@/lib/integrations/shopify/webhooks/ingest
 import { POST, GET } from "@/app/api/integrations/shopify/webhooks/route";
 import { isShopifyWebhookPath } from "@/lib/auth/protection";
 import { buildShopifyWebhookUrl } from "@/lib/config/app-url";
+import { buildShopifyOrderBody } from "../fixtures/shopify-order";
 
 const TEST_SECRET = "shopify-test-secret";
 const STORE_ID = "11111111-1111-1111-1111-111111111111";
 const OWNER_ID = "22222222-2222-2222-2222-222222222222";
 const EVENT_ID = "33333333-3333-3333-3333-333333333333";
+const ORDER_ID = "44444444-4444-4444-4444-444444444444";
 
 vi.mock("@/lib/integrations/shopify/env", () => ({
   getShopifyOAuthEnv: () => ({
@@ -39,9 +41,11 @@ function buildHeaders(input: {
 function createMockDb(options: {
   connected?: boolean;
   existingEventIds?: string[];
+  existingOrders?: string[];
 }) {
   const connected = options.connected ?? true;
   const existingEventIds = new Set(options.existingEventIds ?? []);
+  const existingOrders = new Set(options.existingOrders ?? []);
 
   return {
     from(table: string) {
@@ -88,6 +92,46 @@ function createMockDb(options: {
             }),
           }),
         };
+      }
+
+      if (table === "orders") {
+        const filters: Record<string, string> = {};
+
+        const builder = {
+          select: () => builder,
+          eq(field: string, value: string) {
+            filters[field] = value;
+            return builder;
+          },
+          maybeSingle: async () => {
+            const externalOrderId = filters.external_order_id;
+            const exists = externalOrderId
+              ? existingOrders.has(externalOrderId)
+              : false;
+
+            return {
+              data: exists ? { id: ORDER_ID } : null,
+              error: null,
+            };
+          },
+          insert: (row: { external_order_id: string }) => ({
+            select: () => ({
+              single: async () => {
+                if (existingOrders.has(row.external_order_id)) {
+                  return {
+                    data: null,
+                    error: { code: "23505", message: "duplicate" },
+                  };
+                }
+
+                existingOrders.add(row.external_order_id);
+                return { data: { id: ORDER_ID }, error: null };
+              },
+            }),
+          }),
+        };
+
+        return builder;
       }
 
       if (table === "store_webhook_events") {
@@ -152,7 +196,7 @@ describe("Shopify webhook ingestion", () => {
   });
 
   it("accepts a first webhook for a known shop", async () => {
-    const body = JSON.stringify({ id: 1001 });
+    const body = buildShopifyOrderBody();
     const result = await ingestShopifyWebhook({
       rawBody: body,
       headers: buildHeaders({ body }),
@@ -162,10 +206,11 @@ describe("Shopify webhook ingestion", () => {
     expect(result.httpStatus).toBe(200);
     expect(result.status).toBe("accepted");
     expect(result.eventId).toBe(EVENT_ID);
+    expect(result.orderId).toBe(ORDER_ID);
   });
 
   it("detects duplicate webhook IDs", async () => {
-    const body = JSON.stringify({ id: 1001 });
+    const body = buildShopifyOrderBody();
     const result = await ingestShopifyWebhook({
       rawBody: body,
       headers: buildHeaders({ body, webhookId: "wh_123" }),
@@ -177,7 +222,7 @@ describe("Shopify webhook ingestion", () => {
   });
 
   it("accepts a different webhook ID for the same shop", async () => {
-    const body = JSON.stringify({ id: 1002 });
+    const body = buildShopifyOrderBody({ id: 1002 });
     const result = await ingestShopifyWebhook({
       rawBody: body,
       headers: buildHeaders({ body, webhookId: "wh_456" }),
@@ -189,7 +234,7 @@ describe("Shopify webhook ingestion", () => {
   });
 
   it("rejects invalid HMAC signatures", async () => {
-    const body = JSON.stringify({ id: 1001 });
+    const body = buildShopifyOrderBody();
     const result = await ingestShopifyWebhook({
       rawBody: body,
       headers: buildHeaders({ body, hmac: "invalid" }),
@@ -201,7 +246,7 @@ describe("Shopify webhook ingestion", () => {
   });
 
   it("rejects missing webhook ID header", async () => {
-    const body = JSON.stringify({ id: 1001 });
+    const body = buildShopifyOrderBody();
     const headers = {
       "X-Shopify-Hmac-SHA256": signShopifyWebhookBody(body, TEST_SECRET),
       "X-Shopify-Shop-Domain": "demo.myshopify.com",
@@ -219,7 +264,7 @@ describe("Shopify webhook ingestion", () => {
   });
 
   it("rejects unknown shops", async () => {
-    const body = JSON.stringify({ id: 1001 });
+    const body = buildShopifyOrderBody();
     const result = await ingestShopifyWebhook({
       rawBody: body,
       headers: buildHeaders({ body, shopDomain: "unknown.myshopify.com" }),
@@ -243,7 +288,7 @@ describe("Shopify webhook ingestion", () => {
   });
 
   it("does not expose secrets in API responses", async () => {
-    const body = JSON.stringify({ id: 1001 });
+    const body = buildShopifyOrderBody();
     const request = new Request("http://localhost/api/integrations/shopify/webhooks", {
       method: "POST",
       headers: buildHeaders({ body }),
@@ -256,6 +301,7 @@ describe("Shopify webhook ingestion", () => {
     ).mockResolvedValueOnce({
       status: "accepted",
       eventId: EVENT_ID,
+      orderId: ORDER_ID,
       httpStatus: 200,
     });
 
@@ -264,7 +310,11 @@ describe("Shopify webhook ingestion", () => {
 
     expect(JSON.stringify(payload)).not.toContain(TEST_SECRET);
     expect(JSON.stringify(payload)).not.toContain("shpat_");
-    expect(payload).toEqual({ status: "accepted", eventId: EVENT_ID });
+    expect(payload).toEqual({
+      status: "accepted",
+      eventId: EVENT_ID,
+      orderId: ORDER_ID,
+    });
   });
 
   it("accepts POST and rejects unsupported methods", async () => {

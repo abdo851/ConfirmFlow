@@ -1,8 +1,13 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getShopifyOAuthEnv } from "@/lib/integrations/shopify/env";
 import { normalizeShopDomain } from "@/lib/integrations/shopify/oauth/shop-domain";
-import { persistWebhookEvent } from "@/lib/webhooks/ingestion";
+import {
+  findExistingWebhookEvent,
+  persistWebhookEvent,
+} from "@/lib/webhooks/ingestion";
 import type { WebhookIngestionResult } from "@/lib/webhooks/ingestion";
+import { SHOPIFY_ORDER_CREATE_TOPIC } from "./constants";
+import { processShopifyOrderCreateWebhook } from "./handlers/order-create";
 import { parseShopifyWebhookHeaders } from "./headers";
 import { verifyShopifyWebhookHmac } from "./hmac";
 import { normalizeShopifyWebhookEvent } from "./normalize";
@@ -85,6 +90,40 @@ export async function ingestShopifyWebhook(
   const topicStatus = classifyShopifyWebhookTopic(normalizedEvent.topic);
 
   try {
+    const existingWebhookEventId = await findExistingWebhookEvent(db, {
+      storeId: normalizedEvent.storeId,
+      provider: normalizedEvent.provider,
+      externalEventId: normalizedEvent.externalEventId,
+    });
+
+    if (existingWebhookEventId) {
+      return {
+        status: "duplicate",
+        eventId: existingWebhookEventId,
+        httpStatus: 200,
+      };
+    }
+
+    let orderId: string | undefined;
+
+    if (normalizedEvent.topic === SHOPIFY_ORDER_CREATE_TOPIC) {
+      const orderResult = await processShopifyOrderCreateWebhook({
+        rawBody: input.rawBody,
+        normalizedEvent,
+        db,
+      });
+
+      if (!orderResult.ok) {
+        return rejection(
+          "rejected",
+          orderResult.httpStatus,
+          orderResult.reason,
+        );
+      }
+
+      orderId = orderResult.orderId;
+    }
+
     const persistResult = await persistWebhookEvent(db, {
       storeId: normalizedEvent.storeId,
       provider: normalizedEvent.provider,
@@ -102,6 +141,7 @@ export async function ingestShopifyWebhook(
         status: "duplicate",
         eventId: persistResult.eventId,
         httpStatus: 200,
+        orderId,
       };
     }
 
@@ -109,6 +149,7 @@ export async function ingestShopifyWebhook(
       status: topicStatus,
       eventId: persistResult.eventId,
       httpStatus: 200,
+      orderId,
     };
   } catch {
     return rejection("rejected", 500, "persistence_failed");

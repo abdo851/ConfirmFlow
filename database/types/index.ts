@@ -20,6 +20,8 @@ export type WebhookIngestionStatus =
   | "rejected";
 
 export type WebhookProvider = "shopify";
+export type OrderProvider = "shopify";
+export type OrderConfirmationStatus = "pending";
 
 export interface Profile {
   id: string;
@@ -65,6 +67,27 @@ export interface ShopifyConnection {
 export interface ShopifyConnectionSecret {
   store_connection_id: string;
   encrypted_access_token: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Normalized order — no raw provider payload */
+export interface Order {
+  id: string;
+  store_id: string;
+  owner_id: string;
+  provider: OrderProvider;
+  external_order_id: string;
+  order_number: string | null;
+  customer_email: string | null;
+  customer_phone: string | null;
+  currency: string;
+  subtotal_amount_minor: number;
+  total_amount_minor: number;
+  financial_status: string | null;
+  confirmation_status: OrderConfirmationStatus;
+  provider_created_at: string | null;
+  received_at: string;
   created_at: string;
   updated_at: string;
 }

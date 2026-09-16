@@ -51,8 +51,31 @@ export class ShopifyAdapter implements StoreAdapter {
   }
 
   async normalizeOrder(rawPayload: unknown): Promise<ExternalOrder> {
-    void rawPayload;
-    throw new Error("Shopify order normalization is not implemented yet.");
+    const { parseShopifyOrderPayload, normalizeShopifyOrder } = await import(
+      "@/lib/integrations/shopify/orders"
+    );
+
+    const parsed = parseShopifyOrderPayload(
+      typeof rawPayload === "string"
+        ? rawPayload
+        : JSON.stringify(rawPayload),
+    );
+
+    if (!parsed.ok) {
+      throw new Error(parsed.reason);
+    }
+
+    const normalized = normalizeShopifyOrder(parsed.payload, {
+      storeId: "unknown",
+      ownerId: "unknown",
+      receivedAt: new Date(),
+    });
+
+    return {
+      externalId: normalized.externalOrderId,
+      storeId: normalized.storeId,
+      rawPayload: normalized,
+    };
   }
 
   async registerWebhooks(storeId: string): Promise<void> {

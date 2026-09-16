@@ -1,4 +1,4 @@
-export { persistWebhookEvent } from "./persist";
+export { findExistingWebhookEvent, persistWebhookEvent } from "./persist";
 export type {
   NormalizedWebhookEvent,
   WebhookIngestionResult,

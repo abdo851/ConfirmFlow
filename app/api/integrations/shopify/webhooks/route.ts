@@ -18,6 +18,7 @@ export async function POST(request: Request) {
       : {
           status: result.status,
           ...(result.eventId ? { eventId: result.eventId } : {}),
+          ...(result.orderId ? { orderId: result.orderId } : {}),
         };
 
   return NextResponse.json(body, { status: result.httpStatus });

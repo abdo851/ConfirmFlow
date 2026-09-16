@@ -21,6 +21,7 @@ export interface NormalizedWebhookEvent {
 export interface WebhookIngestionResult {
   status: WebhookIngestionStatus;
   eventId?: string;
+  orderId?: string;
   httpStatus: number;
   message?: string;
 }
