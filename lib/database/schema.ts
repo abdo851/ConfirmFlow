@@ -33,6 +33,9 @@ export const ORDER_TABLES = ["orders"] as const;
 
 export const USER_READABLE_ORDER_TABLES = ["orders"] as const;
 
+export const CONFIRMATION_MIGRATION_FILE =
+  "005_confirmation_engine_foundation.sql";
+
 export function readMvpMigrationSql(): string {
   return readFileSync(
     join(process.cwd(), "database", "migrations", MVP_MIGRATION_FILE),

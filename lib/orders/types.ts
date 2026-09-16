@@ -5,8 +5,8 @@
 
 export type OrderProvider = "shopify";
 
-/** M3-B only supports pending — future milestones extend transitions. */
-export type OrderConfirmationStatus = "pending";
+/** Confirmation lifecycle states for Confirma orders. */
+export type OrderConfirmationStatus = "pending" | "confirmed";
 
 export interface ConfirmaOrderInput {
   storeId: string;
@@ -30,6 +30,7 @@ export interface ConfirmaOrderInput {
 
 export interface ConfirmaOrder extends ConfirmaOrderInput {
   id: string;
+  confirmedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }

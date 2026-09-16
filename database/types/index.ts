@@ -21,7 +21,7 @@ export type WebhookIngestionStatus =
 
 export type WebhookProvider = "shopify";
 export type OrderProvider = "shopify";
-export type OrderConfirmationStatus = "pending";
+export type OrderConfirmationStatus = "pending" | "confirmed";
 
 export interface Profile {
   id: string;
@@ -86,6 +86,7 @@ export interface Order {
   total_amount_minor: number;
   financial_status: string | null;
   confirmation_status: OrderConfirmationStatus;
+  confirmed_at: string | null;
   provider_created_at: string | null;
   received_at: string;
   created_at: string;
