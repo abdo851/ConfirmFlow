@@ -10,6 +10,17 @@ All schema changes must be versioned through numbered SQL migration files in thi
 4. Apply migrations in order (`001_`, `002_`, …).
 5. Each migration should be idempotent where possible (`IF NOT EXISTS`).
 
+## Current MVP Schema
+
+- `002_mvp_database_foundation.sql` — **active MVP schema** (profiles, stores, store_connections, shopify_connections, shopify_connection_secrets)
+- `001_initial_schema.sql` — historical M0 design; **do not apply** (superseded by 002)
+
 ## Applying Migrations
 
-Use the Supabase CLI or dashboard SQL editor in development/staging environments only until a formal migration pipeline is approved.
+1. Install the Supabase CLI (`npx supabase` or global install).
+2. Link the project: `npx supabase link --project-ref <ref>`
+3. Push migrations: `npx supabase db push`
+
+Alternatively, run the SQL file against the Confirma database using a privileged connection (database password or service role).
+
+Do not apply schema changes through ad-hoc dashboard edits — use versioned migration files only.

@@ -1,5 +1,6 @@
--- Confirma M0 — Initial schema foundation
--- Apply via Supabase migrations or manual execution in non-production environments.
+-- Confirma M0 — Initial schema foundation (historical reference)
+-- Superseded by 002_mvp_database_foundation.sql for live deployment.
+-- Do NOT apply this migration to the Confirma Supabase project.
 -- NEVER run destructive reset logic against production.
 
 -- users: extends Supabase auth.users with application profile data

@@ -1,13 +1,11 @@
 import "server-only";
 
-import { getServerEnv } from "@/lib/validation/env";
-
 /**
  * Server-only secrets — must never be imported in client components.
+ * Service role key is optional until a future database milestone.
  */
 export function getServerSecrets() {
-  const env = getServerEnv();
   return {
-    supabaseServiceRoleKey: env.SUPABASE_SERVICE_ROLE_KEY,
+    supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY ?? null,
   };
 }
