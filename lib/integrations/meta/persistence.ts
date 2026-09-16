@@ -7,6 +7,10 @@ import { encryptSecret, decryptSecret } from "@/lib/integrations/shopify/oauth";
 import { getMetaEnv } from "./env";
 import { maskPixelId } from "./validation";
 import type { MetaConnectionPublicState } from "./types";
+import type {
+  MetaCredentialVerificationResult,
+  MetaVerificationStatus,
+} from "./verification/types";
 
 export class MetaPersistenceError extends Error {
   constructor(message: string) {
@@ -121,6 +125,8 @@ export async function persistMetaConnectionForUser(input: {
       store_connection_id: storeConnection.id,
       pixel_id: input.pixelId,
       connected_at: connectedAt,
+      verification_status: "unverified",
+      verified_at: null,
       error_message: null,
     },
     { onConflict: "store_connection_id" },
@@ -175,7 +181,9 @@ export async function getMetaConnectionStateForUser(
 
   const { data: metaConnection, error: metaError } = await db
     .from("meta_connections")
-    .select("pixel_id, connected_at, error_message")
+    .select(
+      "pixel_id, connected_at, verification_status, verified_at, error_message",
+    )
     .eq("store_connection_id", storeConnection.id)
     .maybeSingle();
 
@@ -190,8 +198,119 @@ export async function getMetaConnectionStateForUser(
     status,
     pixelId:
       status === "connected" ? maskPixelId(metaConnection.pixel_id) : undefined,
+    verificationStatus:
+      metaConnection.verification_status as MetaVerificationStatus,
+    verifiedAt: metaConnection.verified_at ?? undefined,
     errorMessage: metaConnection.error_message ?? undefined,
   };
+}
+
+export interface MetaVerificationContext {
+  storeConnectionId: string;
+  storeId: string;
+  pixelId: string;
+  accessToken: string;
+}
+
+export async function loadMetaConnectionForVerification(
+  userId: string,
+  storeId?: string,
+): Promise<MetaVerificationContext | null> {
+  const db = createDatabaseClient();
+  const env = getMetaEnv();
+
+  const { data: stores, error: storesError } = await db
+    .from("stores")
+    .select("id")
+    .eq("owner_id", userId);
+
+  if (storesError || !stores?.length) {
+    return null;
+  }
+
+  const ownedStoreIds = stores.map((store) => store.id);
+  if (storeId && !ownedStoreIds.includes(storeId)) {
+    throw new MetaPersistenceError("Store not found.");
+  }
+
+  const targetStoreIds = storeId ? [storeId] : ownedStoreIds;
+
+  const { data: storeConnection, error: connectionError } = await db
+    .from("store_connections")
+    .select("id, store_id, status")
+    .in("store_id", targetStoreIds)
+    .eq("connection_type", "marketing")
+    .eq("provider", "meta")
+    .eq("status", "active")
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (connectionError || !storeConnection) {
+    return null;
+  }
+
+  const { data: metaConnection, error: metaError } = await db
+    .from("meta_connections")
+    .select("pixel_id")
+    .eq("store_connection_id", storeConnection.id)
+    .maybeSingle();
+
+  if (metaError || !metaConnection?.pixel_id) {
+    return null;
+  }
+
+  const { data: secretRow, error: secretError } = await db
+    .from("meta_connection_secrets")
+    .select("encrypted_access_token")
+    .eq("store_connection_id", storeConnection.id)
+    .maybeSingle();
+
+  if (secretError || !secretRow?.encrypted_access_token) {
+    return null;
+  }
+
+  const accessToken = decryptSecret(
+    secretRow.encrypted_access_token,
+    env.META_SESSION_SECRET,
+  );
+
+  if (!accessToken) {
+    return null;
+  }
+
+  return {
+    storeConnectionId: storeConnection.id,
+    storeId: storeConnection.store_id,
+    pixelId: metaConnection.pixel_id,
+    accessToken,
+  };
+}
+
+export async function persistMetaVerificationResult(input: {
+  storeConnectionId: string;
+  result: MetaCredentialVerificationResult;
+}): Promise<void> {
+  const db = createDatabaseClient();
+  const verifiedAt =
+    input.result.status === "verified" ||
+    input.result.status === "credentials_valid" ||
+    input.result.status === "identifier_not_verified"
+      ? new Date().toISOString()
+      : null;
+
+  const { error } = await db
+    .from("meta_connections")
+    .update({
+      verification_status: input.result.status,
+      verified_at: verifiedAt,
+      error_message: input.result.message ?? null,
+    })
+    .eq("store_connection_id", input.storeConnectionId);
+
+  if (error) {
+    throw new MetaPersistenceError("Unable to persist Meta verification state.");
+  }
 }
 
 export async function getMetaAccessTokenForUser(
@@ -282,6 +401,8 @@ export async function disconnectMetaConnectionForUser(
     .from("meta_connections")
     .update({
       connected_at: null,
+      verification_status: "unverified",
+      verified_at: null,
       error_message: null,
     })
     .eq("store_connection_id", storeConnection.id);

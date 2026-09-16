@@ -76,6 +76,13 @@ export interface MetaConnection {
   store_connection_id: string;
   pixel_id: string;
   connected_at: string | null;
+  verification_status:
+    | "unverified"
+    | "verified"
+    | "credentials_valid"
+    | "identifier_not_verified"
+    | "failed";
+  verified_at: string | null;
   error_message: string | null;
   created_at: string;
   updated_at: string;

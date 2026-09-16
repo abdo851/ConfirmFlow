@@ -6,12 +6,34 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ConnectionStatusBadge } from "./connection-status-badge";
 import type { ConnectionStatus } from "@/lib/connections/types";
+import type { MetaVerificationStatus } from "@/lib/integrations/meta/verification/types";
 
 interface MetaStatusResponse {
   provider: "meta";
   pixelId?: string;
   status: ConnectionStatus;
+  verificationStatus?: MetaVerificationStatus;
+  verifiedAt?: string;
   errorMessage?: string;
+}
+
+function verificationMessageKey(
+  status: MetaVerificationStatus | undefined,
+): string | null {
+  switch (status) {
+    case "verified":
+      return "verificationVerified";
+    case "credentials_valid":
+      return "verificationCredentialsValid";
+    case "identifier_not_verified":
+      return "verificationIdentifierNotVerified";
+    case "failed":
+      return "verificationFailed";
+    case "unverified":
+      return "verificationUnverified";
+    default:
+      return null;
+  }
 }
 
 export function MetaConnectForm() {
@@ -26,19 +48,25 @@ export function MetaConnectForm() {
   const [flashMessage, setFlashMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    async function loadStatus() {
-      const response = await fetch("/api/integrations/meta/status");
-      if (response.ok) {
-        setStatus((await response.json()) as MetaStatusResponse);
-      }
+  async function refreshStatus() {
+    const response = await fetch("/api/integrations/meta/status");
+    if (response.ok) {
+      setStatus((await response.json()) as MetaStatusResponse);
     }
+  }
 
-    void loadStatus();
+  useEffect(() => {
+    void refreshStatus();
   }, []);
 
   const canConnect =
     pixelId.trim().length > 0 && accessToken.trim().length > 0 && !isSubmitting;
+
+  const verificationKey = verificationMessageKey(status.verificationStatus);
+  const showVerifyButton =
+    status.status === "connected" &&
+    status.verificationStatus !== "verified" &&
+    !isSubmitting;
 
   return (
     <div className="rounded-md border border-neutral-200 px-4 py-4 dark:border-neutral-800">
@@ -98,12 +126,7 @@ export function MetaConnectForm() {
 
               if (response.ok) {
                 setAccessToken("");
-                const statusResponse = await fetch("/api/integrations/meta/status");
-                if (statusResponse.ok) {
-                  setStatus((await statusResponse.json()) as MetaStatusResponse);
-                } else {
-                  setStatus({ provider: "meta", status: "connected" });
-                }
+                await refreshStatus();
                 setFlashMessage(t("connectedSuccess"));
               } else if (response.status === 409) {
                 setFlashMessage(t("storeRequired"));
@@ -122,32 +145,73 @@ export function MetaConnectForm() {
           <p className="text-sm text-neutral-600 dark:text-neutral-400">
             {t("configuredNote")}
           </p>
-          <Button
-            type="button"
-            variant="outline"
-            disabled={isSubmitting}
-            onClick={async () => {
-              setIsSubmitting(true);
-              setFlashMessage(null);
+          {verificationKey ? (
+            <p
+              className={`text-sm ${
+                status.verificationStatus === "verified"
+                  ? "text-green-700 dark:text-green-400"
+                  : status.verificationStatus === "failed"
+                    ? "text-red-700 dark:text-red-400"
+                    : "text-amber-700 dark:text-amber-400"
+              }`}
+              role="status"
+            >
+              {t(verificationKey)}
+            </p>
+          ) : null}
+          <div className="flex flex-wrap gap-2">
+            {showVerifyButton ? (
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isSubmitting}
+                onClick={async () => {
+                  setIsSubmitting(true);
+                  setFlashMessage(null);
 
-              const response = await fetch("/api/integrations/meta/disconnect", {
-                method: "POST",
-              });
+                  const response = await fetch("/api/integrations/meta/verify", {
+                    method: "POST",
+                  });
 
-              if (response.ok) {
-                setStatus({ provider: "meta", status: "not_connected" });
-                setPixelId("");
-                setAccessToken("");
-                setFlashMessage(t("disconnectedSuccess"));
-              } else {
-                setFlashMessage(t("disconnectFailed"));
-              }
+                  if (response.ok) {
+                    await refreshStatus();
+                  } else {
+                    setFlashMessage(t("verificationFailed"));
+                  }
 
-              setIsSubmitting(false);
-            }}
-          >
-            {t("disconnect")}
-          </Button>
+                  setIsSubmitting(false);
+                }}
+              >
+                {isSubmitting ? t("verifying") : t("verify")}
+              </Button>
+            ) : null}
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isSubmitting}
+              onClick={async () => {
+                setIsSubmitting(true);
+                setFlashMessage(null);
+
+                const response = await fetch("/api/integrations/meta/disconnect", {
+                  method: "POST",
+                });
+
+                if (response.ok) {
+                  setStatus({ provider: "meta", status: "not_connected" });
+                  setPixelId("");
+                  setAccessToken("");
+                  setFlashMessage(t("disconnectedSuccess"));
+                } else {
+                  setFlashMessage(t("disconnectFailed"));
+                }
+
+                setIsSubmitting(false);
+              }}
+            >
+              {t("disconnect")}
+            </Button>
+          </div>
         </div>
       )}
 

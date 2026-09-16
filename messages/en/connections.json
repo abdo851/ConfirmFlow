@@ -49,6 +49,13 @@
     "connectionFailed": "Meta configuration could not be saved. Please try again.",
     "storeRequired": "Connect a store before configuring Meta.",
     "pixelMasked": "Pixel / Dataset: {pixelId}",
-    "configuredNote": "Credentials are saved securely. Meta API verification is not performed in this milestone."
+    "configuredNote": "Credentials are saved securely. Verification runs server-side and never sends conversion events.",
+    "verify": "Verify credentials",
+    "verifying": "Verifying…",
+    "verificationVerified": "Meta credentials verified.",
+    "verificationCredentialsValid": "Meta credentials are valid, but Pixel/Dataset access could not be fully confirmed.",
+    "verificationIdentifierNotVerified": "Meta credentials are valid, but the configured Pixel/Dataset could not be verified.",
+    "verificationFailed": "Meta credential verification failed.",
+    "verificationUnverified": "Credentials saved. Verification has not completed yet."
   }
 }

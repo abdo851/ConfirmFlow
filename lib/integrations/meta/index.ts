@@ -1,5 +1,5 @@
+export { META_GRAPH_API_VERSION } from "./constants";
 export {
-  META_GRAPH_API_VERSION,
   MetaCapiClient,
   buildMetaCapiEventsUrl,
   buildMetaCapiPayload,
@@ -18,8 +18,17 @@ export {
   disconnectMetaConnectionForUser,
   getMetaAccessTokenForUser,
   getMetaConnectionStateForUser,
+  loadMetaConnectionForVerification,
   persistMetaConnectionForUser,
+  persistMetaVerificationResult,
 } from "./persistence";
+export { verifyMetaConnectionForUser } from "./verification/verify-connection";
+export { verifyMetaCredentials } from "./verification/verify-credentials";
+export type {
+  MetaCredentialVerificationResult,
+  MetaGraphTransport,
+  MetaVerificationStatus,
+} from "./verification/types";
 export {
   clearMetaConnection,
   getMetaConnectionPublicState,

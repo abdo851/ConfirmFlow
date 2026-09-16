@@ -4,6 +4,7 @@ import {
   MetaPersistenceError,
   parseMetaConnectionInput,
   persistMetaConnectionForUser,
+  verifyMetaConnectionForUser,
 } from "@/lib/integrations/meta";
 
 export async function POST(request: Request) {
@@ -31,9 +32,13 @@ export async function POST(request: Request) {
       accessToken: parsed.value.accessToken,
     });
 
+    const verification = await verifyMetaConnectionForUser({ userId: user.id });
+
     return NextResponse.json({
       success: true,
       status: "connected",
+      verificationStatus: verification.status,
+      message: verification.message,
     });
   } catch (error) {
     if (error instanceof MetaPersistenceError) {

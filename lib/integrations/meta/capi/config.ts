@@ -1,5 +1,6 @@
-/** Centralized Meta Graph API version for Conversions API. */
-export const META_GRAPH_API_VERSION = "v21.0";
+import { META_GRAPH_API_VERSION } from "../constants";
+
+export { META_GRAPH_API_VERSION };
 
 export function buildMetaCapiEventsUrl(pixelId: string): string {
   const normalizedPixelId = pixelId.trim();
