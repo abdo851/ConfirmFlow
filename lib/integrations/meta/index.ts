@@ -1,3 +1,16 @@
+export {
+  META_GRAPH_API_VERSION,
+  MetaCapiClient,
+  buildMetaCapiEventsUrl,
+  buildMetaCapiPayload,
+  hashConversionUserDataForMeta,
+  hashMetaEmail,
+  hashMetaPhone,
+  normalizeMetaEmail,
+  normalizeMetaPhone,
+  type MetaCapiRequestPayload,
+  type MetaCapiTransport,
+} from "./capi";
 export { getMetaEnv, type MetaEnv } from "./env";
 export {
   MetaPersistenceError,

@@ -17,6 +17,18 @@ const ZERO_DECIMAL_CURRENCIES = new Set([
   "XPF",
 ]);
 
+export function minorUnitsToMajorAmount(
+  amountMinor: number,
+  currency: string,
+): number {
+  const upperCurrency = currency.trim().toUpperCase();
+  if (ZERO_DECIMAL_CURRENCIES.has(upperCurrency)) {
+    return amountMinor;
+  }
+
+  return amountMinor / 100;
+}
+
 export function parseMoneyStringToMinorUnits(
   amount: string,
   currency: string,
