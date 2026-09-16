@@ -38,9 +38,16 @@ export class ShopifyAdapter implements StoreAdapter {
     headers: Record<string, string>,
     body: string,
   ): Promise<boolean> {
-    void headers;
-    void body;
-    return false;
+    const { verifyShopifyWebhookRequest } = await import(
+      "@/lib/integrations/shopify/webhooks/verify-request"
+    );
+    const secret = process.env.SHOPIFY_API_SECRET;
+
+    if (!secret) {
+      return false;
+    }
+
+    return verifyShopifyWebhookRequest(headers, body, secret);
   }
 
   async normalizeOrder(rawPayload: unknown): Promise<ExternalOrder> {

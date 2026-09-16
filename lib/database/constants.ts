@@ -7,6 +7,7 @@ export const DB_TABLES = {
   storeConnections: "store_connections",
   shopifyConnections: "shopify_connections",
   shopifyConnectionSecrets: "shopify_connection_secrets",
+  storeWebhookEvents: "store_webhook_events",
 } as const;
 
 export type DbTableName = (typeof DB_TABLES)[keyof typeof DB_TABLES];

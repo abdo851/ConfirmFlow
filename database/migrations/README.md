@@ -13,6 +13,7 @@ All schema changes must be versioned through numbered SQL migration files in thi
 ## Current MVP Schema
 
 - `002_mvp_database_foundation.sql` — **active MVP schema** (profiles, stores, store_connections, shopify_connections, shopify_connection_secrets)
+- `003_shopify_webhook_ingestion.sql` — **M3-A webhook ingestion** (store_webhook_events idempotency/event records)
 - `001_initial_schema.sql` — historical M0 design; **do not apply** (superseded by 002)
 
 ## Applying Migrations

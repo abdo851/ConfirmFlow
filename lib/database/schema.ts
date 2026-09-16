@@ -18,7 +18,14 @@ export const USER_OWNED_TABLES = [
   "shopify_connections",
 ] as const;
 
-export const SERVER_ONLY_TABLES = ["shopify_connection_secrets"] as const;
+export const SERVER_ONLY_TABLES = [
+  "shopify_connection_secrets",
+  "store_webhook_events",
+] as const;
+
+export const WEBHOOK_MIGRATION_FILE = "003_shopify_webhook_ingestion.sql";
+
+export const WEBHOOK_TABLES = ["store_webhook_events"] as const;
 
 export function readMvpMigrationSql(): string {
   return readFileSync(

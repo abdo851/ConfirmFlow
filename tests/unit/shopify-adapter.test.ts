@@ -40,7 +40,28 @@ describe("Shopify integration foundation", () => {
     expect(connectResult.error).toContain("/api/integrations/shopify/connect");
   });
 
-  it("does not verify webhooks in M2-A", async () => {
-    expect(await shopifyAdapter.verifyWebhook({}, "{}")).toBe(false);
+  it("verifies Shopify webhooks when configured", async () => {
+    const secret = "shopify-test-secret";
+    const body = JSON.stringify({ id: 1 });
+    const { signShopifyWebhookBody } = await import(
+      "@/lib/integrations/shopify/webhooks/hmac"
+    );
+    const hmac = signShopifyWebhookBody(body, secret);
+
+    process.env.SHOPIFY_API_SECRET = secret;
+
+    expect(
+      await shopifyAdapter.verifyWebhook(
+        {
+          "X-Shopify-Hmac-SHA256": hmac,
+          "X-Shopify-Shop-Domain": "demo.myshopify.com",
+          "X-Shopify-Topic": "orders/create",
+          "X-Shopify-Webhook-Id": "wh_1",
+        },
+        body,
+      ),
+    ).toBe(true);
+
+    expect(await shopifyAdapter.verifyWebhook({}, body)).toBe(false);
   });
 });

@@ -8,6 +8,14 @@ export function isProtectedAppPath(pathname: string): boolean {
   );
 }
 
+export function isShopifyWebhookPath(pathname: string): boolean {
+  return pathname === "/api/integrations/shopify/webhooks";
+}
+
 export function isProtectedShopifyApiPath(pathname: string): boolean {
+  if (isShopifyWebhookPath(pathname)) {
+    return false;
+  }
+
   return pathname.startsWith("/api/integrations/shopify");
 }

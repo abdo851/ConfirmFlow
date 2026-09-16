@@ -3,6 +3,7 @@ import "server-only";
 import { getSupabasePublicEnv } from "@/lib/validation/env";
 import {
   buildShopifyOAuthCallbackUrl,
+  buildShopifyWebhookUrl,
   buildWebhookBaseUrl,
   normalizeBaseUrl,
 } from "./app-url";
@@ -23,4 +24,9 @@ export function getShopifyOAuthCallbackUrl(): string {
 /** Future webhook base URL — not implemented in M2-C4. */
 export function getWebhookBaseUrl(): string {
   return buildWebhookBaseUrl(getAppBaseUrl());
+}
+
+/** Shopify webhook ingestion endpoint — locale-independent API route. */
+export function getShopifyWebhookUrl(): string {
+  return buildShopifyWebhookUrl(getAppBaseUrl());
 }

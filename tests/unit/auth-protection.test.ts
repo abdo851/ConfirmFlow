@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   isProtectedAppPath,
   isProtectedShopifyApiPath,
+  isShopifyWebhookPath,
 } from "@/lib/auth/protection";
 
 describe("Auth route protection", () => {
@@ -27,5 +28,14 @@ describe("Auth route protection", () => {
       true,
     );
     expect(isProtectedShopifyApiPath("/api/health")).toBe(false);
+  });
+
+  it("does not require auth for Shopify webhook ingestion", () => {
+    expect(isShopifyWebhookPath("/api/integrations/shopify/webhooks")).toBe(
+      true,
+    );
+    expect(isProtectedShopifyApiPath("/api/integrations/shopify/webhooks")).toBe(
+      false,
+    );
   });
 });

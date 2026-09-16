@@ -88,11 +88,16 @@ describe("M2-C2 MVP migration SQL", () => {
 
 describe("Database table constants", () => {
   it("matches MVP table names", () => {
-    expect(Object.values(DB_TABLES).sort()).toEqual([...MVP_TABLES].sort());
+    expect(Object.values(DB_TABLES).sort()).toEqual(
+      [...MVP_TABLES, "store_webhook_events"].sort(),
+    );
   });
 
   it("separates server-only tables", () => {
-    expect(SERVER_ONLY_TABLES).toEqual(["shopify_connection_secrets"]);
+    expect(SERVER_ONLY_TABLES).toEqual([
+      "shopify_connection_secrets",
+      "store_webhook_events",
+    ]);
   });
 });
 

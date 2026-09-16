@@ -16,3 +16,7 @@ export function buildShopifyOAuthCallbackUrl(baseUrl: string): string {
 export function buildWebhookBaseUrl(baseUrl: string): string {
   return buildAppPath(baseUrl, "/api/webhooks");
 }
+
+export function buildShopifyWebhookUrl(baseUrl: string): string {
+  return buildAppPath(baseUrl, "/api/integrations/shopify/webhooks");
+}
