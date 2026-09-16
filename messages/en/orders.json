@@ -1,0 +1,29 @@
+{
+  "pageTitle": "Orders",
+  "pageDescription": "Review incoming orders and confirm them before future conversion events are sent.",
+  "emptyTitle": "No orders yet",
+  "emptyDescription": "Orders from your connected store will appear here after they are received.",
+  "columns": {
+    "order": "Order",
+    "customer": "Customer",
+    "total": "Total",
+    "received": "Received",
+    "status": "Status",
+    "action": "Action"
+  },
+  "status": {
+    "pending": "Pending",
+    "confirmed": "Confirmed"
+  },
+  "customerUnavailable": "Not available",
+  "confirmOrder": "Confirm order",
+  "confirming": "Confirming…",
+  "confirmSuccess": "Order confirmed.",
+  "errors": {
+    "unauthorized": "Your session expired. Please sign in again.",
+    "forbidden": "You do not have permission to confirm this order.",
+    "notFound": "This order could not be found.",
+    "invalidState": "This order cannot be confirmed in its current state.",
+    "unexpected": "Unable to confirm the order. Please try again."
+  }
+}

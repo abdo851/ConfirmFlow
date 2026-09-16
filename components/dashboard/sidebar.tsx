@@ -9,6 +9,7 @@ export function DashboardSidebar() {
 
   const navItems = [
     { label: t("overview"), href: "/dashboard" as const },
+    { label: t("orders"), href: "/dashboard/orders" as const },
     { label: t("connections"), href: "/dashboard/connections" as const },
     { label: t("onboarding"), href: "/onboarding" as const },
   ];

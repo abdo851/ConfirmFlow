@@ -24,6 +24,7 @@ const namespaces = [
   "onboarding",
   "connections",
   "errors",
+  "orders",
 ];
 
 function loadJson(locale: string, namespace: string) {

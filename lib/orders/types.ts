@@ -34,3 +34,17 @@ export interface ConfirmaOrder extends ConfirmaOrderInput {
   createdAt: string;
   updatedAt: string;
 }
+
+/** Merchant-facing order row for the dashboard orders list. */
+export interface MerchantOrderListItem {
+  id: string;
+  orderNumber: string | null;
+  externalOrderId: string;
+  customerEmail: string | null;
+  customerPhone: string | null;
+  currency: string;
+  totalAmountMinor: number;
+  confirmationStatus: OrderConfirmationStatus;
+  confirmedAt: string | null;
+  receivedAt: string;
+}

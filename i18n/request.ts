@@ -11,6 +11,7 @@ async function loadMessages(locale: string) {
     onboarding,
     connections,
     errors,
+    orders,
   ] = await Promise.all([
     import(`../messages/${locale}/common.json`),
     import(`../messages/${locale}/navigation.json`),
@@ -20,6 +21,7 @@ async function loadMessages(locale: string) {
     import(`../messages/${locale}/onboarding.json`),
     import(`../messages/${locale}/connections.json`),
     import(`../messages/${locale}/errors.json`),
+    import(`../messages/${locale}/orders.json`),
   ]);
 
   return {
@@ -31,6 +33,7 @@ async function loadMessages(locale: string) {
     onboarding: onboarding.default,
     connections: connections.default,
     errors: errors.default,
+    orders: orders.default,
   };
 }
 
