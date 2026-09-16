@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  META_TABLES,
   MVP_TABLES,
   SERVER_ONLY_TABLES,
   USER_OWNED_TABLES,
@@ -89,13 +90,14 @@ describe("M2-C2 MVP migration SQL", () => {
 describe("Database table constants", () => {
   it("matches MVP table names", () => {
     expect(Object.values(DB_TABLES).sort()).toEqual(
-      [...MVP_TABLES, "store_webhook_events", "orders"].sort(),
+      [...MVP_TABLES, ...META_TABLES, "store_webhook_events", "orders"].sort(),
     );
   });
 
   it("separates server-only tables", () => {
     expect(SERVER_ONLY_TABLES).toEqual([
       "shopify_connection_secrets",
+      "meta_connection_secrets",
       "store_webhook_events",
     ]);
   });

@@ -38,7 +38,7 @@
       "shortLabel": "Meta",
       "description": "Add Meta Pixel and Conversions API credentials.",
       "connectLabel": "Connect Meta",
-      "placeholderMessage": "Meta connection will be available in a future milestone."
+      "placeholderMessage": "Enter your Meta Pixel/Dataset ID and access token to save configuration."
     },
     "confirmation": {
       "label": "Configure confirmation",

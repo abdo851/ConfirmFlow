@@ -21,6 +21,7 @@
     "error": "Error"
   },
   "loadingShopify": "Loading Shopify connection...",
+  "loadingMeta": "Loading Meta connection...",
   "storeProvider": "Store provider",
   "storeProviderLabel": "Store provider: {provider}",
   "connectedToShop": "Connected to {shop}",
@@ -33,5 +34,21 @@
     "disconnectedSuccess": "Shopify disconnected.",
     "disconnectFailed": "Unable to disconnect Shopify.",
     "connectionFailed": "Shopify connection failed. Please try again."
+  },
+  "meta": {
+    "pixelIdLabel": "Pixel / Dataset ID",
+    "pixelIdPlaceholder": "123456789012345",
+    "accessTokenLabel": "Access token",
+    "accessTokenPlaceholder": "Enter your Meta access token",
+    "connect": "Connect Meta",
+    "connecting": "Saving…",
+    "disconnect": "Disconnect Meta",
+    "connectedSuccess": "Meta configuration saved.",
+    "disconnectedSuccess": "Meta disconnected.",
+    "disconnectFailed": "Unable to disconnect Meta.",
+    "connectionFailed": "Meta configuration could not be saved. Please try again.",
+    "storeRequired": "Connect a store before configuring Meta.",
+    "pixelMasked": "Pixel / Dataset: {pixelId}",
+    "configuredNote": "Credentials are saved securely. Meta API verification is not performed in this milestone."
   }
 }

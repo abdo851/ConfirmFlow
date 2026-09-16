@@ -71,6 +71,24 @@ export interface ShopifyConnectionSecret {
   updated_at: string;
 }
 
+/** Public Meta connection metadata — no access tokens */
+export interface MetaConnection {
+  store_connection_id: string;
+  pixel_id: string;
+  connected_at: string | null;
+  error_message: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Server-only encrypted Meta token storage */
+export interface MetaConnectionSecret {
+  store_connection_id: string;
+  encrypted_access_token: string;
+  created_at: string;
+  updated_at: string;
+}
+
 /** Normalized order — no raw provider payload */
 export interface Order {
   id: string;

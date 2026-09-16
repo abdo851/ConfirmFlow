@@ -19,3 +19,7 @@ export function isProtectedShopifyApiPath(pathname: string): boolean {
 
   return pathname.startsWith("/api/integrations/shopify");
 }
+
+export function isProtectedMetaApiPath(pathname: string): boolean {
+  return pathname.startsWith("/api/integrations/meta");
+}

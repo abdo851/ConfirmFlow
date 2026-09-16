@@ -2,19 +2,26 @@ import { getTranslations } from "next-intl/server";
 import { ConnectionStateItem } from "@/components/connections";
 import { Card } from "@/components/ui/card";
 import { defaultConnectionStates } from "@/lib/connections";
-import { getStoreConnectionState } from "@/lib/connections/server";
+import {
+  getMetaConnectionState,
+  getStoreConnectionState,
+} from "@/lib/connections/server";
 
 export async function ConnectionStatus() {
   const t = await getTranslations("dashboard");
-  const storeConnection = await getStoreConnectionState();
+  const [storeConnection, metaConnection] = await Promise.all([
+    getStoreConnectionState(),
+    getMetaConnectionState(),
+  ]);
   const otherConnections = defaultConnectionStates.filter(
-    (connection) => connection.type !== "store",
+    (connection) => connection.type === "confirmation",
   );
 
   return (
     <Card title={t("connectionsTitle")} description={t("connectionsDescription")}>
       <ul className="divide-y divide-neutral-200 dark:divide-neutral-800">
         <ConnectionStateItem connection={storeConnection} />
+        <ConnectionStateItem connection={metaConnection} />
         {otherConnections.map((connection) => (
           <ConnectionStateItem key={connection.type} connection={connection} />
         ))}

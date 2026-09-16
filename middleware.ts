@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { routing, localeCookieName } from "@/i18n/routing";
 import {
   isProtectedAppPath,
+  isProtectedMetaApiPath,
   isProtectedShopifyApiPath,
 } from "@/lib/auth/protection";
 import { defaultLocale, isAppLocale } from "@/lib/i18n/locales";
@@ -65,6 +66,10 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(loginUrl);
       }
 
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (isProtectedMetaApiPath(pathname) && !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

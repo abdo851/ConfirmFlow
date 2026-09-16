@@ -7,6 +7,8 @@ export const DB_TABLES = {
   storeConnections: "store_connections",
   shopifyConnections: "shopify_connections",
   shopifyConnectionSecrets: "shopify_connection_secrets",
+  metaConnections: "meta_connections",
+  metaConnectionSecrets: "meta_connection_secrets",
   storeWebhookEvents: "store_webhook_events",
   orders: "orders",
 } as const;

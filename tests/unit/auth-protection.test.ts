@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   isProtectedAppPath,
+  isProtectedMetaApiPath,
   isProtectedShopifyApiPath,
   isShopifyWebhookPath,
 } from "@/lib/auth/protection";
@@ -28,6 +29,13 @@ describe("Auth route protection", () => {
       true,
     );
     expect(isProtectedShopifyApiPath("/api/health")).toBe(false);
+  });
+
+  it("protects Meta integration API routes", () => {
+    expect(isProtectedMetaApiPath("/api/integrations/meta/connect")).toBe(true);
+    expect(isProtectedMetaApiPath("/api/integrations/meta/status")).toBe(true);
+    expect(isProtectedMetaApiPath("/api/integrations/meta/disconnect")).toBe(true);
+    expect(isProtectedMetaApiPath("/api/health")).toBe(false);
   });
 
   it("does not require auth for Shopify webhook ingestion", () => {

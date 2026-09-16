@@ -38,7 +38,7 @@
       "shortLabel": "Meta",
       "description": "أضف بيانات Meta Pixel وConversions API.",
       "connectLabel": "ربط Meta",
-      "placeholderMessage": "سيكون ربط Meta متاحاً في مرحلة لاحقة."
+      "placeholderMessage": "أدخل معرّف Pixel/Dataset ورمز الوصول لحفظ الإعدادات."
     },
     "confirmation": {
       "label": "إعداد التأكيد",

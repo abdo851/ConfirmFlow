@@ -21,6 +21,7 @@
     "error": "خطأ"
   },
   "loadingShopify": "جارٍ تحميل اتصال Shopify...",
+  "loadingMeta": "جارٍ تحميل اتصال Meta...",
   "storeProvider": "مزود المتجر",
   "storeProviderLabel": "مزود المتجر: {provider}",
   "connectedToShop": "متصل بـ {shop}",
@@ -33,5 +34,21 @@
     "disconnectedSuccess": "تم قطع اتصال Shopify.",
     "disconnectFailed": "تعذر قطع اتصال Shopify.",
     "connectionFailed": "فشل ربط Shopify. يرجى المحاولة مرة أخرى."
+  },
+  "meta": {
+    "pixelIdLabel": "معرّف Pixel / Dataset",
+    "pixelIdPlaceholder": "123456789012345",
+    "accessTokenLabel": "رمز الوصول",
+    "accessTokenPlaceholder": "أدخل رمز الوصول الخاص بـ Meta",
+    "connect": "ربط Meta",
+    "connecting": "جارٍ الحفظ…",
+    "disconnect": "قطع اتصال Meta",
+    "connectedSuccess": "تم حفظ إعدادات Meta.",
+    "disconnectedSuccess": "تم قطع اتصال Meta.",
+    "disconnectFailed": "تعذر قطع اتصال Meta.",
+    "connectionFailed": "تعذر حفظ إعدادات Meta. يرجى المحاولة مرة أخرى.",
+    "storeRequired": "اربط متجرًا قبل إعداد Meta.",
+    "pixelMasked": "Pixel / Dataset: {pixelId}",
+    "configuredNote": "تم حفظ بيانات الاعتماد بشكل آمن. لا يتم التحقق من Meta API في هذه المرحلة."
   }
 }

@@ -18,8 +18,16 @@ export const USER_OWNED_TABLES = [
   "shopify_connections",
 ] as const;
 
+export const META_MIGRATION_FILE = "006_meta_connection_foundation.sql";
+
+export const META_TABLES = [
+  "meta_connections",
+  "meta_connection_secrets",
+] as const;
+
 export const SERVER_ONLY_TABLES = [
   "shopify_connection_secrets",
+  "meta_connection_secrets",
   "store_webhook_events",
 ] as const;
 
