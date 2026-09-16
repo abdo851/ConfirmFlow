@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { getShopifyOAuthEnv, getShopifyRedirectUri } from "@/lib/integrations/shopify/env";
+import { getAuthenticatedUser } from "@/lib/auth/session";
+import {
+  getShopifyOAuthEnv,
+  getShopifyRedirectUri,
+} from "@/lib/integrations/shopify/env";
 import {
   SHOPIFY_OAUTH_STATE_COOKIE,
   SHOPIFY_OAUTH_STATE_TTL_SECONDS,
@@ -10,6 +14,11 @@ import {
 import { setShopifyConnectingFlag } from "@/lib/integrations/shopify/session";
 
 export async function GET(request: Request) {
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
   try {
     const env = getShopifyOAuthEnv();
     const { searchParams } = new URL(request.url);

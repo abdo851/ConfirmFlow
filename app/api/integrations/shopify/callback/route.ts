@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { getAuthenticatedUser } from "@/lib/auth/session";
 import { getShopifyOAuthEnv } from "@/lib/integrations/shopify/env";
 import {
   SHOPIFY_OAUTH_STATE_COOKIE,
@@ -8,9 +9,12 @@ import {
   parseOAuthState,
 } from "@/lib/integrations/shopify/oauth";
 import {
+  ShopifyPersistenceError,
+  persistShopifyConnectionForUser,
+} from "@/lib/integrations/shopify/persistence";
+import {
+  clearLegacyShopifyConnectionCookie,
   clearShopifyConnectingFlag,
-  saveShopifyConnection,
-  saveShopifyConnectionError,
 } from "@/lib/integrations/shopify/session";
 
 function redirectWithCleanup(
@@ -23,6 +27,11 @@ function redirectWithCleanup(
 }
 
 export async function GET(request: Request) {
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    return redirectWithCleanup(request, "/login?error=auth_required");
+  }
+
   const { searchParams } = new URL(request.url);
   const query = Object.fromEntries(searchParams.entries());
 
@@ -39,7 +48,6 @@ export async function GET(request: Request) {
       stateFromCookie !== stateFromQuery
     ) {
       await clearShopifyConnectingFlag();
-      await saveShopifyConnectionError("Shopify authorization could not be verified.");
       return redirectWithCleanup(
         request,
         "/onboarding/store?shopify=error&reason=invalid_state",
@@ -54,7 +62,6 @@ export async function GET(request: Request) {
 
     if (!expectedState) {
       await clearShopifyConnectingFlag();
-      await saveShopifyConnectionError("Shopify authorization could not be verified.");
       return redirectWithCleanup(
         request,
         "/onboarding/store?shopify=error&reason=invalid_state",
@@ -71,25 +78,36 @@ export async function GET(request: Request) {
     await clearShopifyConnectingFlag();
 
     if (!result.ok) {
-      await saveShopifyConnectionError("Shopify connection failed. Please try again.");
       return redirectWithCleanup(
         request,
         `/onboarding/store?shopify=error&reason=${result.reason}`,
       );
     }
 
-    await saveShopifyConnection({
+    await persistShopifyConnectionForUser({
+      userId: user.id,
+      userEmail: user.email ?? "",
       shop: result.shop,
       accessToken: result.accessToken,
       scope: result.scope,
     });
 
+    await clearLegacyShopifyConnectionCookie();
+
     return redirectWithCleanup(
       request,
       "/onboarding/store?shopify=connected",
     );
-  } catch {
+  } catch (error) {
     await clearShopifyConnectingFlag();
+
+    if (error instanceof ShopifyPersistenceError) {
+      return redirectWithCleanup(
+        request,
+        "/onboarding/store?shopify=error&reason=persistence_failed",
+      );
+    }
+
     return redirectWithCleanup(
       request,
       "/onboarding/store?shopify=error&reason=configuration",

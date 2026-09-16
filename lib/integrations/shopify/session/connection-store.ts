@@ -2,20 +2,27 @@ import "server-only";
 
 import { cookies } from "next/headers";
 import type { ConnectionStatus } from "@/lib/connections";
-import { getShopifyOAuthEnv } from "@/lib/integrations/shopify/env";
+import { getAuthenticatedUser } from "@/lib/auth/session";
+import {
+  disconnectShopifyConnectionForUser,
+  getShopifyAccessTokenForUser,
+  getShopifyConnectionStateForUser,
+} from "@/lib/integrations/shopify/persistence";
 import {
   SHOPIFY_CONNECTING_COOKIE,
   SHOPIFY_CONNECTING_TTL_SECONDS,
   SHOPIFY_CONNECTION_COOKIE,
-  encryptSecret,
-  decryptSecret,
 } from "@/lib/integrations/shopify/oauth";
-import type {
-  ShopifyConnectionPublicState,
-  ShopifyConnectionRecord,
-} from "./types";
+import type { ShopifyConnectionPublicState } from "./types";
 
-const CONNECTION_COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
+/**
+ * M2-B prototype cookie for durable Shopify credentials — removed in M2-C3.
+ * Cleared on read paths so legacy browser sessions do not retain tokens.
+ */
+export async function clearLegacyShopifyConnectionCookie(): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.delete(SHOPIFY_CONNECTION_COOKIE);
+}
 
 function getSecureCookieOptions(maxAge: number) {
   return {
@@ -27,25 +34,7 @@ function getSecureCookieOptions(maxAge: number) {
   };
 }
 
-function serializeConnection(record: ShopifyConnectionRecord): string {
-  const env = getShopifyOAuthEnv();
-  return encryptSecret(JSON.stringify(record), env.SHOPIFY_SESSION_SECRET);
-}
-
-function deserializeConnection(value: string): ShopifyConnectionRecord | null {
-  const env = getShopifyOAuthEnv();
-  const decrypted = decryptSecret(value, env.SHOPIFY_SESSION_SECRET);
-  if (!decrypted) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(decrypted) as ShopifyConnectionRecord;
-  } catch {
-    return null;
-  }
-}
-
+/** Short-lived non-secret UI indicator while OAuth is in progress. */
 export async function setShopifyConnectingFlag(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.set(
@@ -60,73 +49,24 @@ export async function clearShopifyConnectingFlag(): Promise<void> {
   cookieStore.delete(SHOPIFY_CONNECTING_COOKIE);
 }
 
-export async function saveShopifyConnection(input: {
-  shop: string;
-  accessToken: string;
-  scope?: string;
-}): Promise<void> {
-  const env = getShopifyOAuthEnv();
-  const record: ShopifyConnectionRecord = {
-    provider: "shopify",
-    shop: input.shop,
-    status: "connected",
-    encryptedAccessToken: encryptSecret(
-      input.accessToken,
-      env.SHOPIFY_SESSION_SECRET,
-    ),
-    scope: input.scope,
-    connectedAt: new Date().toISOString(),
-  };
-
-  const cookieStore = await cookies();
-  cookieStore.set(
-    SHOPIFY_CONNECTION_COOKIE,
-    serializeConnection(record),
-    getSecureCookieOptions(CONNECTION_COOKIE_MAX_AGE),
-  );
-}
-
-export async function saveShopifyConnectionError(
-  message: string,
-): Promise<void> {
-  const record: ShopifyConnectionRecord = {
-    provider: "shopify",
-    shop: "",
-    status: "error",
-    errorMessage: message,
-  };
-
-  const cookieStore = await cookies();
-  cookieStore.set(
-    SHOPIFY_CONNECTION_COOKIE,
-    serializeConnection(record),
-    getSecureCookieOptions(60 * 10),
-  );
-}
-
 export async function clearShopifyConnection(): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.delete(SHOPIFY_CONNECTION_COOKIE);
-}
-
-export async function getShopifyConnectionRecord(): Promise<ShopifyConnectionRecord | null> {
-  const cookieStore = await cookies();
-  const value = cookieStore.get(SHOPIFY_CONNECTION_COOKIE)?.value;
-  if (!value) {
-    return null;
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    throw new Error("UNAUTHENTICATED");
   }
 
-  return deserializeConnection(value);
+  await disconnectShopifyConnectionForUser(user.id);
+  await clearLegacyShopifyConnectionCookie();
 }
 
 export async function getShopifyAccessToken(): Promise<string | null> {
-  const record = await getShopifyConnectionRecord();
-  if (!record?.encryptedAccessToken || record.status !== "connected") {
+  const user = await getAuthenticatedUser();
+  if (!user) {
     return null;
   }
 
-  const env = getShopifyOAuthEnv();
-  return decryptSecret(record.encryptedAccessToken, env.SHOPIFY_SESSION_SECRET);
+  await clearLegacyShopifyConnectionCookie();
+  return getShopifyAccessTokenForUser(user.id);
 }
 
 export async function getShopifyConnectionPublicState(): Promise<ShopifyConnectionPublicState> {
@@ -140,25 +80,40 @@ export async function getShopifyConnectionPublicState(): Promise<ShopifyConnecti
     };
   }
 
-  const record = await getShopifyConnectionRecord();
-  if (!record) {
+  await clearLegacyShopifyConnectionCookie();
+
+  const user = await getAuthenticatedUser();
+  if (!user) {
     return {
       provider: "shopify",
       status: "not_connected",
     };
   }
 
-  return {
-    provider: "shopify",
-    shop: record.shop || undefined,
-    status: record.status,
-    errorMessage: record.errorMessage,
-  };
+  const persisted = await getShopifyConnectionStateForUser(user.id);
+  if (!persisted) {
+    return {
+      provider: "shopify",
+      status: "not_connected",
+    };
+  }
+
+  return persisted;
 }
 
 export async function verifyShopifyConnectionActive(): Promise<boolean> {
-  const record = await getShopifyConnectionRecord();
-  return record?.status === "connected" && Boolean(record.encryptedAccessToken);
+  const state = await getShopifyConnectionPublicState();
+  if (state.status !== "connected") {
+    return false;
+  }
+
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    return false;
+  }
+
+  const token = await getShopifyAccessTokenForUser(user.id);
+  return Boolean(token);
 }
 
 export function toStoreConnectionStatus(

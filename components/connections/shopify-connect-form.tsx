@@ -21,6 +21,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   invalid_hmac: "Shopify callback verification failed.",
   token_exchange_failed: "Shopify token exchange failed.",
   configuration: "Shopify OAuth is not configured correctly.",
+  persistence_failed: "Shopify connection could not be saved. Please try again.",
 };
 
 export function ShopifyConnectForm() {
@@ -91,7 +92,27 @@ export function ShopifyConnectForm() {
             </Button>
           )}
         </div>
-      ) : null}
+      ) : (
+        <div className="mt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={async () => {
+              const response = await fetch("/api/integrations/shopify/disconnect", {
+                method: "POST",
+              });
+              if (response.ok) {
+                setStatus({ provider: "shopify", status: "not_connected" });
+                setFlashMessage("Shopify disconnected.");
+              } else {
+                setFlashMessage("Unable to disconnect Shopify.");
+              }
+            }}
+          >
+            Disconnect Shopify
+          </Button>
+        </div>
+      )}
 
       {flashMessage ? (
         <p
