@@ -1,8 +1,7 @@
 /**
- * Minimum Shopify scope for OAuth connection verification in M2-B.
- * Does not include order, customer, or webhook scopes.
+ * Minimum Shopify scopes for OAuth connection and orders/create webhooks.
  */
-export const SHOPIFY_OAUTH_DEFAULT_SCOPES = "read_products";
+export const SHOPIFY_OAUTH_DEFAULT_SCOPES = "read_products,read_orders";
 
 export const SHOPIFY_OAUTH_STATE_COOKIE = "shopify_oauth_state";
 export const SHOPIFY_CONNECTING_COOKIE = "shopify_connecting";

@@ -79,8 +79,10 @@ export class ShopifyAdapter implements StoreAdapter {
   }
 
   async registerWebhooks(storeId: string): Promise<void> {
-    void storeId;
-    throw new Error("Shopify webhook registration is not implemented yet.");
+    const { registerShopifyWebhooksForStore } = await import(
+      "@/lib/integrations/shopify/webhooks/register"
+    );
+    await registerShopifyWebhooksForStore(storeId);
   }
 }
 

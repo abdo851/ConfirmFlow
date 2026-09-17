@@ -9,10 +9,12 @@ import {
   handleShopifyOAuthCallback,
   parseOAuthState,
 } from "@/lib/integrations/shopify/oauth";
+import { shopifyAdapter } from "@/integrations/stores/shopify";
 import {
   ShopifyPersistenceError,
   persistShopifyConnectionForUser,
 } from "@/lib/integrations/shopify/persistence";
+import { ShopifyWebhookRegistrationError } from "@/lib/integrations/shopify/webhooks/register";
 import {
   clearLegacyShopifyConnectionCookie,
   clearShopifyConnectingFlag,
@@ -86,7 +88,7 @@ export async function GET(request: Request) {
       );
     }
 
-    await persistShopifyConnectionForUser({
+    const { storeId } = await persistShopifyConnectionForUser({
       userId: user.id,
       userEmail: user.email ?? "",
       shop: result.shop,
@@ -95,6 +97,19 @@ export async function GET(request: Request) {
     });
 
     await clearLegacyShopifyConnectionCookie();
+
+    try {
+      await shopifyAdapter.registerWebhooks(storeId);
+    } catch (registrationError) {
+      if (registrationError instanceof ShopifyWebhookRegistrationError) {
+        return redirectWithCleanup(
+          request,
+          "/onboarding/store?shopify=error&reason=webhook_registration_failed",
+        );
+      }
+
+      throw registrationError;
+    }
 
     return redirectWithCleanup(
       request,
@@ -107,6 +122,13 @@ export async function GET(request: Request) {
       return redirectWithCleanup(
         request,
         "/onboarding/store?shopify=error&reason=persistence_failed",
+      );
+    }
+
+    if (error instanceof ShopifyWebhookRegistrationError) {
+      return redirectWithCleanup(
+        request,
+        "/onboarding/store?shopify=error&reason=webhook_registration_failed",
       );
     }
 

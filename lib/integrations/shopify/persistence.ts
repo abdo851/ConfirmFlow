@@ -62,13 +62,20 @@ export async function assertShopAvailableForUser(
   }
 }
 
+export interface ShopifyStoreCredentials {
+  storeId: string;
+  ownerId: string;
+  shopDomain: string;
+  accessToken: string;
+}
+
 export async function persistShopifyConnectionForUser(input: {
   userId: string;
   userEmail: string;
   shop: string;
   accessToken: string;
   scope?: string;
-}): Promise<void> {
+}): Promise<{ storeId: string }> {
   const db = createDatabaseClient();
   const env = getShopifyOAuthEnv();
   const encryptedAccessToken = encryptSecret(
@@ -158,6 +165,75 @@ export async function persistShopifyConnectionForUser(input: {
   if (secretError) {
     throw new ShopifyPersistenceError("Unable to persist Shopify credentials.");
   }
+
+  return { storeId: store.id };
+}
+
+export async function getShopifyStoreCredentialsForStore(
+  storeId: string,
+): Promise<ShopifyStoreCredentials | null> {
+  const db = createDatabaseClient();
+  const env = getShopifyOAuthEnv();
+
+  const { data: store, error: storeError } = await db
+    .from("stores")
+    .select("id, owner_id, external_store_id")
+    .eq("id", storeId)
+    .eq("platform", "shopify")
+    .maybeSingle();
+
+  if (storeError || !store?.external_store_id || !store.owner_id) {
+    return null;
+  }
+
+  const { data: storeConnection, error: connectionError } = await db
+    .from("store_connections")
+    .select("id, status")
+    .eq("store_id", store.id)
+    .eq("connection_type", "store")
+    .eq("provider", "shopify")
+    .eq("status", "active")
+    .maybeSingle();
+
+  if (connectionError || !storeConnection) {
+    return null;
+  }
+
+  const { data: shopifyConnection, error: shopifyError } = await db
+    .from("shopify_connections")
+    .select("shop_domain")
+    .eq("store_connection_id", storeConnection.id)
+    .maybeSingle();
+
+  if (shopifyError || !shopifyConnection) {
+    return null;
+  }
+
+  const { data: secretRow, error: secretError } = await db
+    .from("shopify_connection_secrets")
+    .select("encrypted_access_token")
+    .eq("store_connection_id", storeConnection.id)
+    .maybeSingle();
+
+  if (secretError || !secretRow?.encrypted_access_token) {
+    return null;
+  }
+
+  const accessToken = decryptSecret(
+    secretRow.encrypted_access_token,
+    env.SHOPIFY_SESSION_SECRET,
+  );
+
+  if (!accessToken) {
+    return null;
+  }
+
+  return {
+    storeId: store.id,
+    ownerId: store.owner_id,
+    shopDomain: shopifyConnection.shop_domain,
+    accessToken,
+  };
 }
 
 export async function getShopifyConnectionStateForUser(

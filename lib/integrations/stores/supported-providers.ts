@@ -1,4 +1,7 @@
-import { SHOPIFY_PROVIDER_ID, SHOPIFY_PROVIDER_LABEL } from "@/integrations/stores/shopify";
+import {
+  SHOPIFY_PROVIDER_ID,
+  SHOPIFY_PROVIDER_LABEL,
+} from "@/integrations/stores/shopify/constants";
 import type { StorePlatform } from "@/lib/integrations/adapters/store-adapter";
 
 export const supportedStoreProviders = [

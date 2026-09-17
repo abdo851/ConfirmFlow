@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { ConnectionStatusBadge } from "./connection-status-badge";
 import type { ConnectionState } from "@/lib/connections";
-import { getStoreProviderLabel } from "@/lib/integrations/stores";
+import { getStoreProviderLabel } from "@/lib/integrations/stores/supported-providers";
 
 interface ConnectionStateItemProps {
   connection: ConnectionState;
