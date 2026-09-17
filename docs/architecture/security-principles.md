@@ -16,8 +16,11 @@ Supabase Auth clients in `lib/auth/`:
 
 - `createAuthBrowserClient()` — client components
 - `createAuthServerClient()` — server components and API routes
+- Server actions in `lib/auth/actions.ts` for login, signup, and logout
+- Session refresh and protected-route redirects in `middleware.ts`
+- Email-confirmation callback at `/api/auth/callback`
 
-Full auth flows (login, signup, session middleware) are future milestones.
+Login and signup redirects only allow safe internal relative paths. Signup respects whether Supabase returns an immediate session or requires email confirmation first.
 
 ## Authorization
 

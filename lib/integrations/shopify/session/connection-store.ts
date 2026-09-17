@@ -3,8 +3,8 @@ import "server-only";
 import { cookies } from "next/headers";
 import type { ConnectionStatus } from "@/lib/connections";
 import { getAuthenticatedUser } from "@/lib/auth/session";
+import { disconnectShopifyForAuthenticatedUser } from "@/lib/integrations/shopify/disconnect";
 import {
-  disconnectShopifyConnectionForUser,
   getShopifyAccessTokenForUser,
   getShopifyConnectionStateForUser,
 } from "@/lib/integrations/shopify/persistence";
@@ -51,12 +51,7 @@ export async function clearShopifyConnectingFlag(): Promise<void> {
 }
 
 export async function clearShopifyConnection(): Promise<void> {
-  const user = await getAuthenticatedUser();
-  if (!user) {
-    throw new Error("UNAUTHENTICATED");
-  }
-
-  await disconnectShopifyConnectionForUser(user.id);
+  await disconnectShopifyForAuthenticatedUser();
   await clearLegacyShopifyConnectionCookie();
 }
 

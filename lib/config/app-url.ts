@@ -20,3 +20,11 @@ export function buildWebhookBaseUrl(baseUrl: string): string {
 export function buildShopifyWebhookUrl(baseUrl: string): string {
   return buildAppPath(baseUrl, "/api/integrations/shopify/webhooks");
 }
+
+export function buildAuthCallbackUrl(
+  baseUrl: string,
+  nextPath = "/onboarding",
+): string {
+  const next = nextPath.startsWith("/") ? nextPath : `/${nextPath}`;
+  return `${buildAppPath(baseUrl, "/api/auth/callback")}?next=${encodeURIComponent(next)}`;
+}

@@ -346,7 +346,7 @@ describe("Meta Purchase delivery", () => {
   });
 
   it("does not create duplicate delivery records on repeat confirmation", async () => {
-    createDeliveryMockDb({
+    const db = createDeliveryMockDb({
       orders: {
         [ORDER_ID]: {
           id: ORDER_ID,
@@ -381,12 +381,13 @@ describe("Meta Purchase delivery", () => {
     const result = await processMetaPurchaseDelivery({
       orderId: ORDER_ID,
       userId: OWNER_ID,
-      createIfMissing: false,
       transport: { send },
     });
 
     expect(result?.status).toBe("sent");
+    expect(result?.eventId).toBe(`purchase:${ORDER_ID}`);
     expect(send).not.toHaveBeenCalled();
+    expect(db.deliveries.size).toBe(1);
   });
 
   it("rejects delivery for unconfirmed orders", async () => {

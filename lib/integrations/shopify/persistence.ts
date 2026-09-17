@@ -4,6 +4,7 @@ import { createDatabaseClient } from "@/lib/database/client";
 import { getShopifyOAuthEnv } from "@/lib/integrations/shopify/env";
 import { encryptSecret, decryptSecret } from "@/lib/integrations/shopify/oauth";
 import type { ShopifyConnectionPublicState } from "@/lib/integrations/shopify/session/types";
+import { unregisterShopifyOrdersCreateWebhook } from "@/lib/integrations/shopify/webhooks/register";
 
 export class ShopifyPersistenceError extends Error {
   constructor(message: string) {
@@ -329,27 +330,34 @@ export async function getShopifyAccessTokenForUser(
   return decryptSecret(secretRow.encrypted_access_token, env.SHOPIFY_SESSION_SECRET);
 }
 
-export async function disconnectShopifyConnectionForUser(
+export async function getShopifyStoreIdForUser(
   userId: string,
-): Promise<void> {
+): Promise<string | null> {
   const db = createDatabaseClient();
 
   const { data: stores, error: storesError } = await db
     .from("stores")
     .select("id")
     .eq("owner_id", userId)
-    .eq("platform", "shopify");
+    .eq("platform", "shopify")
+    .limit(1);
 
   if (storesError || !stores?.length) {
-    return;
+    return null;
   }
 
-  const storeIds = stores.map((store) => store.id);
+  return stores[0].id;
+}
+
+async function removeShopifyConnectionRecordsForStore(
+  storeId: string,
+): Promise<void> {
+  const db = createDatabaseClient();
 
   const { data: storeConnection, error: connectionError } = await db
     .from("store_connections")
     .select("id")
-    .in("store_id", storeIds)
+    .eq("store_id", storeId)
     .eq("connection_type", "store")
     .eq("provider", "shopify")
     .maybeSingle();
@@ -375,4 +383,52 @@ export async function disconnectShopifyConnectionForUser(
       error_message: null,
     })
     .eq("store_connection_id", storeConnection.id);
+}
+
+export async function disconnectShopifyStoreForUser(
+  userId: string,
+  storeId: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<void> {
+  const db = createDatabaseClient();
+
+  const { data: store, error: storeError } = await db
+    .from("stores")
+    .select("id, owner_id")
+    .eq("id", storeId)
+    .eq("platform", "shopify")
+    .maybeSingle();
+
+  if (storeError || !store) {
+    return;
+  }
+
+  if (store.owner_id !== userId) {
+    throw new ShopifyPersistenceError("Shopify store access forbidden.");
+  }
+
+  const credentials = await getShopifyStoreCredentialsForStore(storeId);
+  if (credentials) {
+    await unregisterShopifyOrdersCreateWebhook(
+      {
+        shop: credentials.shopDomain,
+        accessToken: credentials.accessToken,
+      },
+      fetchImpl,
+    );
+  }
+
+  await removeShopifyConnectionRecordsForStore(storeId);
+}
+
+export async function disconnectShopifyConnectionForUser(
+  userId: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<void> {
+  const storeId = await getShopifyStoreIdForUser(userId);
+  if (!storeId) {
+    return;
+  }
+
+  await disconnectShopifyStoreForUser(userId, storeId, fetchImpl);
 }

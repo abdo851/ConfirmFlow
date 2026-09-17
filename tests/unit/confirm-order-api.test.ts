@@ -126,6 +126,44 @@ describe("POST /api/orders/[id]/confirm", () => {
     expect(body.metaPurchaseDelivery?.status).toBe("failed");
   });
 
+  it("returns already_confirmed for duplicate confirmation requests", async () => {
+    const { getAuthenticatedUser } = await import("@/lib/auth/session");
+
+    vi.mocked(getAuthenticatedUser).mockResolvedValue({
+      id: "user_1",
+    } as never);
+    mockConfirmOrder.mockResolvedValue({
+      status: "already_confirmed",
+      orderId: ORDER_ID,
+      confirmedAt: "2024-06-02T10:00:00.000Z",
+    });
+    mockDispatchPurchaseDeliveryAfterConfirmation.mockResolvedValue({
+      status: "sent",
+      eventId: `purchase:${ORDER_ID}`,
+    });
+
+    const response = await POST(new Request("http://localhost"), {
+      params: Promise.resolve({ id: ORDER_ID }),
+    });
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body).toEqual({
+      status: "already_confirmed",
+      orderId: ORDER_ID,
+      confirmedAt: "2024-06-02T10:00:00.000Z",
+      metaPurchaseDelivery: {
+        status: "sent",
+        eventId: `purchase:${ORDER_ID}`,
+      },
+    });
+    expect(mockConfirmOrder).toHaveBeenCalledTimes(1);
+    expect(mockDispatchPurchaseDeliveryAfterConfirmation).toHaveBeenCalledWith({
+      orderId: ORDER_ID,
+      userId: "user_1",
+    });
+  });
+
   it("does not accept confirmation_status or confirmed_at from the client body", async () => {
     const { getAuthenticatedUser } = await import("@/lib/auth/session");
 

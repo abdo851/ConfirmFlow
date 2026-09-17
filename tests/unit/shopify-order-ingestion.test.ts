@@ -42,7 +42,11 @@ function createOrderIngestionMockDb(options: {
     );
   }
 
-  return {
+  let orderInsertCount = 0;
+
+  const db = {
+    getOrderInsertCount: () => orderInsertCount,
+    getOrderCount: () => existingOrders.size,
     from(table: string) {
       if (table === "shopify_connections") {
         return {
@@ -129,6 +133,7 @@ function createOrderIngestionMockDb(options: {
                 }
 
                 existingOrders.set(key, ORDER_ID);
+                orderInsertCount += 1;
                 return {
                   data: { id: ORDER_ID },
                   error: null,
@@ -189,6 +194,8 @@ function createOrderIngestionMockDb(options: {
       throw new Error(`Unexpected table: ${table}`);
     },
   };
+
+  return db;
 }
 
 describe("Shopify order ingestion via webhook", () => {
@@ -204,6 +211,30 @@ describe("Shopify order ingestion via webhook", () => {
     expect(result.httpStatus).toBe(200);
     expect(result.status).toBe("accepted");
     expect(result.orderId).toBe(ORDER_ID);
+  });
+
+  it("processes the same Shopify webhook only once when delivered sequentially", async () => {
+    const body = buildShopifyOrderBody();
+    const db = createOrderIngestionMockDb({});
+
+    const first = await ingestShopifyWebhook({
+      rawBody: body,
+      headers: buildHeaders(body, "wh_seq"),
+      db: db as never,
+    });
+
+    const second = await ingestShopifyWebhook({
+      rawBody: body,
+      headers: buildHeaders(body, "wh_seq"),
+      db: db as never,
+    });
+
+    expect(first.status).toBe("accepted");
+    expect(first.orderId).toBe(ORDER_ID);
+    expect(second.status).toBe("duplicate");
+    expect(second.eventId).toBe(EVENT_ID);
+    expect(db.getOrderInsertCount()).toBe(1);
+    expect(db.getOrderCount()).toBe(1);
   });
 
   it("does not create a duplicate order for duplicate webhook delivery", async () => {

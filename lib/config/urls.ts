@@ -2,6 +2,7 @@ import "server-only";
 
 import { getSupabasePublicEnv } from "@/lib/validation/env";
 import {
+  buildAuthCallbackUrl,
   buildShopifyOAuthCallbackUrl,
   buildShopifyWebhookUrl,
   buildWebhookBaseUrl,
@@ -14,6 +15,11 @@ import {
 export function getAppBaseUrl(): string {
   const env = getSupabasePublicEnv();
   return normalizeBaseUrl(env.NEXT_PUBLIC_APP_URL);
+}
+
+/** Supabase email-confirmation callback — locale-independent API route. */
+export function getAuthCallbackUrl(nextPath = "/onboarding"): string {
+  return buildAuthCallbackUrl(getAppBaseUrl(), nextPath);
 }
 
 /** Shopify OAuth callback — locale-independent API route. */

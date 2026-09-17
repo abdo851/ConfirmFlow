@@ -29,8 +29,15 @@ export type ShopifyWebhookRegistrationAction =
   | "already_registered"
   | "updated";
 
+export type ShopifyWebhookUnregisterAction = "deleted" | "already_missing";
+
 export interface ShopifyWebhookRegistrationResult {
   action: ShopifyWebhookRegistrationAction;
+  webhookId?: number;
+}
+
+export interface ShopifyWebhookUnregisterResult {
+  action: ShopifyWebhookUnregisterAction;
   webhookId?: number;
 }
 
@@ -141,6 +148,88 @@ export async function updateShopifyWebhook(
   }
 
   return body.webhook;
+}
+
+export function findConfirmaOrdersCreateWebhook(
+  webhooks: ShopifyWebhookRecord[],
+  webhookUrl: string,
+): ShopifyWebhookRecord | undefined {
+  return webhooks.find(
+    (webhook) =>
+      webhook.topic === SHOPIFY_ORDER_CREATE_TOPIC &&
+      webhook.address === webhookUrl,
+  );
+}
+
+export async function deleteShopifyWebhook(
+  shop: string,
+  accessToken: string,
+  webhookId: number,
+  fetchImpl: typeof fetch = fetch,
+): Promise<void> {
+  const response = await fetchImpl(
+    buildAdminApiUrl(shop, `/webhooks/${webhookId}.json`),
+    {
+      method: "DELETE",
+      headers: {
+        "X-Shopify-Access-Token": accessToken,
+        Accept: "application/json",
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new ShopifyWebhookRegistrationError(
+      `shopify_webhook_delete_failed:${response.status}`,
+    );
+  }
+}
+
+export async function unregisterShopifyOrdersCreateWebhook(
+  input: RegisterShopifyWebhookInput,
+  fetchImpl: typeof fetch = fetch,
+): Promise<ShopifyWebhookUnregisterResult> {
+  const webhookUrl = input.webhookUrl ?? getShopifyWebhookUrl();
+  const existing = await listShopifyWebhooks(
+    input.shop,
+    input.accessToken,
+    fetchImpl,
+  );
+
+  const ownedWebhook = findConfirmaOrdersCreateWebhook(existing, webhookUrl);
+  if (!ownedWebhook) {
+    return { action: "already_missing" };
+  }
+
+  await deleteShopifyWebhook(
+    input.shop,
+    input.accessToken,
+    ownedWebhook.id,
+    fetchImpl,
+  );
+
+  return {
+    action: "deleted",
+    webhookId: ownedWebhook.id,
+  };
+}
+
+export async function unregisterShopifyWebhooksForStore(
+  storeId: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<ShopifyWebhookUnregisterResult> {
+  const credentials = await getShopifyStoreCredentialsForStore(storeId);
+  if (!credentials) {
+    return { action: "already_missing" };
+  }
+
+  return unregisterShopifyOrdersCreateWebhook(
+    {
+      shop: credentials.shopDomain,
+      accessToken: credentials.accessToken,
+    },
+    fetchImpl,
+  );
 }
 
 export async function registerShopifyOrdersCreateWebhook(

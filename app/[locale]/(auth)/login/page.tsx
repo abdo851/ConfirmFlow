@@ -8,7 +8,7 @@ import { loginAction } from "@/lib/auth/actions";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; next?: string }>;
 }) {
   const params = await searchParams;
   const t = await getTranslations("auth");
@@ -22,6 +22,9 @@ export default async function LoginPage({
   return (
     <Card title={t("loginTitle")} description={t("loginDescription")}>
       <form action={loginAction} className="space-y-4" aria-label={t("loginTitle")}>
+        {params.next ? (
+          <input type="hidden" name="next" value={params.next} />
+        ) : null}
         <Input
           label={t("email")}
           type="email"

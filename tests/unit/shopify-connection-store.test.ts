@@ -17,8 +17,11 @@ vi.mock("@/lib/auth/session", () => ({
   getAuthenticatedUser: vi.fn(),
 }));
 
+vi.mock("@/lib/integrations/shopify/disconnect", () => ({
+  disconnectShopifyForAuthenticatedUser: vi.fn(),
+}));
+
 vi.mock("@/lib/integrations/shopify/persistence", () => ({
-  disconnectShopifyConnectionForUser: vi.fn(),
   getShopifyAccessTokenForUser: vi.fn(),
   getShopifyConnectionStateForUser: vi.fn(),
 }));
@@ -82,20 +85,18 @@ describe("Shopify connection store cookie boundaries", () => {
   });
 
   it("clears the legacy connection cookie when disconnecting", async () => {
-    const { getAuthenticatedUser } = await import("@/lib/auth/session");
-    const { disconnectShopifyConnectionForUser } = await import(
-      "@/lib/integrations/shopify/persistence"
+    const { disconnectShopifyForAuthenticatedUser } = await import(
+      "@/lib/integrations/shopify/disconnect"
     );
     const { clearShopifyConnection } = await import(
       "@/lib/integrations/shopify/session"
     );
 
-    vi.mocked(getAuthenticatedUser).mockResolvedValue({ id: "user-1" } as never);
-    vi.mocked(disconnectShopifyConnectionForUser).mockResolvedValue(undefined);
+    vi.mocked(disconnectShopifyForAuthenticatedUser).mockResolvedValue(undefined);
 
     await clearShopifyConnection();
 
-    expect(disconnectShopifyConnectionForUser).toHaveBeenCalledWith("user-1");
+    expect(disconnectShopifyForAuthenticatedUser).toHaveBeenCalled();
     expect(mockDelete).toHaveBeenCalledWith(SHOPIFY_CONNECTION_COOKIE);
   });
 });

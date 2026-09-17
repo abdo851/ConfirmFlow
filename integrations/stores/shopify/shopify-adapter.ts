@@ -21,12 +21,36 @@ export class ShopifyAdapter implements StoreAdapter {
     };
   }
 
-  async disconnect(_storeId: string): Promise<StoreConnectionResult> {
-    void _storeId;
-    return {
-      success: false,
-      error: "Shopify disconnect is not implemented yet.",
-    };
+  async disconnect(storeId: string): Promise<StoreConnectionResult> {
+    const { disconnectShopifyStoreForAuthenticatedUser, ShopifyDisconnectError } =
+      await import("@/lib/integrations/shopify/disconnect");
+    const { ShopifyPersistenceError } = await import(
+      "@/lib/integrations/shopify/persistence"
+    );
+    const { ShopifyWebhookRegistrationError } = await import(
+      "@/lib/integrations/shopify/webhooks/register"
+    );
+
+    try {
+      await disconnectShopifyStoreForAuthenticatedUser(storeId);
+      return { success: true };
+    } catch (error) {
+      if (
+        error instanceof ShopifyDisconnectError ||
+        error instanceof ShopifyPersistenceError ||
+        error instanceof ShopifyWebhookRegistrationError
+      ) {
+        return {
+          success: false,
+          error: "Unable to disconnect Shopify store.",
+        };
+      }
+
+      return {
+        success: false,
+        error: "Unable to disconnect Shopify store.",
+      };
+    }
   }
 
   async verifyConnection(_storeId: string): Promise<boolean> {
