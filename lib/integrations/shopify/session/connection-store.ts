@@ -17,7 +17,8 @@ import type { ShopifyConnectionPublicState } from "./types";
 
 /**
  * M2-B prototype cookie for durable Shopify credentials — removed in M2-C3.
- * Cleared on read paths so legacy browser sessions do not retain tokens.
+ * Cleared only from mutation boundaries (OAuth callback, disconnect) so legacy
+ * browser sessions do not retain tokens.
  */
 export async function clearLegacyShopifyConnectionCookie(): Promise<void> {
   const cookieStore = await cookies();
@@ -65,7 +66,6 @@ export async function getShopifyAccessToken(): Promise<string | null> {
     return null;
   }
 
-  await clearLegacyShopifyConnectionCookie();
   return getShopifyAccessTokenForUser(user.id);
 }
 
@@ -79,8 +79,6 @@ export async function getShopifyConnectionPublicState(): Promise<ShopifyConnecti
       status: "connecting",
     };
   }
-
-  await clearLegacyShopifyConnectionCookie();
 
   const user = await getAuthenticatedUser();
   if (!user) {
