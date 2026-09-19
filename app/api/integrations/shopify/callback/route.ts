@@ -1,6 +1,8 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth/session";
+import { buildAppPath } from "@/lib/config/app-url";
+import { getAppBaseUrl } from "@/lib/config/urls";
 import { getLocalizedPath } from "@/lib/i18n/server-locale";
 import { getShopifyOAuthEnv } from "@/lib/integrations/shopify/env";
 import {
@@ -20,12 +22,11 @@ import {
   clearShopifyConnectingFlag,
 } from "@/lib/integrations/shopify/session";
 
-async function redirectWithCleanup(
-  request: Request,
-  path: string,
-): Promise<NextResponse> {
+async function redirectWithCleanup(path: string): Promise<NextResponse> {
   const localizedPath = await getLocalizedPath(path);
-  const response = NextResponse.redirect(new URL(localizedPath, request.url));
+  const response = NextResponse.redirect(
+    buildAppPath(getAppBaseUrl(), localizedPath),
+  );
   response.cookies.delete(SHOPIFY_OAUTH_STATE_COOKIE);
   return response;
 }
@@ -33,7 +34,7 @@ async function redirectWithCleanup(
 export async function GET(request: Request) {
   const user = await getAuthenticatedUser();
   if (!user) {
-    return redirectWithCleanup(request, "/login?error=auth_required");
+    return redirectWithCleanup("/login?error=auth_required");
   }
 
   const { searchParams } = new URL(request.url);
@@ -53,7 +54,6 @@ export async function GET(request: Request) {
     ) {
       await clearShopifyConnectingFlag();
       return redirectWithCleanup(
-        request,
         "/onboarding/store?shopify=error&reason=invalid_state",
       );
     }
@@ -67,7 +67,6 @@ export async function GET(request: Request) {
     if (!expectedState) {
       await clearShopifyConnectingFlag();
       return redirectWithCleanup(
-        request,
         "/onboarding/store?shopify=error&reason=invalid_state",
       );
     }
@@ -83,7 +82,6 @@ export async function GET(request: Request) {
 
     if (!result.ok) {
       return redirectWithCleanup(
-        request,
         `/onboarding/store?shopify=error&reason=${result.reason}`,
       );
     }
@@ -103,7 +101,6 @@ export async function GET(request: Request) {
     } catch (registrationError) {
       if (registrationError instanceof ShopifyWebhookRegistrationError) {
         return redirectWithCleanup(
-          request,
           "/onboarding/store?shopify=error&reason=webhook_registration_failed",
         );
       }
@@ -111,29 +108,23 @@ export async function GET(request: Request) {
       throw registrationError;
     }
 
-    return redirectWithCleanup(
-      request,
-      "/onboarding/store?shopify=connected",
-    );
+    return redirectWithCleanup("/onboarding/store?shopify=connected");
   } catch (error) {
     await clearShopifyConnectingFlag();
 
     if (error instanceof ShopifyPersistenceError) {
       return redirectWithCleanup(
-        request,
         "/onboarding/store?shopify=error&reason=persistence_failed",
       );
     }
 
     if (error instanceof ShopifyWebhookRegistrationError) {
       return redirectWithCleanup(
-        request,
         "/onboarding/store?shopify=error&reason=webhook_registration_failed",
       );
     }
 
     return redirectWithCleanup(
-      request,
       "/onboarding/store?shopify=error&reason=configuration",
     );
   }

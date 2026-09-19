@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth/session";
+import { buildAppPath } from "@/lib/config/app-url";
+import { getAppBaseUrl } from "@/lib/config/urls";
 import { getLocalizedPath } from "@/lib/i18n/server-locale";
 import {
   getShopifyOAuthEnv,
@@ -18,7 +20,7 @@ export async function GET(request: Request) {
   const user = await getAuthenticatedUser();
   if (!user) {
     const loginPath = await getLocalizedPath("/login");
-    return NextResponse.redirect(new URL(loginPath, request.url));
+    return NextResponse.redirect(buildAppPath(getAppBaseUrl(), loginPath));
   }
 
   try {
@@ -30,7 +32,7 @@ export async function GET(request: Request) {
       const errorPath = await getLocalizedPath(
         "/onboarding/store?shopify=error&reason=invalid_shop",
       );
-      return NextResponse.redirect(new URL(errorPath, request.url));
+      return NextResponse.redirect(buildAppPath(getAppBaseUrl(), errorPath));
     }
 
     const { state } = createOAuthState(shop, env.SHOPIFY_SESSION_SECRET);
@@ -59,6 +61,6 @@ export async function GET(request: Request) {
     const errorPath = await getLocalizedPath(
       "/onboarding/store?shopify=error&reason=configuration",
     );
-    return NextResponse.redirect(new URL(errorPath, request.url));
+    return NextResponse.redirect(buildAppPath(getAppBaseUrl(), errorPath));
   }
 }
