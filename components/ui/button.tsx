@@ -30,6 +30,15 @@ export function Button({
   const classes = `${baseClasses} ${variantClasses[variant]} ${className}`.trim();
 
   if (href) {
+    // API routes are locale-independent; next-intl Link would prefix /ar or /en.
+    if (href.startsWith("/api/")) {
+      return (
+        <a href={href} className={classes}>
+          {children}
+        </a>
+      );
+    }
+
     return (
       <Link href={href} className={classes}>
         {children}
