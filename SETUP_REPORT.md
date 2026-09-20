@@ -241,6 +241,21 @@ All 8 Supabase timestamped migrations (002–009 equivalents) are applied on bot
 
 ---
 
+## Test User (Local Development)
+
+| Item | Value |
+|------|-------|
+| Email | `test@confirma.local` |
+| Password | `Test1234!Confirma` |
+| Recreate / ensure exists | `npm run seed:test-user` |
+| Seed script | `scripts/seed-test-user.mjs` |
+
+The test user is stored in the **cloud Supabase project** (`othfbqxjwtlkbiemwsvl`), so it persists across computer restarts and does not require re-registration.
+
+**Warning:** Do NOT use this account in production. It is for local development only.
+
+---
+
 ## Final Verification (2026-09-20)
 
 ### GitHub
