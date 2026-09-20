@@ -16,6 +16,8 @@ export interface ConnectionMetadata {
   provider?: string;
   /** Optional connected shop domain for store integrations */
   shopDomain?: string;
+  /** Optional connected store slug for YouCan integrations */
+  storeSlug?: string;
   /** Optional human-readable error when status is error */
   errorMessage?: string;
 }

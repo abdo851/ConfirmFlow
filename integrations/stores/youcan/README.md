@@ -1,5 +1,7 @@
 # YouCan Store Adapter
 
-**Status:** Placeholder — M0
+**Status:** Active — MVP primary store integration
 
-Future milestone will implement `YouCanAdapter` conforming to `StoreAdapter`.
+OAuth connection is handled by `/api/integrations/youcan/connect` and `/api/integrations/youcan/callback`.
+
+Webhooks are ingested at `/api/integrations/youcan/webhooks`.

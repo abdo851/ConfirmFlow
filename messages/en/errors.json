@@ -1,4 +1,16 @@
 {
+  "youcan": {
+    "invalid_store": "Enter a valid YouCan store slug.",
+    "invalid_state": "Authorization could not be verified. Please try again.",
+    "access_denied": "YouCan authorization was canceled.",
+    "token_exchange_failed": "YouCan token exchange failed.",
+    "configuration": "YouCan OAuth is not configured correctly.",
+    "persistence_failed": "YouCan connection could not be saved. Please try again.",
+    "webhook_registration_failed": "YouCan connected, but webhook registration failed.",
+    "store_slug_mismatch": "The authorized YouCan store does not match the slug you entered.",
+    "unauthorized": "Unauthorized",
+    "statusReadFailed": "Unable to read YouCan connection status."
+  },
   "shopify": {
     "invalid_shop": "Enter a valid Shopify shop domain.",
     "invalid_state": "Authorization could not be verified. Please try again.",

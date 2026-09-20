@@ -2,19 +2,19 @@ import "server-only";
 
 import { getDefaultConnectionState } from "./defaults";
 import type { ConnectionState } from "./types";
-import { getShopifyConnectionPublicState } from "@/lib/integrations/shopify/session";
+import { getYouCanConnectionPublicState } from "@/lib/integrations/youcan/session";
 
 export async function getStoreConnectionState(): Promise<ConnectionState> {
   const base = getDefaultConnectionState("store");
-  const shopify = await getShopifyConnectionPublicState();
+  const youcan = await getYouCanConnectionPublicState();
 
   return {
     ...base,
-    status: shopify.status,
+    status: youcan.status,
     metadata: {
-      provider: "shopify",
-      shopDomain: shopify.shop,
-      errorMessage: shopify.errorMessage,
+      provider: "youcan",
+      storeSlug: youcan.storeSlug,
+      errorMessage: youcan.errorMessage,
     },
   };
 }

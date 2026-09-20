@@ -2,9 +2,17 @@ import {
   SHOPIFY_PROVIDER_ID,
   SHOPIFY_PROVIDER_LABEL,
 } from "@/integrations/stores/shopify/constants";
+import {
+  YOUCAN_PROVIDER_ID,
+  YOUCAN_PROVIDER_LABEL,
+} from "@/integrations/stores/youcan/constants";
 import type { StorePlatform } from "@/lib/integrations/adapters/store-adapter";
 
 export const supportedStoreProviders = [
+  {
+    id: YOUCAN_PROVIDER_ID,
+    label: YOUCAN_PROVIDER_LABEL,
+  },
   {
     id: SHOPIFY_PROVIDER_ID,
     label: SHOPIFY_PROVIDER_LABEL,

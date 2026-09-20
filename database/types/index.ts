@@ -3,7 +3,7 @@
  * Mirrors database/migrations/002_mvp_database_foundation.sql
  */
 
-export type StorePlatform = "shopify";
+export type StorePlatform = "shopify" | "youcan";
 export type StoreStatus = "pending" | "active" | "inactive";
 export type StoreConnectionType = "store" | "confirmation" | "marketing";
 export type StoreConnectionStatus =
@@ -19,8 +19,8 @@ export type WebhookIngestionStatus =
   | "duplicate"
   | "rejected";
 
-export type WebhookProvider = "shopify";
-export type OrderProvider = "shopify";
+export type WebhookProvider = "shopify" | "youcan";
+export type OrderProvider = "shopify" | "youcan";
 export type OrderConfirmationStatus = "pending" | "confirmed";
 
 export interface Profile {
@@ -65,6 +65,26 @@ export interface ShopifyConnection {
 
 /** Server-only encrypted token storage */
 export interface ShopifyConnectionSecret {
+  store_connection_id: string;
+  encrypted_access_token: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Public YouCan connection metadata — no access tokens */
+export interface YouCanConnection {
+  store_connection_id: string;
+  store_slug: string;
+  youcan_store_id: string | null;
+  scope: string | null;
+  connected_at: string | null;
+  error_message: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Server-only encrypted YouCan token storage */
+export interface YouCanConnectionSecret {
   store_connection_id: string;
   encrypted_access_token: string;
   created_at: string;

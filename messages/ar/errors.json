@@ -1,4 +1,16 @@
 {
+  "youcan": {
+    "invalid_store": "أدخل معرّف متجر YouCan (slug) صالحاً.",
+    "invalid_state": "تعذر التحقق من التفويض. يرجى المحاولة مرة أخرى.",
+    "access_denied": "تم إلغاء تفويض YouCan.",
+    "token_exchange_failed": "فشل تبادل رمز YouCan.",
+    "configuration": "إعداد OAuth لـ YouCan غير صحيح.",
+    "persistence_failed": "تعذر حفظ اتصال YouCan. يرجى المحاولة مرة أخرى.",
+    "webhook_registration_failed": "تم ربط YouCan، لكن فشل تسجيل webhook.",
+    "store_slug_mismatch": "متجر YouCan المصرّح به لا يطابق المعرّف الذي أدخلته.",
+    "unauthorized": "غير مصرح",
+    "statusReadFailed": "تعذر قراءة حالة اتصال YouCan."
+  },
   "shopify": {
     "invalid_shop": "أدخل نطاق متجر Shopify صالحاً.",
     "invalid_state": "تعذر التحقق من التفويض. يرجى المحاولة مرة أخرى.",

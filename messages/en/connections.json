@@ -2,7 +2,7 @@
   "types": {
     "store": {
       "label": "Store",
-      "description": "Shopify is the first supported store provider."
+      "description": "YouCan is the primary supported store provider."
     },
     "meta": {
       "label": "Meta",
@@ -21,10 +21,21 @@
     "error": "Error"
   },
   "loadingShopify": "Loading Shopify connection...",
+  "loadingYouCan": "Loading YouCan connection...",
   "loadingMeta": "Loading Meta connection...",
   "storeProvider": "Store provider",
   "storeProviderLabel": "Store provider: {provider}",
   "connectedToShop": "Connected to {shop}",
+  "youcan": {
+    "storeSlugLabel": "YouCan store slug",
+    "storeSlugPlaceholder": "your-store",
+    "connect": "Connect YouCan",
+    "disconnect": "Disconnect YouCan",
+    "connectedSuccess": "YouCan connected successfully.",
+    "disconnectedSuccess": "YouCan disconnected.",
+    "disconnectFailed": "Unable to disconnect YouCan.",
+    "connectionFailed": "YouCan connection failed. Please try again."
+  },
   "shopify": {
     "shopDomainLabel": "Shopify shop domain",
     "shopDomainPlaceholder": "your-store.myshopify.com",

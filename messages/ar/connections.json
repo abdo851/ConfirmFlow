@@ -2,7 +2,7 @@
   "types": {
     "store": {
       "label": "المتجر",
-      "description": "Shopify هو أول مزود متجر مدعوم."
+      "description": "YouCan هو مزود المتجر الأساسي المدعوم."
     },
     "meta": {
       "label": "Meta",
@@ -21,10 +21,21 @@
     "error": "خطأ"
   },
   "loadingShopify": "جارٍ تحميل اتصال Shopify...",
+  "loadingYouCan": "جارٍ تحميل اتصال YouCan...",
   "loadingMeta": "جارٍ تحميل اتصال Meta...",
   "storeProvider": "مزود المتجر",
   "storeProviderLabel": "مزود المتجر: {provider}",
   "connectedToShop": "متصل بـ {shop}",
+  "youcan": {
+    "storeSlugLabel": "معرّف متجر YouCan (slug)",
+    "storeSlugPlaceholder": "your-store",
+    "connect": "ربط YouCan",
+    "disconnect": "قطع اتصال YouCan",
+    "connectedSuccess": "تم ربط YouCan بنجاح.",
+    "disconnectedSuccess": "تم قطع اتصال YouCan.",
+    "disconnectFailed": "تعذر قطع اتصال YouCan.",
+    "connectionFailed": "فشل ربط YouCan. يرجى المحاولة مرة أخرى."
+  },
   "shopify": {
     "shopDomainLabel": "نطاق متجر Shopify",
     "shopDomainPlaceholder": "your-store.myshopify.com",

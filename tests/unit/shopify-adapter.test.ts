@@ -14,6 +14,7 @@ describe("Shopify integration foundation", () => {
   it("recognizes Shopify as a supported store provider", () => {
     expect(isSupportedStoreProvider("shopify")).toBe(true);
     expect(supportedStoreProviders).toEqual([
+      { id: "youcan", label: "YouCan" },
       { id: "shopify", label: "Shopify" },
     ]);
   });
@@ -26,7 +27,7 @@ describe("Shopify integration foundation", () => {
   it("keeps default store connection state as not connected", () => {
     const store = getDefaultConnectionState("store");
     expect(store.status).toBe("not_connected");
-    expect(store.metadata?.provider).toBe("shopify");
+    expect(store.metadata?.provider).toBe("youcan");
   });
 
   it("routes connect through the Shopify OAuth API", async () => {

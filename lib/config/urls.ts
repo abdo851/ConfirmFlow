@@ -6,6 +6,8 @@ import {
   buildShopifyOAuthCallbackUrl,
   buildShopifyWebhookUrl,
   buildWebhookBaseUrl,
+  buildYouCanOAuthCallbackUrl,
+  buildYouCanWebhookUrl,
   normalizeBaseUrl,
 } from "./app-url";
 
@@ -35,4 +37,14 @@ export function getWebhookBaseUrl(): string {
 /** Shopify webhook ingestion endpoint — locale-independent API route. */
 export function getShopifyWebhookUrl(): string {
   return buildShopifyWebhookUrl(getAppBaseUrl());
+}
+
+/** YouCan OAuth callback — locale-independent API route. */
+export function getYouCanOAuthCallbackUrl(): string {
+  return buildYouCanOAuthCallbackUrl(getAppBaseUrl());
+}
+
+/** YouCan webhook ingestion endpoint — locale-independent API route. */
+export function getYouCanWebhookUrl(): string {
+  return buildYouCanWebhookUrl(getAppBaseUrl());
 }

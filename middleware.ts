@@ -6,6 +6,7 @@ import {
   isProtectedAppPath,
   isProtectedMetaApiPath,
   isProtectedShopifyApiPath,
+  isProtectedYouCanApiPath,
 } from "@/lib/auth/protection";
 import { defaultLocale, isAppLocale } from "@/lib/i18n/locales";
 import { getLocaleFromPathname, withLocalePath } from "@/lib/i18n/paths";
@@ -58,6 +59,18 @@ export async function middleware(request: NextRequest) {
     const user = await applySupabaseSession(request, response);
 
     if (isProtectedShopifyApiPath(pathname) && !user) {
+      if (pathname.endsWith("/connect") || pathname.endsWith("/callback")) {
+        const locale = getRequestLocale(request);
+        const loginUrl = request.nextUrl.clone();
+        loginUrl.pathname = withLocalePath(locale, "/login");
+        loginUrl.searchParams.set("next", pathname);
+        return NextResponse.redirect(loginUrl);
+      }
+
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (isProtectedYouCanApiPath(pathname) && !user) {
       if (pathname.endsWith("/connect") || pathname.endsWith("/callback")) {
         const locale = getRequestLocale(request);
         const loginUrl = request.nextUrl.clone();

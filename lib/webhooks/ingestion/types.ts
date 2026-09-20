@@ -1,4 +1,4 @@
-export type WebhookProvider = "shopify";
+export type WebhookProvider = "shopify" | "youcan";
 
 export type WebhookIngestionStatus =
   | "accepted"

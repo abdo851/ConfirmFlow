@@ -21,6 +21,14 @@ export function buildShopifyWebhookUrl(baseUrl: string): string {
   return buildAppPath(baseUrl, "/api/integrations/shopify/webhooks");
 }
 
+export function buildYouCanOAuthCallbackUrl(baseUrl: string): string {
+  return buildAppPath(baseUrl, "/api/integrations/youcan/callback");
+}
+
+export function buildYouCanWebhookUrl(baseUrl: string): string {
+  return buildAppPath(baseUrl, "/api/integrations/youcan/webhooks");
+}
+
 export function buildAuthCallbackUrl(
   baseUrl: string,
   nextPath = "/onboarding",
