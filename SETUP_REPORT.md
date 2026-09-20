@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary
 
-The ConfirmFlow environment is **partially activated**. YouCan integration was committed (`8af66c8`), all **261 unit tests pass**, Next.js dev server is **running on port 3000**, and ngrok is **tunneling to `https://ignore-savings-joyfully.ngrok-free.dev`** (matches `NEXT_PUBLIC_APP_URL`). **GitHub push** and **Supabase migration 009** were **not completed** — they require human credentials (GitHub repo URL + PAT, Supabase login).
+The ConfirmFlow environment is **fully activated**. GitHub remote is configured and `master` is in sync with `origin`. Supabase CLI is logged in, linked to project `othfbqxjwtlkbiemwsvl`, and **migration 009 is applied on remote**. Next.js dev server is **running on port 3000**, ngrok is **tunneling to `https://ignore-savings-joyfully.ngrok-free.dev`** (matches `NEXT_PUBLIC_APP_URL`), and all **261 unit tests pass**.
 
 ---
 
@@ -18,8 +18,8 @@ The ConfirmFlow environment is **partially activated**. YouCan integration was c
 |------|-------|
 | Date | 2026-09-20 |
 | Branch | `master` |
-| Final commit hash | `8af66c81c8660ffb314fb20c33c10f3a1a76a963` |
-| Commit message | `M6-C3: Add YouCan integration (OAuth, webhooks, orders, persistence, UI, tests) + migration 009` |
+| Final commit hash (pre-finalization) | `fcb5d11` — see **Final Verification** for latest |
+| Latest commit message (pre-finalization) | `docs: add project status, setup report, and handoff documents + GSAP prototype` |
 
 ---
 
@@ -175,39 +175,102 @@ git log origin/master..master  → (empty)
 
 ---
 
+## Post-Push Cleanup (2026-09-20)
+
+Documentation and prototype files committed and pushed after initial GitHub setup.
+
+| Item | Value |
+|------|-------|
+| Commit hash | `fcb5d11` (`fcb5d11a...` full hash on push) |
+| Commit message | `docs: add project status, setup report, and handoff documents + GSAP prototype` |
+| Files added | 6 files, 3032 insertions |
+| Push result | `8af66c8..fcb5d11  master -> master` |
+| Working tree | Clean |
+
+**`git log --oneline -3` after cleanup:**
+```
+fcb5d11 docs: add project status, setup report, and handoff documents + GSAP prototype
+8af66c8 M6-C3: Add YouCan integration (OAuth, webhooks, orders, persistence, UI, tests) + migration 009
+dc2d7eb M6-C2.1: Fix Shopify OAuth public redirect base
+```
+
+---
+
 ## 6. Supabase Migration 009 Status
 
-### Commands Run
+**Status: APPLIED to remote** (verified 2026-09-20)
 
-#### `npx supabase migration list`
-```
-{"_tag":"Error","error":{"code":"LegacyProjectNotLinkedError","message":"Cannot find project ref. Have you run supabase link?"}}
-```
+| Item | Value |
+|------|-------|
+| Migration file | `supabase/migrations/20250920000000_youcan_integration_foundation.sql` |
+| Timestamp | `20250920000000` |
+| Database mirror | `database/migrations/009_youcan_integration_foundation.sql` |
+| Applied to remote | **YES** |
+| Project ref | `othfbqxjwtlkbiemwsvl` |
+| Project name | `confirma` |
 
-#### `npx supabase link --project-ref othfbqxjwtlkbiemwsvl`
-```
-{"_tag":"Error","error":{"code":"LegacyPlatformAuthRequiredError","message":"Access token not provided. Supply an access token by running `supabase login` or setting the SUPABASE_ACCESS_TOKEN environment variable."}}
-```
-
-#### `npx supabase db push --dry-run`
-**NOT RUN** — blocked by missing Supabase authentication.
-
-#### `npx supabase db push`
-**NOT RUN** — blocked by missing Supabase authentication.
-
-### Known Project Reference (from local metadata file, not CLI link)
-- Project ref: `othfbqxjwtlkbiemwsvl`
-- Project name: `confirma`
-- Source file: `supabase/.temp/linked-project.json` (exists locally but CLI session is not authenticated)
-
-### Migration 009 Verification
-| Check | Status |
+### CLI Status (final)
+| Check | Result |
 |-------|--------|
-| Migration file committed | YES (`database/migrations/009_youcan_integration_foundation.sql`, `supabase/migrations/20250920000000_youcan_integration_foundation.sql`) |
-| Applied to remote Supabase | **NO** — requires `supabase login` then `supabase link` then `db push` |
-| `youcan_connections` table exists remotely | **NOT VERIFIED** |
-| `youcan_connection_secrets` table exists remotely | **NOT VERIFIED** |
-| CHECK constraints include `'youcan'` | **NOT VERIFIED on remote** (defined in migration 009 SQL locally) |
+| Supabase CLI version | `2.117.0` |
+| CLI login | **Successful** |
+| Project link | **Successful** (`othfbqxjwtlkbiemwsvl`) |
+| `npx supabase db push` | **Completed successfully** (user-confirmed) |
+
+### Migration 009 creates
+- Table `youcan_connections`
+- Table `youcan_connection_secrets`
+- Extends CHECK constraints on `stores.platform`, `orders.provider`, `store_webhook_events.provider` to include `'youcan'`
+
+### Migration list (Local vs Remote — in sync)
+
+Verified via `npx supabase migration list`:
+
+| Local | Remote | Timestamp | Status |
+|-------|--------|-----------|--------|
+| `20250915190000` | `20250915190000` | 2025-09-15 19:00:00 | In sync |
+| `20250916193000` | `20250916193000` | 2025-09-16 19:30:00 | In sync |
+| `20250916200000` | `20250916200000` | 2025-09-16 20:00:00 | In sync |
+| `20250916210000` | `20250916210000` | 2025-09-16 21:00:00 | In sync |
+| `20250916220000` | `20250916220000` | 2025-09-16 22:00:00 | In sync |
+| `20250916230000` | `20250916230000` | 2025-09-16 23:00:00 | In sync |
+| `20250917000000` | `20250917000000` | 2025-09-17 00:00:00 | In sync |
+| `20250920000000` | `20250920000000` | 2025-09-20 00:00:00 | In sync |
+
+All 8 Supabase timestamped migrations (002–009 equivalents) are applied on both local and remote.
+
+---
+
+## Final Verification (2026-09-20)
+
+### GitHub
+| Item | Status |
+|------|--------|
+| Remote URL | `https://github.com/abdo851/ConfirmFlow.git` |
+| Branch | `master` (tracking `origin/master`) |
+| Latest commit (pre-final report push) | `fcb5d11` |
+| Push status | **In sync with origin** |
+| Working tree | Clean (except pending SETUP_REPORT.md update) |
+
+### Supabase CLI
+| Item | Status |
+|------|--------|
+| Login | **Successful** |
+| Project link | **Successful** — ref `othfbqxjwtlkbiemwsvl` |
+| Migration 009 applied | **YES** — `20250920000000_youcan_integration_foundation.sql` |
+| Local/Remote migrations | **In sync** (8 migrations) |
+
+### Next.js Dev Server (verified at finalization)
+| Endpoint | Response |
+|----------|----------|
+| `GET /api/health` | `{"status":"ok","service":"confirma","milestone":"M0"}` |
+| `GET /api/supabase/verify` | `{"service":"confirma","supabase":{"configured":true,"reachable":true,"error":null}}` |
+
+### ngrok
+| Item | Value |
+|------|-------|
+| Public URL | `https://ignore-savings-joyfully.ngrok-free.dev` |
+| Matches `NEXT_PUBLIC_APP_URL` | **YES** |
 
 ---
 
@@ -257,7 +320,7 @@ npm run dev
  ✓ Ready in 14.1s
 ```
 
-### Health Check — Local
+### Health Check — Local (latest, 2026-09-20 post-push)
 
 **Command:**
 ```powershell
@@ -269,7 +332,7 @@ curl.exe -s http://localhost:3000/api/health
 {"status":"ok","service":"confirma","milestone":"M0"}
 ```
 
-### Supabase Verify — Local
+### Supabase Verify — Local (latest, 2026-09-20 post-push)
 
 **Command:**
 ```powershell
@@ -287,6 +350,7 @@ curl.exe -s http://localhost:3000/api/supabase/verify
 | Port | **3000** |
 | Health endpoint | **200 OK** |
 | Supabase verify | **configured + reachable** |
+| Re-checked after doc push | **YES — both endpoints still OK** |
 
 ### Observed Warning (non-blocking)
 Dev server log shows intermittent `SyntaxError: Unexpected end of JSON input` on `/en` page during initial compilation. Health and Supabase verify endpoints work correctly.
@@ -404,9 +468,6 @@ npm run test
 
 | Item | Status | Impact |
 |------|--------|--------|
-| GitHub remote + push | Not configured | Code not backed up remotely |
-| Supabase CLI login | Not authenticated | Cannot push migration 009 |
-| Migration 009 on remote DB | Not applied | YouCan tables/constraints missing in production Supabase |
 | YouCan env vars | Not set | YouCan OAuth will fail with `reason=configuration` |
 | Meta session secret | Not set | Meta connect and CAPI delivery will fail |
 | Shopify OAuth live E2E | Previously blocked at Shopify grant page | Store connection not verified live |
@@ -414,53 +475,24 @@ npm run test
 | `.gitignore` gaps | Missing `.temp`, `supabase/.temp`, `.vercel` | Temp/link files could be accidentally committed |
 | Intermittent `/en` JSON parse error | Observed in dev server log | May affect landing page on first load |
 
+**Resolved during setup:** GitHub remote/push, Supabase CLI login, project link, migration 009 on remote.
+
 ---
 
 ## 14. MANUAL ACTIONS REQUIRED
 
-These steps require human input or credentials that cannot be obtained autonomously:
+**Setup blockers resolved.** No manual actions required to complete environment activation.
 
-1. **Provide GitHub repository URL** — needed to run:
-   ```powershell
-   git remote add origin <YOUR_GITHUB_REPO_URL>
-   git push -u origin master
-   ```
-   If prompted for authentication, paste a GitHub Personal Access Token (PAT) with `repo` scope.
-
-2. **Authenticate Supabase CLI** — run in a separate terminal:
-   ```powershell
-   cd "C:\Users\pc\Documents\AI Projects\02_Projects\ConfirmFlow"
-   npx supabase login
-   ```
-   Then confirm here so migration push can continue with:
-   ```powershell
-   npx supabase link --project-ref othfbqxjwtlkbiemwsvl
-   npx supabase db push --dry-run
-   npx supabase db push
-   ```
-
-3. **Set missing environment variables in `.env.local`** (names only):
-   - `YOUCAN_API_KEY`
-   - `YOUCAN_API_SECRET`
-   - `YOUCAN_SESSION_SECRET`
-   - `META_SESSION_SECRET`
-   - (Optional) `YOUCAN_OAUTH_SCOPES`, `SHOPIFY_OAUTH_SCOPES`
-
-4. **Obtain YouCan Partner API credentials** from YouCan developer dashboard (if testing YouCan OAuth).
-
-5. **Obtain Meta session secret** — generate a random string ≥ 32 characters for `META_SESSION_SECRET`.
-
-6. **Fix Shopify OAuth grant page error** — verify Shopify Partners Dashboard distribution settings for app `confirma-3` and store `yhken8-ej.myshopify.com` (dashboard-only action).
-
-7. **(Optional) Add to `.gitignore`:** `.temp`, `supabase/.temp`, `.vercel` to prevent accidental commits of temp/link metadata.
+Optional next steps (product testing, not setup):
+1. Set `YOUCAN_API_KEY`, `YOUCAN_API_SECRET`, `YOUCAN_SESSION_SECRET` in `.env.local` to test YouCan OAuth.
+2. Set `META_SESSION_SECRET` (≥ 32 chars) to test Meta connect and CAPI delivery.
+3. Verify Shopify Partners Dashboard distribution for app `confirma-3` if retrying Shopify OAuth.
 
 ---
 
 ## 15. Recommended Next Action
 
-**Provide your GitHub repository URL** (e.g. `https://github.com/yourusername/ConfirmFlow.git`) so the agent can add the remote and push `master` with commit `8af66c8`.
-
-After that, run `npx supabase login` in your terminal and confirm when done so migration 009 can be pushed to remote Supabase.
+Test the full MVP loop: connect a store (YouCan or Shopify) → receive a webhook order → confirm in dashboard → verify Meta CAPI Purchase delivery.
 
 ---
 
@@ -470,8 +502,8 @@ After that, run `npx supabase login` in your terminal and confirm when done so m
 |-------|-------------|--------|
 | A | Audit | Completed — all commands run, outputs recorded above |
 | B | Git commit YouCan | **Completed** — commit `8af66c8` |
-| C | GitHub remote + push | **Blocked** — no remote URL provided |
-| D | Supabase migration 009 | **Blocked** — `supabase login` required |
+| C | GitHub remote + push | **Completed** — `https://github.com/abdo851/ConfirmFlow.git` |
+| D | Supabase migration 009 | **Completed** — applied on remote (`20250920000000`) |
 | E | Env vars audit | **Completed** — table in §7 |
 | F | Start Next.js dev server | **Completed** — port 3000, health OK |
 | G | Start ngrok tunnel | **Completed** — URL matches APP_URL |
