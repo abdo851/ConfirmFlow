@@ -14,5 +14,5 @@ test("health API responds", async ({ request }) => {
   expect(response.ok()).toBeTruthy();
   const body = await response.json();
   expect(body.status).toBe("ok");
-  expect(body.milestone).toBe("M0");
+  expect(body.milestone).toBe("MVP");
 });
