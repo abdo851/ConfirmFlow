@@ -4,6 +4,6 @@ export async function GET() {
   return NextResponse.json({
     status: "ok",
     service: "confirma",
-    milestone: "M0",
+    milestone: "MVP",
   });
 }
