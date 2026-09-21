@@ -8,7 +8,7 @@ import {
   isProtectedShopifyApiPath,
   isProtectedYouCanApiPath,
 } from "@/lib/auth/protection";
-import { defaultLocale, isAppLocale } from "@/lib/i18n/locales";
+import { defaultLocale, isAppLocale, type AppLocale } from "@/lib/i18n/locales";
 import { getLocaleFromPathname, withLocalePath } from "@/lib/i18n/paths";
 
 const handleI18nRouting = createIntlMiddleware(routing);
@@ -51,6 +51,23 @@ async function applySupabaseSession(
   return user;
 }
 
+/** Path + query for post-login redirect (e.g. connect routes with ?shop=). */
+function buildLoginNextPath(request: NextRequest): string {
+  const { pathname, search } = request.nextUrl;
+  return `${pathname}${search}`;
+}
+
+function redirectUnauthenticatedToLogin(
+  request: NextRequest,
+  locale: AppLocale,
+): NextResponse {
+  const loginUrl = request.nextUrl.clone();
+  loginUrl.pathname = withLocalePath(locale, "/login");
+  loginUrl.search = "";
+  loginUrl.searchParams.set("next", buildLoginNextPath(request));
+  return NextResponse.redirect(loginUrl);
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -60,11 +77,7 @@ export async function middleware(request: NextRequest) {
 
     if (isProtectedShopifyApiPath(pathname) && !user) {
       if (pathname.endsWith("/connect") || pathname.endsWith("/callback")) {
-        const locale = getRequestLocale(request);
-        const loginUrl = request.nextUrl.clone();
-        loginUrl.pathname = withLocalePath(locale, "/login");
-        loginUrl.searchParams.set("next", pathname);
-        return NextResponse.redirect(loginUrl);
+        return redirectUnauthenticatedToLogin(request, getRequestLocale(request));
       }
 
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -72,11 +85,7 @@ export async function middleware(request: NextRequest) {
 
     if (isProtectedYouCanApiPath(pathname) && !user) {
       if (pathname.endsWith("/connect") || pathname.endsWith("/callback")) {
-        const locale = getRequestLocale(request);
-        const loginUrl = request.nextUrl.clone();
-        loginUrl.pathname = withLocalePath(locale, "/login");
-        loginUrl.searchParams.set("next", pathname);
-        return NextResponse.redirect(loginUrl);
+        return redirectUnauthenticatedToLogin(request, getRequestLocale(request));
       }
 
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -93,11 +102,7 @@ export async function middleware(request: NextRequest) {
   const user = await applySupabaseSession(request, response);
 
   if (isProtectedAppPath(pathname) && !user) {
-    const locale = getRequestLocale(request);
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = withLocalePath(locale, "/login");
-    loginUrl.searchParams.set("next", pathname);
-    return NextResponse.redirect(loginUrl);
+    return redirectUnauthenticatedToLogin(request, getRequestLocale(request));
   }
 
   return response;
