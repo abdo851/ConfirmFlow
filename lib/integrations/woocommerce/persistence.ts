@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { toConnectionStatus } from "@/lib/database/connection-status";
 import { createDatabaseClient } from "@/lib/database/client";
+import { logger } from "@/lib/logging/logger";
 import { getWooCommerceEnv } from "./env";
 import { encryptSecret } from "./oauth/crypto";
 import type { WooCommerceConnectionPublicState } from "./types";
@@ -58,15 +59,17 @@ async function assertStoreAvailableForUser(
   }
 }
 
-export async function persistWooCommerceConnectionForUser(input: {
-  userId: string;
-  userEmail: string;
-  storeUrl: string;
-  consumerKey: string;
-  consumerSecret: string;
-  scope?: string | null;
-}): Promise<{ storeId: string }> {
-  const db = createDatabaseClient();
+export async function persistWooCommerceConnectionForUser(
+  input: {
+    userId: string;
+    userEmail: string;
+    storeUrl: string;
+    consumerKey: string;
+    consumerSecret: string;
+    scope?: string | null;
+  },
+  db: SupabaseClient = createDatabaseClient(),
+): Promise<{ storeId: string }> {
   const env = getWooCommerceEnv();
   const encryptedConsumerKey = encryptSecret(
     input.consumerKey,
@@ -164,9 +167,8 @@ export async function persistWooCommerceConnectionForUser(input: {
 
 export async function getWooCommerceConnectionStateForUser(
   userId: string,
+  db: SupabaseClient = createDatabaseClient(),
 ): Promise<WooCommerceConnectionPublicState> {
-  const db = createDatabaseClient();
-
   const { data: stores, error: storesError } = await db
     .from("stores")
     .select("id")
@@ -174,31 +176,45 @@ export async function getWooCommerceConnectionStateForUser(
     .eq("platform", "woocommerce");
 
   if (storesError || !stores?.length) {
+    logger.info("woocommerce_status_not_connected", {
+      reason: storesError ? "stores_query_failed" : "no_store",
+      detail: storesError?.message,
+    });
     return { connected: false };
   }
 
   const storeIds = stores.map((store) => store.id);
-  const { data: storeConnection, error: connectionError } = await db
+  const { data: connections, error: connectionError } = await db
     .from("store_connections")
-    .select("id, status")
+    .select("id, status, updated_at")
     .in("store_id", storeIds)
     .eq("connection_type", "store")
-    .eq("provider", "woocommerce")
-    .order("updated_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .eq("provider", "woocommerce");
+
+  const storeConnection = [...(connections ?? [])].sort((left, right) =>
+    String(right.updated_at ?? "").localeCompare(String(left.updated_at ?? "")),
+  )[0];
 
   if (connectionError || !storeConnection) {
+    logger.info("woocommerce_status_not_connected", {
+      reason: connectionError ? "connection_query_failed" : "no_connection",
+      detail: connectionError?.message,
+    });
     return { connected: false };
   }
 
-  const { data: wooConnection, error: wooError } = await db
+  const { data: wooConnections, error: wooError } = await db
     .from("woocommerce_connections")
     .select("store_url, error_message, connected_at")
-    .eq("store_connection_id", storeConnection.id)
-    .maybeSingle();
+    .eq("store_connection_id", storeConnection.id);
+
+  const wooConnection = wooConnections?.[0];
 
   if (wooError || !wooConnection) {
+    logger.info("woocommerce_status_not_connected", {
+      reason: wooError ? "woocommerce_query_failed" : "no_woocommerce_row",
+      detail: wooError?.message,
+    });
     return { connected: false };
   }
 

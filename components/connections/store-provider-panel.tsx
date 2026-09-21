@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { ShopifyConnectForm } from "./shopify-connect-form";
@@ -19,9 +20,24 @@ function StoreProviderLoading() {
   );
 }
 
+function initialProvider(
+  searchParams: { get(name: string): string | null },
+): StoreProviderId {
+  if (searchParams.get("woocommerce")) {
+    return "woocommerce";
+  }
+  if (searchParams.get("shopify")) {
+    return "shopify";
+  }
+  return "youcan";
+}
+
 function StoreProviderPanelContent() {
   const t = useTranslations("connections");
-  const [activeProvider, setActiveProvider] = useState<StoreProviderId>("youcan");
+  const searchParams = useSearchParams();
+  const [activeProvider, setActiveProvider] = useState<StoreProviderId>(() =>
+    initialProvider(searchParams),
+  );
 
   return (
     <div className="space-y-4">

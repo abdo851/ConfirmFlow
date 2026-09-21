@@ -3,6 +3,7 @@ import { buildAppPath } from "@/lib/config/app-url";
 import { getAppBaseUrl } from "@/lib/config/urls";
 import { getLocalizedPath } from "@/lib/i18n/server-locale";
 import { createDatabaseClient } from "@/lib/database/client";
+import { logger } from "@/lib/logging/logger";
 import {
   WOOCOMMERCE_OAUTH_STATE_TTL_SECONDS,
   getWooCommerceEnv,
@@ -75,7 +76,7 @@ export async function POST(request: Request) {
       .eq("id", state.userId)
       .maybeSingle();
 
-    await persistWooCommerceConnectionForUser({
+    const saved = await persistWooCommerceConnectionForUser({
       userId: state.userId,
       userEmail: profile?.email ?? "",
       storeUrl: state.storeUrl,
@@ -83,7 +84,15 @@ export async function POST(request: Request) {
       consumerSecret: verified.credentials.consumerSecret,
       scope: verified.credentials.keyPermissions,
     });
-  } catch {
+    logger.info("woocommerce_callback_persisted", {
+      storeId: saved.storeId,
+      userId: state.userId,
+    });
+  } catch (error) {
+    logger.error("woocommerce_callback_persist_failed", {
+      message: error instanceof Error ? error.message : "unknown",
+      userId: state.userId,
+    });
     return NextResponse.json({ error: "persistence_failed" }, { status: 400 });
   }
 
