@@ -85,7 +85,7 @@ The test consumer key and consumer secret from the working session were **not** 
 
 ## 9. Latest commit hash
 
-Set after push.
+Feature commit: `242c497`.
 
 ## 10. Next steps
 
