@@ -51,6 +51,18 @@ async function applySupabaseSession(
   return user;
 }
 
+function isWooCommerceCallbackPath(pathname: string): boolean {
+  return pathname === "/api/integrations/woocommerce/callback";
+}
+
+function isProtectedWooCommerceApiPath(pathname: string): boolean {
+  if (isWooCommerceCallbackPath(pathname)) {
+    return false;
+  }
+
+  return pathname.startsWith("/api/integrations/woocommerce");
+}
+
 /** Path + query for post-login redirect (e.g. connect routes with ?shop=). */
 function buildLoginNextPath(request: NextRequest): string {
   const { pathname, search } = request.nextUrl;
@@ -85,6 +97,14 @@ export async function middleware(request: NextRequest) {
 
     if (isProtectedYouCanApiPath(pathname) && !user) {
       if (pathname.endsWith("/connect") || pathname.endsWith("/callback")) {
+        return redirectUnauthenticatedToLogin(request, getRequestLocale(request));
+      }
+
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (isProtectedWooCommerceApiPath(pathname) && !user) {
+      if (pathname.endsWith("/connect")) {
         return redirectUnauthenticatedToLogin(request, getRequestLocale(request));
       }
 

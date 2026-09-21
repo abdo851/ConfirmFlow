@@ -4,9 +4,10 @@ import { Suspense, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { ShopifyConnectForm } from "./shopify-connect-form";
+import { WooCommerceConnectForm } from "./woocommerce-connect-form";
 import { YouCanConnectForm } from "./youcan-connect-form";
 
-type StoreProviderId = "youcan" | "shopify";
+type StoreProviderId = "youcan" | "shopify" | "woocommerce";
 
 function StoreProviderLoading() {
   const t = useTranslations("connections");
@@ -41,10 +42,19 @@ function StoreProviderPanelContent() {
           >
             {t("shopifyLabel")}
           </Button>
+          <Button
+            type="button"
+            variant={activeProvider === "woocommerce" ? "default" : "outline"}
+            onClick={() => setActiveProvider("woocommerce")}
+          >
+            {t("woocommerceLabel")}
+          </Button>
         </div>
       </div>
 
-      {activeProvider === "youcan" ? <YouCanConnectForm /> : <ShopifyConnectForm />}
+      {activeProvider === "youcan" ? <YouCanConnectForm /> : null}
+      {activeProvider === "shopify" ? <ShopifyConnectForm /> : null}
+      {activeProvider === "woocommerce" ? <WooCommerceConnectForm /> : null}
     </div>
   );
 }
