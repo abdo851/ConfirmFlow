@@ -43,6 +43,7 @@
   },
   "storeProvider": "Store provider",
   "storeProviderLabel": "Store provider: {provider}",
+  "activeProvider": "{provider}: {target}",
   "connectedToShop": "Connected to {shop}",
   "youcan": {
     "storeSlugLabel": "YouCan store slug",

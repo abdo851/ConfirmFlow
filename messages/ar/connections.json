@@ -43,6 +43,7 @@
   },
   "storeProvider": "مزود المتجر",
   "storeProviderLabel": "مزود المتجر: {provider}",
+  "activeProvider": "{provider}: {target}",
   "connectedToShop": "متصل بـ {shop}",
   "youcan": {
     "storeSlugLabel": "معرّف متجر YouCan (slug)",

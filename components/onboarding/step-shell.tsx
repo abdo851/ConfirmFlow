@@ -5,6 +5,13 @@ import { ConnectionStatusBadge } from "@/components/connections";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getDefaultConnectionState } from "@/lib/connections";
+import { getShopifyConnectionPublicState } from "@/lib/integrations/shopify/session";
+import { getWooCommerceConnectionPublicState } from "@/lib/integrations/woocommerce";
+import { getYouCanConnectionPublicState } from "@/lib/integrations/youcan/session";
+import {
+  listConnectedStoreProviders,
+  type ConnectedStoreProvider,
+} from "./connected-store-providers";
 import { ConnectPlaceholderButton } from "./connect-placeholder-button";
 import { OnboardingStepNav } from "./step-nav";
 import {
@@ -14,6 +21,36 @@ import {
   onboardingSteps,
   type OnboardingStepNumber,
 } from "./steps";
+
+async function readConnectedStoreProviders(): Promise<ConnectedStoreProvider[]> {
+  const [youcan, shopify, woocommerce] = await Promise.all([
+    getYouCanConnectionPublicState().catch(() => ({
+      provider: "youcan" as const,
+      status: "not_connected" as const,
+    })),
+    getShopifyConnectionPublicState().catch(() => ({
+      provider: "shopify" as const,
+      status: "not_connected" as const,
+    })),
+    getWooCommerceConnectionPublicState().catch(() => ({
+      connected: false,
+    })),
+  ]);
+
+  return listConnectedStoreProviders({ youcan, shopify, woocommerce });
+}
+
+function providerLabelKey(
+  provider: ConnectedStoreProvider["provider"],
+): "youcanLabel" | "shopifyLabel" | "woocommerceLabel" {
+  if (provider === "youcan") {
+    return "youcanLabel";
+  }
+  if (provider === "shopify") {
+    return "shopifyLabel";
+  }
+  return "woocommerceLabel";
+}
 
 interface OnboardingStepShellProps {
   currentStep: OnboardingStepNumber;
@@ -27,9 +64,27 @@ export async function OnboardingStepShell({
   connectOverride,
 }: OnboardingStepShellProps) {
   const t = await getTranslations("onboarding");
+  const connectionsT = await getTranslations("connections");
   const common = await getTranslations("common");
   const step = getOnboardingStep(currentStep);
   const connection = getDefaultConnectionState(step.connectionType);
+  const connectedProviders =
+    step.connectionType === "store" ? await readConnectedStoreProviders() : [];
+  const storeConnected = connectedProviders.length > 0;
+  const badgeStatus = storeConnected ? "connected" : connection.status;
+  const statusText = storeConnected
+    ? connectedProviders
+        .map((item) => {
+          const provider = connectionsT(providerLabelKey(item.provider));
+          return item.target
+            ? connectionsT("activeProvider", {
+                provider,
+                target: item.target,
+              })
+            : provider;
+        })
+        .join(" · ")
+    : t("noRealIntegration");
   const backHref = getPreviousStepHref(currentStep);
   const nextHref = getNextStepHref(currentStep) ?? "/dashboard";
   const continueLabel =
@@ -49,13 +104,10 @@ export async function OnboardingStepShell({
           <div>
             <p className="text-sm font-medium">{t("connectionStatus")}</p>
             <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-              {t("noRealIntegration")}
+              {statusText}
             </p>
           </div>
-          <ConnectionStatusBadge
-            type={connection.type}
-            status={connection.status}
-          />
+          <ConnectionStatusBadge type={connection.type} status={badgeStatus} />
         </div>
 
         {children ? <div className="mt-4">{children}</div> : null}
