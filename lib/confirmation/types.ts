@@ -3,10 +3,12 @@
  * Operates on Confirma orders — not Shopify or other store payloads.
  */
 
-export type ConfirmationStatus = "pending" | "confirmed";
+export type ConfirmationStatus = "pending" | "confirmed" | "rejected" | "archived";
 
 export type ConfirmOrderResultStatus =
   | "confirmed"
+  | "rejected"
+  | "archived"
   | "already_confirmed"
   | "not_found"
   | "forbidden"

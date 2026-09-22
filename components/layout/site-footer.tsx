@@ -33,10 +33,11 @@ export function SiteFooter() {
   const landing = useTranslations("landing");
   const nav = useTranslations("navigation");
   const brand = useTranslations("common");
+  const policies = useTranslations("policies");
 
   return (
     <footer className="mt-auto border-t border-line bg-surface">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-3 lg:px-8">
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
         <div>
           <p className="text-base font-semibold">{brand("brand")}</p>
           <p className="mt-2 max-w-xs text-sm text-muted">{landing("footer")}</p>
@@ -53,6 +54,36 @@ export function SiteFooter() {
               <a href="#features" className="hover:text-foreground">
                 {landing("stepsTitle")}
               </a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p className="text-sm font-semibold">{landing("footerCompany")}</p>
+          <ul className="mt-3 space-y-2 text-sm text-muted">
+            <li>
+              <Link href="/" className="hover:text-foreground">
+                {brand("home")}
+              </Link>
+            </li>
+            <li>
+              <Link href="/policies/privacy" className="hover:text-foreground">
+                {policies("links.privacy")}
+              </Link>
+            </li>
+            <li>
+              <Link href="/policies/terms" className="hover:text-foreground">
+                {policies("links.terms")}
+              </Link>
+            </li>
+            <li>
+              <Link href="/policies/refund" className="hover:text-foreground">
+                {policies("links.refund")}
+              </Link>
+            </li>
+            <li>
+              <Link href="/policies/cookies" className="hover:text-foreground">
+                {policies("links.cookies")}
+              </Link>
             </li>
           </ul>
         </div>

@@ -86,6 +86,20 @@
     "verificationCredentialsValid": "Meta credentials are valid, but Pixel/Dataset access could not be fully confirmed.",
     "verificationIdentifierNotVerified": "Meta credentials are valid, but the configured Pixel/Dataset could not be verified.",
     "verificationFailed": "Meta credential verification failed.",
-    "verificationUnverified": "Credentials saved. Verification has not completed yet."
-  }
+    "verificationUnverified": "Credentials saved. Verification has not completed yet.",
+    "verificationStatusLabel": "Verification",
+    "lastDeliveryLabel": "Last delivery",
+    "noDelivery": "No delivery yet"
+  },
+  "activeNow": "Active",
+  "comingSoon": "Coming soon",
+  "comingSoonSubtitle": "We are adding this platform soon.",
+  "teamTitle": "Team",
+  "waitlistNote": "Interested? Join the waitlist",
+  "notifyMe": "Notify me",
+  "waitlistSaved": "You are on the list.",
+  "waitlistInvalid": "Enter a valid email.",
+  "connect": "Connect",
+  "disconnect": "Disconnect",
+  "disconnectFailed": "Unable to disconnect this integration."
 }

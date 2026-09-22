@@ -86,6 +86,20 @@
     "verificationCredentialsValid": "بيانات اعتماد Meta صالحة، لكن تعذر تأكيد الوصول إلى Pixel/Dataset بالكامل.",
     "verificationIdentifierNotVerified": "بيانات اعتماد Meta صالحة، لكن تعذر التحقق من Pixel/Dataset المُعد.",
     "verificationFailed": "فشل التحقق من بيانات اعتماد Meta.",
-    "verificationUnverified": "تم حفظ بيانات الاعتماد. لم يكتمل التحقق بعد."
-  }
+    "verificationUnverified": "تم حفظ بيانات الاعتماد. لم يكتمل التحقق بعد.",
+    "verificationStatusLabel": "التحقق",
+    "lastDeliveryLabel": "آخر محاولة إرسال",
+    "noDelivery": "لا توجد محاولة إرسال بعد"
+  },
+  "activeNow": "نشط",
+  "comingSoon": "قريباً",
+  "comingSoonSubtitle": "نعمل على إضافة هذه المنصة قريباً",
+  "teamTitle": "الفريق",
+  "waitlistNote": "هل أنت مهتم بهذه المنصة؟ انضم إلى قائمة الانتظار",
+  "notifyMe": "أبلغني عند الإطلاق",
+  "waitlistSaved": "تمت إضافتك إلى القائمة.",
+  "waitlistInvalid": "أدخل بريداً صالحاً.",
+  "connect": "اتصال",
+  "disconnect": "قطع الاتصال",
+  "disconnectFailed": "تعذر قطع اتصال هذا التكامل."
 }

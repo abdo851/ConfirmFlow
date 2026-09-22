@@ -19,15 +19,16 @@ export function ConnectionStateItem({ connection }: ConnectionStateItemProps) {
     ? t("connectedToShop", { shop: connection.metadata.shopDomain })
     : t(`types.${connection.type}.description`);
 
-  const accent =
-    connection.type === "meta"
-      ? "border-s-sky-500"
-      : connection.type === "confirmation"
-        ? "border-s-teal-500"
-        : "border-s-indigo-500";
+  const connected = connection.status === "connected";
+  const disconnected = connection.status === "not_connected";
+  const frame = connected
+    ? "border-emerald-200 border-s-4 border-s-emerald-500 bg-emerald-50/40 dark:border-emerald-900 dark:bg-emerald-950/20"
+    : disconnected
+      ? "border-dashed border-line bg-surface-muted/40 text-muted"
+      : "border-line bg-surface";
 
   return (
-    <li className={`flex items-start justify-between gap-4 rounded-2xl border border-line border-s-4 bg-surface p-4 shadow-soft ${accent}`}>
+    <li className={`hover-lift flex items-start justify-between gap-4 rounded-2xl border p-4 shadow-soft sm:p-6 ${frame}`}>
       <div>
         <p className="font-medium">{t(`types.${connection.type}.label`)}</p>
         {providerLabel ? (
@@ -44,10 +45,18 @@ export function ConnectionStateItem({ connection }: ConnectionStateItemProps) {
           </p>
         ) : null}
       </div>
-      <ConnectionStatusBadge
-        type={connection.type}
-        status={connection.status}
-      />
+      <div className="flex items-center gap-2">
+        {connected ? (
+          <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+            <span className="animate-pulse-dot size-2 rounded-full bg-emerald-500" />
+            {t("activeNow")}
+          </span>
+        ) : null}
+        <ConnectionStatusBadge
+          type={connection.type}
+          status={connection.status}
+        />
+      </div>
     </li>
   );
 }

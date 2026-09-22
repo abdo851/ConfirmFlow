@@ -27,5 +27,22 @@
   "ctaTitle": "Ready to send cleaner conversion data?",
   "ctaDescription": "Connect your store, confirm real orders, and keep Meta focused on purchases that actually happened.",
   "footerProduct": "Product",
-  "footerAccount": "Account"
+  "footerAccount": "Account",
+  "footerCompany": "Company",
+  "features": {
+    "confirm": "Confirm only real orders",
+    "stores": "WooCommerce, YouCan, and Shopify",
+    "meta": "Meta Conversions API ready",
+    "inbox": "One inbox for incoming orders",
+    "rtl": "Arabic and English, including RTL",
+    "privacy": "Secrets stay encrypted on the server"
+  },
+  "pricing": {
+    "basicName": "Basic",
+    "basicPrice": "Start free",
+    "basicDetail": "Connect one store and confirm orders before anything is sent.",
+    "proName": "Pro",
+    "proPrice": "For growing stores",
+    "proDetail": "A visual preview of a higher tier. Billing is not enabled."
+  }
 }

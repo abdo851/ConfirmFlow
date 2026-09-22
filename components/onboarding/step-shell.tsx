@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { ReactNode } from "react";
 import { ConnectionStatusBadge } from "@/components/connections";
+import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getDefaultConnectionState } from "@/lib/connections";
@@ -95,6 +96,7 @@ export async function OnboardingStepShell({
 
   return (
     <div>
+      <BackButton href="/onboarding" label={common("back")} />
       <OnboardingStepNav currentStep={currentStep} />
       <Card
         title={`${t("stepNumber", { number: step.number })} — ${t(`steps.${step.stepKey}.label`)}`}
@@ -102,7 +104,10 @@ export async function OnboardingStepShell({
       >
         <div className="flex items-start justify-between gap-4 rounded-2xl border border-line bg-surface-muted px-4 py-3">
           <div>
-            <p className="text-sm font-medium">{t("connectionStatus")}</p>
+            <p className="text-sm font-medium">
+              {storeConnected ? <span aria-hidden>✓ </span> : null}
+              {t("connectionStatus")}
+            </p>
             <p className="mt-1 text-sm text-muted">
               {statusText}
             </p>

@@ -72,8 +72,17 @@ export function shouldShowConfirmButton(
 
 export function getOrderStatusBadgeVariant(
   confirmationStatus: OrderConfirmationStatus,
-): "default" | "warning" {
-  return confirmationStatus === "confirmed" ? "default" : "warning";
+): "default" | "warning" | "danger" | "muted" {
+  if (confirmationStatus === "confirmed") {
+    return "default";
+  }
+  if (confirmationStatus === "rejected") {
+    return "danger";
+  }
+  if (confirmationStatus === "archived") {
+    return "muted";
+  }
+  return "warning";
 }
 
 export function isConfirmButtonDisabled(

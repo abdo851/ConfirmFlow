@@ -13,12 +13,37 @@
   },
   "status": {
     "pending": "قيد الانتظار",
-    "confirmed": "مؤكد"
+    "confirmed": "مؤكد",
+    "rejected": "مرفوض",
+    "archived": "مؤرشف"
   },
   "customerUnavailable": "غير متوفر",
   "confirmOrder": "تأكيد الطلب",
   "confirming": "جارٍ التأكيد…",
   "confirmSuccess": "تم تأكيد الطلب.",
+  "exportCsv": "تصدير CSV",
+  "exportNote": "التصدير غير متاح بعد. هذا الزر لا ينزّل ملفاً.",
+  "exportFailed": "تعذر تصدير الطلبات.",
+  "confirmShort": "تأكيد",
+  "rejectOrder": "رفض",
+  "archiveOrder": "أرشفة",
+  "detailDescription": "العميل والمبلغ ومسار التأكيد.",
+  "source": "المصدر",
+  "created": "تاريخ الإنشاء",
+  "timeline": {
+    "received": "تم الاستلام",
+    "confirmed": "تم التأكيد"
+  },
+  "tabs": {
+    "all": "الكل",
+    "new": "جديدة",
+    "review": "قيد المراجعة",
+    "confirmed": "مؤكدة",
+    "rejected": "مرفوضة",
+    "archived": "مؤرشفة"
+  },
+  "filterEmpty": "لا توجد طلبات في هذه الحالة.",
+  "loadMore": "عرض المزيد",
   "errors": {
     "unauthorized": "انتهت جلستك. يرجى تسجيل الدخول مرة أخرى.",
     "forbidden": "ليس لديك صلاحية لتأكيد هذا الطلب.",

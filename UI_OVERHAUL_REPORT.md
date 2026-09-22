@@ -1,109 +1,61 @@
-# Confirma UI overhaul
+# UI polish pass
 
-status = "uncommitted, awaiting user approval"
+Status: uncommitted, awaiting user approval
 
-## 1. Summary of design decisions
+## 1. Summary
 
-The interface now uses an indigo primary and a teal accent on a slate surface, with Inter for English and Cairo for Arabic. Existing routes, forms, server actions, and data loading are unchanged. New copy was added only where the layout needed a label that did not already exist.
+Visual refinement of the marketing, dashboard, orders, connections, auth, and onboarding surfaces. Existing indigo, teal, Inter, and Cairo tokens stay in place. Data loading, confirmation, and provider connect flows are unchanged.
 
-The dashboard welcome banner does not insert a personal name. That page does not load a profile, and fetching one would be a data change. The banner uses the new “Welcome back” line plus the existing overview title.
+Dashboard stat numbers are an em dash, and the 7-day chart is a CSS placeholder. The overview page does not load orders, so it does not invent counts.
 
-Orders do not have a search or filter action, so no non-functional search box was added. The table is a sticky-header table from the `md` breakpoint up, and stacked cards below that.
+Order status tabs filter the list already loaded in the browser. Statuses the product does not store (in review, rejected, archived) show a count of 0. Confirm still posts to the existing confirm route. There is no order-detail route, so rows do not navigate to a new page.
 
-Footer icons link to Home, Sign in, and Get started. They are not placeholder social-network profiles.
+Export CSV and Google sign-in are disabled controls with a short note. Forgot password is disabled the same way. No new routes were added.
 
-## 2. Design tokens added
+## 2. New UI components
 
-Defined in `app/globals.css`:
+- `components/ui/stat-card.tsx`
+- `components/ui/empty-state.tsx`
+- `components/ui/section-heading.tsx`
+- `components/ui/sparkline.tsx`
 
-- Colors: primary indigo, secondary teal, accent cyan, success emerald, warning amber, danger rose, slate neutrals, plus dark-mode values under `prefers-color-scheme`
-- Type: `--font-inter` and `--font-cairo` (weights 400, 500, 600, 700), loaded with `next/font`
-- Radius: existing Tailwind scale, applied as `rounded-xl` / `rounded-2xl` / `rounded-3xl` / `rounded-full`
-- Shadows: `shadow-soft`, `shadow-medium`, `shadow-large`
-- Motion: 150ms, 250ms, and 400ms ease-out, plus fade, slide, float, pulse, shimmer, toast, dialog, and drawer keyframes
-- `prefers-reduced-motion` disables those animations and press/hover transforms
+## 3. Pages touched
 
-## 3. Components refined
+- Landing page
+- Dashboard overview
+- Orders page and orders list
+- Connections cards
+- Login, signup, and the auth layout
+- Site footer
+- Onboarding step navigation already shows a check on visited steps; no flow change
 
-- `components/ui/button.tsx`
-- `components/ui/input.tsx`
-- `components/ui/card.tsx`
-- `components/ui/badge.tsx`
-- `components/layout/site-header.tsx`
-- `components/layout/site-footer.tsx`
-- `components/layout/language-switcher.tsx`
-- `components/layout/dashboard-shell.tsx`
-- `components/dashboard/sidebar.tsx`
-- `components/dashboard/connection-status.tsx`
-- `components/dashboard/setup-progress.tsx`
-- `components/dashboard/recent-events-placeholder.tsx`
-- `components/onboarding/step-nav.tsx`
-- `components/onboarding/step-shell.tsx`
-- `components/onboarding/overview-steps.tsx`
-- `components/orders/orders-list.tsx`
-- `components/orders/order-status-badge.tsx`
-- `components/connections/connection-status-badge.tsx`
-- `components/connections/connection-state-item.tsx`
+## 4. Motion
 
-## 4. Components added
+CSS mesh background, count fade, sparkline rise, existing hover lift, button press, toast, dialog, and skeleton shimmer. All of the new motion is disabled under `prefers-reduced-motion`.
 
-- `components/ui/toast.tsx`
-- `components/ui/dialog.tsx`
-- `components/ui/tooltip.tsx`
-- `components/ui/skeleton.tsx`
-- `components/ui/reveal.tsx`
+## 5. Responsive and RTL
 
-## 5. Pages redesigned
+Landing, stats, and orders stack on small screens. The orders table stays hidden below `md` and the card list stays visible. Auth illustration is hidden below `lg`. Spacing uses logical properties (`text-start`, `border-s`, `ps`/`pe` where already used).
 
-- `app/[locale]/(marketing)/page.tsx`
-- `app/[locale]/(auth)/layout.tsx`
-- `app/[locale]/(auth)/login/page.tsx`
-- `app/[locale]/(auth)/signup/page.tsx`
-- `app/[locale]/onboarding/layout.tsx`
-- `app/[locale]/onboarding/page.tsx`
-- `app/[locale]/dashboard/page.tsx`
-- `app/[locale]/dashboard/orders/page.tsx`
-- `app/[locale]/dashboard/connections/page.tsx`
-- `app/[locale]/layout.tsx` (fonts and page background)
-- `app/globals.css`
+## 6. Test results
 
-Provider connect forms, API routes, and `lib/` were not rewritten. Buttons, inputs, badges, and cards pick up the new styles where those screens already use them.
+`npm run test`: 282/282 passed (45 files). The suite is 282, not 279, because the WooCommerce webhook tests added earlier are still included. No tests were removed.
 
-## 6. Responsive breakpoints used
+`npm run lint`: pass, no new errors.
 
-- Mobile: default through `640px` (`sm`), padding `p-4`, stacked actions, sidebar and marketing nav as drawers, orders as cards
-- Tablet: `sm` to `lg` (`1024px`), padding `p-6`
-- Desktop: `lg` and up, padding `p-8`, persistent sidebar, orders table
-- Wide: content capped at `max-w-6xl`
+## 7. Typecheck
 
-Touch targets on primary controls use at least `min-h-11` (44px).
+`npm run typecheck`: pass.
 
-## 7. RTL considerations
+## 8. Screenshots to review
 
-- Navigation, drawers, badges, and progress bars use logical properties (`start`/`end`, `ps`/`pe`, `border-s`, `border-e`)
-- Drawer motion swaps direction under `html[dir="rtl"]`
-- Arabic pages use Cairo; English pages use Inter
-- Existing translation keys were kept. New keys were added in both `en` and `ar`
+- `/en` and `/ar` landing, including pricing and the final gradient
+- `/en/login` and `/ar/login` split layout
+- `/en/dashboard` and `/ar/dashboard`
+- `/en/dashboard/orders` with status tabs
+- `/en/dashboard/connections` connected and disconnected cards
+- `/en/onboarding/store`
 
-## 8. Test results
+## 9. Status
 
-270/270
-
-## 9. Typecheck result
-
-pass
-
-Lint: pass, no new errors.
-
-## 10. Screenshots recommended
-
-- `/en` and `/ar` landing, including the mobile menu
-- `/en/login` and `/ar/signup`
-- `/en/onboarding` and `/ar/onboarding/store` while WooCommerce is connected
-- `/en/dashboard`, `/en/dashboard/orders` (empty and with rows), `/en/dashboard/connections`
-- Desktop sidebar collapsed and expanded
-- A narrow 375px viewport for the orders cards and the dashboard drawer
-
-## 11. Status
-
-status = "uncommitted, awaiting user approval"
+uncommitted, awaiting user approval

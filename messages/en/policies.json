@@ -1,0 +1,24 @@
+{
+  "links": {
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "refund": "Refunds",
+    "cookies": "Cookies"
+  },
+  "privacy": {
+    "title": "Privacy policy",
+    "body": "Confirma collects the account email you use to sign in, store connection status, and order fields needed to confirm a purchase: order number, customer email, phone, currency, and amount.\n\nWe use cookies to keep your session signed in and to remember your language. We do not sell personal information.\n\nWhen you confirm an order and Meta is connected, Confirma can send a purchase event to Meta Conversions API using a hashed identifier and the order total. Events are not sent for orders you have not confirmed.\n\nOrder and account records are kept while your account is active and for a short period afterward so you can export them or resolve a billing question. You can ask us to delete your account data by emailing privacy@confirma.local.\n\nContact privacy@confirma.local for access, correction, or deletion requests."
+  },
+  "terms": {
+    "title": "Terms of use",
+    "body": "By creating a Confirma account you agree to these terms. If you use Confirma for a business, you confirm you are allowed to bind that business.\n\nYou are responsible for the email and password on your account and for the store and Meta credentials you connect. Do not share access to your dashboard.\n\nUse Confirma to confirm real orders from stores you own or operate. Do not send fabricated purchases, probe other accounts, or interfere with the service.\n\nConfirma confirms orders and can forward confirmed purchases to Meta. We do not guarantee ad delivery, attribution, or revenue. Liability is limited to the fees you paid for the current billing month.\n\nWe may suspend an account that breaks these terms or that we cannot keep secure. You may close your account at any time from support."
+  },
+  "refund": {
+    "title": "Refund policy",
+    "body": "New Confirma workspaces include a 30-day trial. During the trial you can connect a store and confirm orders without a paid subscription.\n\nAfter the trial, Confirma is billed monthly in advance. The subscription renews each month until you cancel.\n\nCancel before the next renewal date to avoid the following charge. Cancellation stops future billing and leaves your data available until the end of the paid period. Fees already collected for the current month are not refunded, except where a charge was made in error."
+  },
+  "cookies": {
+    "title": "Cookie policy",
+    "body": "Confirma uses a session cookie so you stay signed in, a locale cookie so Arabic or English stays selected, and a short-lived cookie while a store connection is in progress.\n\nThese cookies are required to run the product. We do not use them to build advertising profiles of visitors on this site.\n\nYou can block cookies in your browser settings. Blocking them will sign you out and reset the language choice on the next visit."
+  }
+}

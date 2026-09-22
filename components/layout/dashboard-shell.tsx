@@ -1,12 +1,18 @@
 "use client";
 
-import { useCallback, useState, type ReactNode } from "react";
+import { Suspense, useCallback, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { LanguageSwitcher } from "./language-switcher";
 
-export function DashboardShell({ children }: { children: ReactNode }) {
+export function DashboardShell({
+  children,
+  isAdmin,
+}: {
+  children: ReactNode;
+  isAdmin: boolean;
+}) {
   const brand = useTranslations("common");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -14,12 +20,15 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background lg:grid lg:grid-cols-[auto_minmax(0,1fr)]">
-      <DashboardSidebar
-        mobileOpen={mobileOpen}
-        collapsed={collapsed}
-        onClose={closeMobile}
-        onToggleCollapsed={() => setCollapsed((current) => !current)}
-      />
+      <Suspense fallback={null}>
+        <DashboardSidebar
+          mobileOpen={mobileOpen}
+          collapsed={collapsed}
+          isAdmin={isAdmin}
+          onClose={closeMobile}
+          onToggleCollapsed={() => setCollapsed((current) => !current)}
+        />
+      </Suspense>
       <div className="flex min-w-0 flex-col">
         <header className="sticky top-0 z-30 border-b border-line bg-white/75 backdrop-blur-xl dark:bg-slate-950/70">
           <div className="flex items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">

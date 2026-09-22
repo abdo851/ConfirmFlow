@@ -13,7 +13,7 @@ export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
   const t = useTranslations("orders.status");
 
   const variant = getOrderStatusBadgeVariant(status);
-  const label = status === "confirmed" ? t("confirmed") : t("pending");
+  const label = t(status);
 
   return (
     <Badge

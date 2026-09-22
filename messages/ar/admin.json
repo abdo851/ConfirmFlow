@@ -1,0 +1,47 @@
+{
+  "title": "إدارة المحتوى",
+  "listTitle": "كتل المحتوى",
+  "listDescription": "اسحب الكتلة لتغيير ترتيبها. الكتل النشطة تظهر في لوحة التحكم والإعداد.",
+  "newTitle": "كتلة جديدة",
+  "editTitle": "تعديل الكتلة",
+  "empty": "لا توجد كتل بعد.",
+  "untitled": "بدون عنوان",
+  "create": "إنشاء الكتلة",
+  "save": "حفظ",
+  "edit": "تعديل",
+  "delete": "حذف",
+  "activate": "إظهار",
+  "deactivate": "إخفاء",
+  "watchNow": "شاهد الآن",
+  "addType": "إضافة {type}",
+  "policiesTitle": "محرر السياسات",
+  "policiesDescription": "عدّل JSON لصفحات السياسة بالعربية والإنجليزية. الصفحات العامة تستخدم هذا النص بعد الحفظ.",
+  "policiesJson": "JSON السياسات",
+  "policiesSaved": "تم حفظ السياسات.",
+  "policiesInvalid": "تعذر حفظ JSON. أبقِ العنوان والنص لكل سياسة باللغتين.",
+  "nav": {
+    "blocks": "الكتل",
+    "policies": "السياسات"
+  },
+  "types": {
+    "banner": "لافتة",
+    "video": "فيديو",
+    "ad": "إعلان",
+    "text": "نص"
+  },
+  "fields": {
+    "title": "العنوان",
+    "description": "الوصف",
+    "imageUrl": "رابط الصورة",
+    "videoUrl": "رابط يوتيوب",
+    "ctaLabel": "نص الزر",
+    "ctaUrl": "رابط الزر",
+    "locale": "اللغة",
+    "active": "نشط"
+  },
+  "locales": {
+    "both": "العربية والإنجليزية",
+    "ar": "العربية",
+    "en": "الإنجليزية"
+  }
+}

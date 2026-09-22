@@ -13,12 +13,37 @@
   },
   "status": {
     "pending": "Pending",
-    "confirmed": "Confirmed"
+    "confirmed": "Confirmed",
+    "rejected": "Rejected",
+    "archived": "Archived"
   },
   "customerUnavailable": "Not available",
   "confirmOrder": "Confirm order",
   "confirming": "Confirming…",
   "confirmSuccess": "Order confirmed.",
+  "exportCsv": "Export CSV",
+  "exportNote": "Export is not available yet. This button does not download a file.",
+  "exportFailed": "Unable to export orders.",
+  "confirmShort": "Confirm",
+  "rejectOrder": "Reject",
+  "archiveOrder": "Archive",
+  "detailDescription": "Customer, amount, and confirmation timeline.",
+  "source": "Source",
+  "created": "Created",
+  "timeline": {
+    "received": "Received",
+    "confirmed": "Confirmed"
+  },
+  "tabs": {
+    "all": "All",
+    "new": "New",
+    "review": "In review",
+    "confirmed": "Confirmed",
+    "rejected": "Rejected",
+    "archived": "Archived"
+  },
+  "filterEmpty": "No orders in this status.",
+  "loadMore": "Load more",
   "errors": {
     "unauthorized": "Your session expired. Please sign in again.",
     "forbidden": "You do not have permission to confirm this order.",

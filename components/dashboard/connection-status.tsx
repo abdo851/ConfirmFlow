@@ -18,14 +18,20 @@ export async function ConnectionStatus() {
   );
 
   return (
-    <Card title={t("connectionsTitle")} description={t("connectionsDescription")} interactive>
-      <ul className="grid gap-3">
-        <ConnectionStateItem connection={storeConnection} />
-        <ConnectionStateItem connection={metaConnection} />
-        {otherConnections.map((connection) => (
-          <ConnectionStateItem key={connection.type} connection={connection} />
-        ))}
-      </ul>
-    </Card>
+    <div className="space-y-6">
+      <Card title={t("storesSection")} description={t("connectionsDescription")} interactive>
+        <ul className="grid gap-3">
+          <ConnectionStateItem connection={storeConnection} />
+          {otherConnections.map((connection) => (
+            <ConnectionStateItem key={connection.type} connection={connection} />
+          ))}
+        </ul>
+      </Card>
+      <Card title={t("metaSection")} description={t("connectionsManageDescription")} interactive>
+        <ul className="grid gap-3">
+          <ConnectionStateItem connection={metaConnection} />
+        </ul>
+      </Card>
+    </div>
   );
 }

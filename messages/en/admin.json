@@ -1,0 +1,47 @@
+{
+  "title": "Content admin",
+  "listTitle": "Content blocks",
+  "listDescription": "Drag a block to change its order. Active blocks appear on the dashboard and onboarding.",
+  "newTitle": "New block",
+  "editTitle": "Edit block",
+  "empty": "No blocks yet.",
+  "untitled": "Untitled",
+  "create": "Create block",
+  "save": "Save",
+  "edit": "Edit",
+  "delete": "Delete",
+  "activate": "Show",
+  "deactivate": "Hide",
+  "watchNow": "Watch now",
+  "addType": "Add {type}",
+  "policiesTitle": "Policy editor",
+  "policiesDescription": "Edit the JSON for English and Arabic policy pages. Public pages use this text when it is saved.",
+  "policiesJson": "Policy JSON",
+  "policiesSaved": "Policies saved.",
+  "policiesInvalid": "That JSON could not be saved. Keep title and body for each policy in both languages.",
+  "nav": {
+    "blocks": "Blocks",
+    "policies": "Policies"
+  },
+  "types": {
+    "banner": "Banner",
+    "video": "Video",
+    "ad": "Ad",
+    "text": "Text"
+  },
+  "fields": {
+    "title": "Title",
+    "description": "Description",
+    "imageUrl": "Image URL",
+    "videoUrl": "YouTube URL",
+    "ctaLabel": "Button label",
+    "ctaUrl": "Button link",
+    "locale": "Language",
+    "active": "Active"
+  },
+  "locales": {
+    "both": "Arabic and English",
+    "ar": "Arabic",
+    "en": "English"
+  }
+}

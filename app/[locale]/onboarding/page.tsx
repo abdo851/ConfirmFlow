@@ -1,13 +1,24 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
+import { ContentBlockFeed } from "@/components/content/content-block-feed";
 import { OnboardingOverviewSteps, OnboardingStepNav } from "@/components/onboarding";
+import { listActiveBlocks } from "@/lib/content/blocks";
 
-export default async function OnboardingPage() {
+export default async function OnboardingPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
   const t = await getTranslations("onboarding");
+  const common = await getTranslations("common");
+  const blocks = await listActiveBlocks(locale === "ar" ? "ar" : "en");
 
   return (
     <div>
+      <BackButton href="/dashboard" label={common("back")} />
       <div className="mb-8">
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{t("title")}</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted sm:text-base">
@@ -30,6 +41,10 @@ export default async function OnboardingPage() {
       </div>
 
       <OnboardingOverviewSteps />
+
+      <div className="mt-8">
+        <ContentBlockFeed blocks={blocks} />
+      </div>
 
       <p className="mt-8 text-sm">
         <Link href="/dashboard" className="underline">

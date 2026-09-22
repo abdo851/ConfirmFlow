@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ export default async function LoginPage({
 }) {
   const params = await searchParams;
   const t = await getTranslations("auth");
+  const common = await getTranslations("common");
 
   const errorMessage = params.error
     ? t(`errors.${params.error}` as "errors.missing_fields", {
@@ -21,6 +23,8 @@ export default async function LoginPage({
     : null;
 
   return (
+    <div className="space-y-4">
+    <BackButton href="/" label={common("back")} />
     <Card title={t("loginTitle")} description={t("loginDescription")} backdrop>
       <form action={loginAction} className="space-y-4" aria-label={t("loginTitle")}>
         {params.next ? (
@@ -42,10 +46,23 @@ export default async function LoginPage({
           placeholder={t("passwordPlaceholder")}
           required
         />
+        <p className="text-end text-sm">
+          <Link href="/forgot-password" className="underline">
+            {t("forgotPassword")}
+          </Link>
+        </p>
         {errorMessage ? <Toast tone="danger" role="alert">{errorMessage}</Toast> : null}
         <Button type="submit" className="w-full">
           {t("signIn")}
         </Button>
+        <button
+          type="button"
+          disabled
+          className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-line text-sm font-medium text-muted"
+        >
+          {t("googleSignIn")}
+        </button>
+        <p className="text-xs text-muted">{t("googleNote")}</p>
       </form>
       <p className="mt-4 text-sm text-muted">{t("trustHint")}</p>
       <p className="mt-4 text-sm">
@@ -62,5 +79,6 @@ export default async function LoginPage({
         </Link>
       </p>
     </Card>
+    </div>
   );
 }

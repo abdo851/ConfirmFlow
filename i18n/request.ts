@@ -9,6 +9,8 @@ import enLanding from "../messages/en/landing.json";
 import enNavigation from "../messages/en/navigation.json";
 import enOnboarding from "../messages/en/onboarding.json";
 import enOrders from "../messages/en/orders.json";
+import enAdmin from "../messages/en/admin.json";
+import enPolicies from "../messages/en/policies.json";
 import arAuth from "../messages/ar/auth.json";
 import arCommon from "../messages/ar/common.json";
 import arConnections from "../messages/ar/connections.json";
@@ -18,6 +20,8 @@ import arLanding from "../messages/ar/landing.json";
 import arNavigation from "../messages/ar/navigation.json";
 import arOnboarding from "../messages/ar/onboarding.json";
 import arOrders from "../messages/ar/orders.json";
+import arAdmin from "../messages/ar/admin.json";
+import arPolicies from "../messages/ar/policies.json";
 
 const messageCatalogs = {
   en: {
@@ -30,6 +34,8 @@ const messageCatalogs = {
     connections: enConnections,
     errors: enErrors,
     orders: enOrders,
+    admin: enAdmin,
+    policies: enPolicies,
   },
   ar: {
     common: arCommon,
@@ -41,6 +47,8 @@ const messageCatalogs = {
     connections: arConnections,
     errors: arErrors,
     orders: arOrders,
+    admin: arAdmin,
+    policies: arPolicies,
   },
 } as const;
 

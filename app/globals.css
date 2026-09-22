@@ -255,6 +255,61 @@ html[dir="rtl"] .animate-drawer-end {
   box-shadow: var(--shadow-medium);
 }
 
+@keyframes cf-mesh {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes cf-count {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cf-bar-rise {
+  from {
+    transform: scaleY(0.2);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.bg-mesh {
+  background-image:
+    radial-gradient(circle at 15% 20%, rgb(67 56 202 / 0.18), transparent 32%),
+    radial-gradient(circle at 85% 10%, rgb(13 148 136 / 0.16), transparent 28%),
+    linear-gradient(120deg, transparent, rgb(99 102 241 / 0.08), transparent);
+  background-size: 140% 140%;
+  animation: cf-mesh 18s ease-in-out infinite;
+}
+
+.animate-count {
+  animation: cf-count var(--duration-base) ease-out both;
+}
+
+.spark-bar {
+  transform-origin: bottom;
+  animation: cf-bar-rise var(--duration-slow) ease-out both;
+}
+
+.tab-active {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in,
   .animate-slide-up,
@@ -265,7 +320,10 @@ html[dir="rtl"] .animate-drawer-end {
   .animate-dialog-in,
   .animate-drawer-start,
   .animate-drawer-end,
-  .skeleton {
+  .skeleton,
+  .bg-mesh,
+  .animate-count,
+  .spark-bar {
     animation: none !important;
   }
 

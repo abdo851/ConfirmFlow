@@ -8,23 +8,31 @@ export default async function AuthLayout({
   children: React.ReactNode;
 }) {
   const brand = await getTranslations("common");
+  const auth = await getTranslations("auth");
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-8 sm:px-6">
-      <div className="pointer-events-none absolute inset-0" aria-hidden>
-        <div className="animate-float absolute -start-20 top-0 size-80 rounded-full bg-indigo-400/25 blur-3xl" />
-        <div className="animate-float-delayed absolute end-0 bottom-0 size-72 rounded-full bg-teal-300/25 blur-3xl" />
+    <div className="grid min-h-screen lg:grid-cols-2">
+      <aside className="relative hidden overflow-hidden bg-gradient-to-br from-indigo-700 via-indigo-600 to-teal-500 text-white lg:flex lg:flex-col lg:justify-between lg:p-12">
+        <p className="text-lg font-semibold">{brand("brand")}</p>
+        <div>
+          <p className="max-w-md text-4xl leading-[1.15] font-semibold text-balance">
+            {auth("heroAside")}
+          </p>
+        </div>
+        <p className="text-sm text-white/80">{auth("trustHint")}</p>
+      </aside>
+      <div className="bg-mesh relative flex flex-col justify-center px-4 py-8 sm:px-6">
+        <div className="mb-6 flex w-full max-w-md items-center justify-between self-center">
+          <Link href="/" className="inline-flex min-h-11 items-center gap-2 font-semibold lg:invisible">
+            <span className="inline-flex size-9 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground">
+              C
+            </span>
+            {brand("brand")}
+          </Link>
+          <LanguageSwitcher />
+        </div>
+        <div className="animate-fade-in relative w-full max-w-md self-center">{children}</div>
       </div>
-      <div className="relative mb-6 flex w-full max-w-md items-center justify-between">
-        <Link href="/" className="inline-flex min-h-11 items-center gap-2 font-semibold">
-          <span className="inline-flex size-9 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground">
-            C
-          </span>
-          {brand("brand")}
-        </Link>
-        <LanguageSwitcher />
-      </div>
-      <div className="animate-fade-in relative w-full max-w-md">{children}</div>
     </div>
   );
 }

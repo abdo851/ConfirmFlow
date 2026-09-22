@@ -27,5 +27,22 @@
   "ctaTitle": "هل أنت مستعد لإرسال بيانات تحويل أنظف؟",
   "ctaDescription": "اربط متجرك، أكّد الطلبات الحقيقية، واجعل Meta يركّز على المشتريات التي حدثت فعلاً.",
   "footerProduct": "المنتج",
-  "footerAccount": "الحساب"
+  "footerAccount": "الحساب",
+  "footerCompany": "الشركة",
+  "features": {
+    "confirm": "أكّد الطلبات الحقيقية فقط",
+    "stores": "WooCommerce وYouCan وShopify",
+    "meta": "جاهز لـ Meta Conversions API",
+    "inbox": "صندوق واحد للطلبات الواردة",
+    "rtl": "العربية والإنجليزية مع دعم الاتجاه",
+    "privacy": "تبقى الأسرار مشفرة على الخادم"
+  },
+  "pricing": {
+    "basicName": "أساسي",
+    "basicPrice": "ابدأ مجاناً",
+    "basicDetail": "اربط متجراً واحداً وأكّد الطلبات قبل إرسال أي شيء.",
+    "proName": "احترافي",
+    "proPrice": "للمتاجر النامية",
+    "proDetail": "معاينة بصرية لخطة أعلى. الفوترة غير مفعّلة."
+  }
 }

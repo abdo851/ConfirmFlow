@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ export default async function SignupPage({
 }) {
   const params = await searchParams;
   const t = await getTranslations("auth");
+  const common = await getTranslations("common");
 
   const errorMessage = params.error
     ? t(`errors.${params.error}` as "errors.missing_fields", {
@@ -27,6 +29,8 @@ export default async function SignupPage({
     : null;
 
   return (
+    <div className="space-y-4">
+    <BackButton href="/" label={common("back")} />
     <Card title={t("signupTitle")} description={t("signupDescription")} backdrop>
       <form
         action={signupAction}
@@ -62,6 +66,14 @@ export default async function SignupPage({
         <Button type="submit" className="w-full">
           {t("createAccount")}
         </Button>
+        <button
+          type="button"
+          disabled
+          className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-line text-sm font-medium text-muted"
+        >
+          {t("googleSignIn")}
+        </button>
+        <p className="text-xs text-muted">{t("googleNote")}</p>
       </form>
       <p className="mt-4 text-sm text-muted">{t("trustHint")}</p>
       <p className="mt-4 text-sm">
@@ -73,5 +85,6 @@ export default async function SignupPage({
         </Link>
       </p>
     </Card>
+    </div>
   );
 }

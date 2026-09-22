@@ -6,7 +6,7 @@
 export type OrderProvider = "shopify" | "youcan" | "woocommerce";
 
 /** Confirmation lifecycle states for Confirma orders. */
-export type OrderConfirmationStatus = "pending" | "confirmed";
+export type OrderConfirmationStatus = "pending" | "confirmed" | "rejected" | "archived";
 
 export interface ConfirmaOrderInput {
   storeId: string;

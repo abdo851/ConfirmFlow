@@ -4,7 +4,8 @@ export function isProtectedAppPath(pathname: string): boolean {
   const normalized = stripLocalePrefix(pathname);
   return (
     normalized.startsWith("/dashboard") ||
-    normalized.startsWith("/onboarding")
+    normalized.startsWith("/onboarding") ||
+    normalized.startsWith("/admin")
   );
 }
 
