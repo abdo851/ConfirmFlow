@@ -9,17 +9,17 @@ export default async function OnboardingPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-        <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{t("title")}</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted sm:text-base">
           {t("description")}
         </p>
       </div>
 
       <OnboardingStepNav />
 
-      <div className="mb-8 rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-4 dark:border-neutral-800 dark:bg-neutral-950">
+      <div className="mb-8 rounded-2xl border border-line bg-surface px-4 py-5 shadow-soft sm:px-6">
         <p className="text-sm font-medium">{t("setupSequence")}</p>
-        <ol className="mt-2 list-decimal space-y-1 ps-5 text-sm text-neutral-600 dark:text-neutral-400">
+        <ol className="mt-2 list-decimal space-y-1 ps-5 text-sm text-muted">
           <li>{t("sequenceSteps.store")}</li>
           <li>{t("sequenceSteps.meta")}</li>
           <li>{t("sequenceSteps.confirmation")}</li>

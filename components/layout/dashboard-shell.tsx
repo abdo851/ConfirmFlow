@@ -1,40 +1,57 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
-import { logoutAction } from "@/lib/auth/actions";
-import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "./language-switcher";
 
 export function DashboardShell({ children }: { children: ReactNode }) {
-  const t = useTranslations("navigation");
   const brand = useTranslations("common");
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const closeMobile = useCallback(() => setMobileOpen(false), []);
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="border-b border-neutral-200 px-6 py-4 dark:border-neutral-800">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between gap-4">
-          <Link href="/dashboard" className="text-lg font-semibold tracking-tight">
-            {brand("brand")}
-          </Link>
-          <div className="flex items-center gap-4">
-            <LanguageSwitcher />
-            <Link href="/" className="text-sm text-neutral-600 dark:text-neutral-400">
-              {brand("home")}
-            </Link>
-            <form action={logoutAction}>
-              <Button type="submit" variant="outline">
-                {t("signOut")}
-              </Button>
-            </form>
+    <div className="min-h-screen bg-background lg:grid lg:grid-cols-[auto_minmax(0,1fr)]">
+      <DashboardSidebar
+        mobileOpen={mobileOpen}
+        collapsed={collapsed}
+        onClose={closeMobile}
+        onToggleCollapsed={() => setCollapsed((current) => !current)}
+      />
+      <div className="flex min-w-0 flex-col">
+        <header className="sticky top-0 z-30 border-b border-line bg-white/75 backdrop-blur-xl dark:bg-slate-950/70">
+          <div className="flex items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                className="inline-flex size-11 items-center justify-center rounded-xl border border-line bg-surface lg:hidden"
+                aria-expanded={mobileOpen}
+                aria-label={mobileOpen ? brand("closeMenu") : brand("openMenu")}
+                onClick={() => setMobileOpen((current) => !current)}
+              >
+                <span aria-hidden className="flex w-4 flex-col gap-1">
+                  <span className="h-0.5 rounded-full bg-foreground" />
+                  <span className="h-0.5 rounded-full bg-foreground" />
+                  <span className="h-0.5 rounded-full bg-foreground" />
+                </span>
+              </button>
+              <Link href="/dashboard" className="text-base font-semibold tracking-tight">
+                {brand("brand")}
+              </Link>
+            </div>
+            <div className="flex items-center gap-3">
+              <LanguageSwitcher />
+              <Link href="/" className="hidden min-h-11 items-center text-sm text-muted sm:inline-flex">
+                {brand("home")}
+              </Link>
+            </div>
           </div>
-        </nav>
-      </header>
-      <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col md:flex-row">
-        <DashboardSidebar />
-        <main className="flex-1 px-6 py-8">{children}</main>
+        </header>
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+          {children}
+        </main>
       </div>
     </div>
   );

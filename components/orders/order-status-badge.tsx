@@ -15,5 +15,13 @@ export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
   const variant = getOrderStatusBadgeVariant(status);
   const label = status === "confirmed" ? t("confirmed") : t("pending");
 
-  return <Badge variant={variant}>{label}</Badge>;
+  return (
+    <Badge
+      variant={status === "confirmed" ? "success" : variant}
+      dot
+      pulse={status === "confirmed"}
+    >
+      {label}
+    </Badge>
+  );
 }

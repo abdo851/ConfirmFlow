@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Toast } from "@/components/ui/toast";
 import { signupAction } from "@/lib/auth/actions";
 
 export default async function SignupPage({
@@ -26,7 +27,7 @@ export default async function SignupPage({
     : null;
 
   return (
-    <Card title={t("signupTitle")} description={t("signupDescription")}>
+    <Card title={t("signupTitle")} description={t("signupDescription")} backdrop>
       <form
         action={signupAction}
         className="space-y-4"
@@ -56,23 +57,13 @@ export default async function SignupPage({
           placeholder={t("passwordPlaceholder")}
           required
         />
-        {infoMessage ? (
-          <p
-            className="text-sm text-blue-700 dark:text-blue-300"
-            role="status"
-          >
-            {infoMessage}
-          </p>
-        ) : null}
-        {errorMessage ? (
-          <p className="text-sm text-red-700 dark:text-red-400" role="alert">
-            {errorMessage}
-          </p>
-        ) : null}
+        {infoMessage ? <Toast tone="info">{infoMessage}</Toast> : null}
+        {errorMessage ? <Toast tone="danger" role="alert">{errorMessage}</Toast> : null}
         <Button type="submit" className="w-full">
           {t("createAccount")}
         </Button>
       </form>
+      <p className="mt-4 text-sm text-muted">{t("trustHint")}</p>
       <p className="mt-4 text-sm">
         <span className="text-neutral-600 dark:text-neutral-400">
           {t("hasAccount")}{" "}

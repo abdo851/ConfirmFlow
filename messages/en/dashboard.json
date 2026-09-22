@@ -1,4 +1,6 @@
 {
+  "welcomeTitle": "Welcome back",
+  "quickActions": "Quick actions",
   "overviewTitle": "Overview",
   "overviewDescription": "Monitor setup progress and connection status for your Confirma account.",
   "connectionsTitle": "Connections",

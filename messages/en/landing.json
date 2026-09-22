@@ -20,5 +20,12 @@
     "confirmationTitle": "Configure confirmation",
     "confirmationDescription": "Define how orders are confirmed before conversions are sent."
   },
-  "footer": "Confirma — verified conversions for Meta"
+  "footer": "Confirma — verified conversions for Meta",
+  "proofTitle": "Built for verified conversions",
+  "proofQuote": "Only confirmed orders should teach your ads what a real customer looks like.",
+  "proofRole": "Confirma",
+  "ctaTitle": "Ready to send cleaner conversion data?",
+  "ctaDescription": "Connect your store, confirm real orders, and keep Meta focused on purchases that actually happened.",
+  "footerProduct": "Product",
+  "footerAccount": "Account"
 }

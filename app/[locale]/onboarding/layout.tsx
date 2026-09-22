@@ -12,24 +12,29 @@ export default async function OnboardingLayout({
   const nav = await getTranslations("navigation");
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-neutral-200 px-6 py-4 dark:border-neutral-800">
-        <nav className="mx-auto flex max-w-3xl items-center justify-between gap-4">
-          <Link href="/" className="text-lg font-semibold tracking-tight">
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-30 border-b border-line bg-white/75 backdrop-blur-xl dark:bg-slate-950/70">
+        <nav className="mx-auto flex max-w-4xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+          <Link href="/" className="inline-flex min-h-11 items-center gap-2 text-base font-semibold tracking-tight">
+            <span className="inline-flex size-9 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground">
+              C
+            </span>
             {brand("brand")}
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <LanguageSwitcher />
             <Link
               href="/dashboard"
-              className="text-sm text-neutral-600 dark:text-neutral-400"
+              className="inline-flex min-h-11 items-center text-sm font-medium text-muted"
             >
               {nav("dashboard")}
             </Link>
           </div>
         </nav>
       </header>
-      <main className="mx-auto max-w-3xl px-6 py-12">{children}</main>
+      <main className="animate-fade-in mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
+        {children}
+      </main>
     </div>
   );
 }

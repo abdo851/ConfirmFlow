@@ -20,5 +20,12 @@
     "confirmationTitle": "إعداد التأكيد",
     "confirmationDescription": "حدد كيفية تأكيد الطلبات قبل إرسال التحويلات."
   },
-  "footer": "Confirma — تحويلات موثقة لـ Meta"
+  "footer": "Confirma — تحويلات موثقة لـ Meta",
+  "proofTitle": "مصممة للتحويلات الموثقة",
+  "proofQuote": "يجب أن تتعلم إعلاناتك شكل العميل الحقيقي من الطلبات المؤكدة فقط.",
+  "proofRole": "Confirma",
+  "ctaTitle": "هل أنت مستعد لإرسال بيانات تحويل أنظف؟",
+  "ctaDescription": "اربط متجرك، أكّد الطلبات الحقيقية، واجعل Meta يركّز على المشتريات التي حدثت فعلاً.",
+  "footerProduct": "المنتج",
+  "footerAccount": "الحساب"
 }

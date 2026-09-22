@@ -16,10 +16,11 @@ export async function OnboardingOverviewSteps() {
         return (
           <Card
             key={step.href}
+            interactive
             title={`${t("stepNumber", { number: step.number })} — ${t(`steps.${step.stepKey}.label`)}`}
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
-              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+              <p className="text-sm text-muted">
                 {t(`steps.${step.stepKey}.description`)}
               </p>
               <ConnectionStatusBadge

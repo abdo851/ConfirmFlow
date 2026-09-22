@@ -10,9 +10,6 @@ interface ConnectionStatusBadgeProps {
   status: ConnectionStatus;
 }
 
-const errorBadgeClasses =
-  "bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200";
-
 export function ConnectionStatusBadge({
   type,
   status,
@@ -24,13 +21,19 @@ export function ConnectionStatusBadge({
       : t(status);
   const variant = getConnectionStatusVariant(status);
 
+  if (status === "connected") {
+    return (
+      <Badge variant="success" dot pulse>
+        {label}
+      </Badge>
+    );
+  }
+
   if (variant === "error") {
     return (
-      <span
-        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${errorBadgeClasses}`}
-      >
+      <Badge variant="danger" dot>
         {label}
-      </span>
+      </Badge>
     );
   }
 

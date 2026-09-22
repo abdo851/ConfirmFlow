@@ -11,11 +11,11 @@ export function LanguageSwitcher() {
   const pathname = usePathname();
 
   return (
-    <label className="inline-flex items-center gap-2 text-sm">
+    <label className="inline-flex min-h-11 items-center gap-2 text-sm">
       <span className="sr-only">{t("switchLabel")}</span>
       <select
         aria-label={t("switchLabel")}
-        className="rounded-md border border-neutral-300 bg-white px-2 py-1 text-sm dark:border-neutral-700 dark:bg-neutral-950"
+        className="min-h-11 rounded-xl border border-line bg-surface px-3 text-sm text-foreground shadow-soft outline-none focus:border-primary focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--ring)_28%,transparent)]"
         value={locale}
         onChange={(event) => {
           router.replace(pathname, { locale: event.target.value as AppLocale });

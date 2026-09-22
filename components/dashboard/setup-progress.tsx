@@ -18,10 +18,10 @@ export async function SetupProgress() {
   const completedCount = steps.filter((step) => step.complete).length;
 
   return (
-    <Card title={t("setupProgressTitle")} description={t("setupProgressDescription")}>
+    <Card title={t("setupProgressTitle")} description={t("setupProgressDescription")} interactive>
       <div className="mb-4">
         <div className="mb-2 flex items-center justify-between text-sm">
-          <span className="text-neutral-600 dark:text-neutral-400">
+          <span className="text-muted">
             {t("integrationsConfigured", {
               completed: completedCount,
               total: steps.length,
@@ -31,9 +31,9 @@ export async function SetupProgress() {
             {Math.round((completedCount / steps.length) * 100)}%
           </span>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
+        <div className="h-2 overflow-hidden rounded-full bg-surface-muted">
           <div
-            className="h-full rounded-full bg-neutral-900 transition-all dark:bg-neutral-100"
+            className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-teal-400 transition-[width] duration-500 ease-out rtl:bg-gradient-to-l"
             style={{ width: `${(completedCount / steps.length) * 100}%` }}
           />
         </div>
@@ -43,9 +43,9 @@ export async function SetupProgress() {
           <li key={step.label}>
             <Link
               href={step.href}
-              className="flex items-center gap-3 rounded-md px-2 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-900"
+              className="flex min-h-11 items-center gap-3 rounded-xl px-2 py-2 text-sm hover:bg-surface-muted"
             >
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-neutral-300 text-xs font-medium dark:border-neutral-700">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-full border border-line text-xs font-medium">
                 {index + 1}
               </span>
               <span>{step.label}</span>

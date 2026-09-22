@@ -3,6 +3,11 @@
   "back": "رجوع",
   "continue": "متابعة",
   "home": "الرئيسية",
+  "account": "الحساب",
+  "openMenu": "فتح القائمة",
+  "closeMenu": "إغلاق القائمة",
+  "collapseSidebar": "طي الشريط الجانبي",
+  "expandSidebar": "توسيع الشريط الجانبي",
   "language": {
     "english": "English",
     "arabic": "العربية",

@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Toast } from "@/components/ui/toast";
 import { loginAction } from "@/lib/auth/actions";
 
 export default async function LoginPage({
@@ -20,7 +21,7 @@ export default async function LoginPage({
     : null;
 
   return (
-    <Card title={t("loginTitle")} description={t("loginDescription")}>
+    <Card title={t("loginTitle")} description={t("loginDescription")} backdrop>
       <form action={loginAction} className="space-y-4" aria-label={t("loginTitle")}>
         {params.next ? (
           <input type="hidden" name="next" value={params.next} />
@@ -41,15 +42,12 @@ export default async function LoginPage({
           placeholder={t("passwordPlaceholder")}
           required
         />
-        {errorMessage ? (
-          <p className="text-sm text-red-700 dark:text-red-400" role="alert">
-            {errorMessage}
-          </p>
-        ) : null}
+        {errorMessage ? <Toast tone="danger" role="alert">{errorMessage}</Toast> : null}
         <Button type="submit" className="w-full">
           {t("signIn")}
         </Button>
       </form>
+      <p className="mt-4 text-sm text-muted">{t("trustHint")}</p>
       <p className="mt-4 text-sm">
         <span className="text-neutral-600 dark:text-neutral-400">
           {t("noAccount")}{" "}

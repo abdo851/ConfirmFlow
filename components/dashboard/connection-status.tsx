@@ -18,8 +18,8 @@ export async function ConnectionStatus() {
   );
 
   return (
-    <Card title={t("connectionsTitle")} description={t("connectionsDescription")}>
-      <ul className="divide-y divide-neutral-200 dark:divide-neutral-800">
+    <Card title={t("connectionsTitle")} description={t("connectionsDescription")} interactive>
+      <ul className="grid gap-3">
         <ConnectionStateItem connection={storeConnection} />
         <ConnectionStateItem connection={metaConnection} />
         {otherConnections.map((connection) => (

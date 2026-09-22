@@ -1,54 +1,102 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
 
-type ButtonVariant = "default" | "outline";
+type ButtonVariant =
+  | "default"
+  | "primary"
+  | "secondary"
+  | "outline"
+  | "ghost"
+  | "danger";
+
+type ButtonSize = "sm" | "md" | "lg";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
+  size?: ButtonSize;
   href?: string;
+  loading?: boolean;
+  icon?: ReactNode;
   children: ReactNode;
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
   default:
-    "bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-white",
+    "bg-primary text-primary-foreground shadow-soft hover:brightness-110",
+  primary:
+    "bg-primary text-primary-foreground shadow-soft hover:brightness-110",
+  secondary:
+    "bg-secondary text-secondary-foreground shadow-soft hover:brightness-110",
   outline:
-    "border border-neutral-300 bg-transparent hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-900",
+    "border border-line bg-surface text-foreground hover:bg-surface-muted",
+  ghost: "bg-transparent text-foreground hover:bg-surface-muted",
+  danger: "bg-danger text-white shadow-soft hover:brightness-110",
+};
+
+const sizeClasses: Record<ButtonSize, string> = {
+  sm: "min-h-11 gap-1.5 rounded-lg px-3 text-sm",
+  md: "min-h-11 gap-2 rounded-xl px-4 text-sm",
+  lg: "min-h-12 gap-2 rounded-xl px-5 text-base",
 };
 
 const baseClasses =
-  "inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors";
+  "pressable inline-flex items-center justify-center font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50";
+
+function Spinner() {
+  return (
+    <span
+      aria-hidden
+      className="size-4 animate-spin rounded-full border-2 border-current border-e-transparent"
+    />
+  );
+}
 
 export function Button({
   variant = "default",
+  size = "md",
   className = "",
   href,
   children,
   type = "button",
+  loading = false,
+  icon,
+  disabled,
   ...props
 }: ButtonProps) {
-  const classes = `${baseClasses} ${variantClasses[variant]} ${className}`.trim();
+  const classes =
+    `${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${className}`.trim();
+  const content = (
+    <>
+      {loading ? <Spinner /> : icon}
+      {children}
+    </>
+  );
 
-  if (href) {
-    // API routes are locale-independent; next-intl Link would prefix /ar or /en.
+  if (href && !disabled && !loading) {
     if (href.startsWith("/api/")) {
       return (
         <a href={href} className={classes}>
-          {children}
+          {content}
         </a>
       );
     }
 
     return (
       <Link href={href} className={classes}>
-        {children}
+        {content}
       </Link>
     );
   }
 
   return (
-    <button type={type} className={classes} {...props}>
-      {children}
+    <button
+      type={type}
+      className={classes}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
+      {...props}
+    >
+      {content}
     </button>
   );
 }

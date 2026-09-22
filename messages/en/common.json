@@ -3,6 +3,11 @@
   "back": "Back",
   "continue": "Continue",
   "home": "Home",
+  "account": "Account",
+  "openMenu": "Open menu",
+  "closeMenu": "Close menu",
+  "collapseSidebar": "Collapse sidebar",
+  "expandSidebar": "Expand sidebar",
   "language": {
     "english": "English",
     "arabic": "العربية",

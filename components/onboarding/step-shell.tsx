@@ -100,10 +100,10 @@ export async function OnboardingStepShell({
         title={`${t("stepNumber", { number: step.number })} — ${t(`steps.${step.stepKey}.label`)}`}
         description={t(`steps.${step.stepKey}.description`)}
       >
-        <div className="flex items-start justify-between gap-4 rounded-md border border-neutral-200 px-4 py-3 dark:border-neutral-800">
+        <div className="flex items-start justify-between gap-4 rounded-2xl border border-line bg-surface-muted px-4 py-3">
           <div>
             <p className="text-sm font-medium">{t("connectionStatus")}</p>
-            <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+            <p className="mt-1 text-sm text-muted">
               {statusText}
             </p>
           </div>
@@ -122,9 +122,9 @@ export async function OnboardingStepShell({
         </div>
 
         {remainingSteps.length > 0 ? (
-          <div className="mt-6 rounded-md border border-dashed border-neutral-300 px-4 py-3 dark:border-neutral-700">
+          <div className="mt-6 rounded-2xl border border-dashed border-line px-4 py-3">
             <p className="text-sm font-medium">{t("whatRemains")}</p>
-            <ul className="mt-2 space-y-1 text-sm text-neutral-600 dark:text-neutral-400">
+            <ul className="mt-2 space-y-1 text-sm text-muted">
               {remainingSteps.map((item) => (
                 <li key={item.href}>
                   {t("remainingStep", {
@@ -136,14 +136,14 @@ export async function OnboardingStepShell({
             </ul>
           </div>
         ) : (
-          <div className="mt-6 rounded-md border border-dashed border-neutral-300 px-4 py-3 dark:border-neutral-700">
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+          <div className="mt-6 rounded-2xl border border-dashed border-line px-4 py-3">
+            <p className="text-sm text-muted">
               {t("finalStepNote")}
             </p>
           </div>
         )}
 
-        <div className="mt-8 flex items-center justify-between gap-4 border-t border-neutral-200 pt-6 dark:border-neutral-800">
+        <div className="mt-8 flex items-center justify-between gap-4 border-t border-line pt-6">
           <Link href={backHref} className="text-sm underline">
             {common("back")}
           </Link>

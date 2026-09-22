@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Toast } from "@/components/ui/toast";
 import {
   applyOrderConfirmation,
   confirmOrderRequest,
@@ -57,10 +59,13 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
   if (orders.length === 0) {
     return (
       <Card title={t("emptyTitle")} description={t("emptyDescription")}>
-        <div className="rounded-md border border-dashed border-neutral-300 px-6 py-10 text-center dark:border-neutral-700">
-          <p className="text-sm text-neutral-600 dark:text-neutral-400">
-            {t("emptyDescription")}
-          </p>
+        <div className="rounded-2xl border border-dashed border-line px-6 py-10 text-center">
+          <svg viewBox="0 0 160 96" className="mx-auto mb-4 h-24 w-40 text-muted" aria-hidden>
+            <rect x="16" y="18" width="128" height="64" rx="14" fill="none" stroke="currentColor" strokeWidth="2" />
+            <path d="M36 44h52M36 58h32" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <circle cx="118" cy="52" r="12" fill="none" stroke="currentColor" strokeWidth="2" />
+          </svg>
+          <p className="text-sm text-muted">{t("emptyDescription")}</p>
         </div>
       </Card>
     );
@@ -68,37 +73,82 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
 
   return (
     <div className="space-y-4">
-      {errorMessage ? (
-        <p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300" role="alert">
-          {errorMessage}
-        </p>
-      ) : null}
+      {confirmingOrderId ? <Skeleton className="h-1.5 w-full" /> : null}
+      {errorMessage ? <Toast tone="danger" role="alert">{errorMessage}</Toast> : null}
 
-      <div className="overflow-x-auto rounded-lg border border-neutral-200 dark:border-neutral-800">
-        <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-800">
-          <thead className="bg-neutral-50 dark:bg-neutral-950">
+      <div className="grid gap-3 md:hidden">
+        {orders.map((order) => {
+          const customer = formatOrderCustomerContact(order);
+          const isConfirming = confirmingOrderId === order.id;
+          const confirmDisabled = isConfirmButtonDisabled(confirmingOrderId);
+          const showConfirm = shouldShowConfirmButton(order.confirmationStatus);
+
+          return (
+            <article key={order.id} className="rounded-2xl border border-line bg-surface p-4 shadow-soft">
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-sm font-semibold">{formatOrderDisplayIdentifier(order)}</p>
+                <OrderStatusBadge status={order.confirmationStatus} />
+              </div>
+              <dl className="mt-3 space-y-2 text-sm">
+                <div className="flex justify-between gap-3">
+                  <dt className="text-muted">{t("columns.customer")}</dt>
+                  <dd>{customer ?? t("customerUnavailable")}</dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-muted">{t("columns.total")}</dt>
+                  <dd>{formatMoneyMinor(order.totalAmountMinor, order.currency)}</dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-muted">{t("columns.received")}</dt>
+                  <dd>{new Date(order.receivedAt).toLocaleString()}</dd>
+                </div>
+              </dl>
+              <div className="mt-4">
+                {showConfirm ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    loading={isConfirming}
+                    disabled={isConfirming || confirmDisabled}
+                    onClick={() => void handleConfirm(order.id)}
+                  >
+                    {isConfirming ? t("confirming") : t("confirmOrder")}
+                  </Button>
+                ) : successOrderId === order.id ? (
+                  <Toast tone="success">{t("confirmSuccess")}</Toast>
+                ) : null}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+
+      <div className="hidden overflow-x-auto rounded-2xl border border-line bg-surface shadow-soft md:block">
+        <table className="min-w-full divide-y divide-line">
+          <thead className="sticky top-0 bg-surface-muted">
             <tr>
-              <th className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-neutral-500">
+              <th className="px-4 py-3 text-start text-xs font-semibold tracking-wide text-muted uppercase">
                 {t("columns.order")}
               </th>
-              <th className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-neutral-500">
+              <th className="px-4 py-3 text-start text-xs font-semibold tracking-wide text-muted uppercase">
                 {t("columns.customer")}
               </th>
-              <th className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-neutral-500">
+              <th className="px-4 py-3 text-start text-xs font-semibold tracking-wide text-muted uppercase">
                 {t("columns.total")}
               </th>
-              <th className="hidden px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-neutral-500 sm:table-cell">
+              <th className="px-4 py-3 text-start text-xs font-semibold tracking-wide text-muted uppercase">
                 {t("columns.received")}
               </th>
-              <th className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-neutral-500">
+              <th className="px-4 py-3 text-start text-xs font-semibold tracking-wide text-muted uppercase">
                 {t("columns.status")}
               </th>
-              <th className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-neutral-500">
+              <th className="px-4 py-3 text-start text-xs font-semibold tracking-wide text-muted uppercase">
                 {t("columns.action")}
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-neutral-200 bg-white dark:divide-neutral-800 dark:bg-neutral-950">
+          <tbody className="divide-y divide-line">
             {orders.map((order) => {
               const customer = formatOrderCustomerContact(order);
               const isConfirming = confirmingOrderId === order.id;
@@ -106,17 +156,17 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
               const showConfirm = shouldShowConfirmButton(order.confirmationStatus);
 
               return (
-                <tr key={order.id}>
+                <tr key={order.id} className="transition-colors duration-150 hover:bg-surface-muted/70">
                   <td className="px-4 py-4 text-sm font-medium">
                     {formatOrderDisplayIdentifier(order)}
                   </td>
-                  <td className="px-4 py-4 text-sm text-neutral-600 dark:text-neutral-400">
+                  <td className="px-4 py-4 text-sm text-muted">
                     {customer ?? t("customerUnavailable")}
                   </td>
                   <td className="px-4 py-4 text-sm">
                     {formatMoneyMinor(order.totalAmountMinor, order.currency)}
                   </td>
-                  <td className="hidden px-4 py-4 text-sm text-neutral-600 dark:text-neutral-400 sm:table-cell">
+                  <td className="px-4 py-4 text-sm text-muted">
                     {new Date(order.receivedAt).toLocaleString()}
                   </td>
                   <td className="px-4 py-4">
@@ -127,15 +177,14 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
                       <Button
                         type="button"
                         variant="outline"
+                        loading={isConfirming}
                         disabled={isConfirming || confirmDisabled}
                         onClick={() => void handleConfirm(order.id)}
                       >
                         {isConfirming ? t("confirming") : t("confirmOrder")}
                       </Button>
                     ) : successOrderId === order.id ? (
-                      <p className="text-sm text-green-700 dark:text-green-400" role="status">
-                        {t("confirmSuccess")}
-                      </p>
+                      <Toast tone="success">{t("confirmSuccess")}</Toast>
                     ) : null}
                   </td>
                 </tr>
