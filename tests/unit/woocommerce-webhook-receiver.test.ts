@@ -169,6 +169,61 @@ describe("WooCommerce webhook receiver", () => {
     expect(response.status).toBe(401);
   });
 
+  it("returns 200 for a WooCommerce activation ping and does not create an order", async () => {
+    const db = createIngestDb();
+    const response = await POST(
+      new Request(
+        `http://localhost/api/integrations/woocommerce/webhooks?connection=${CONNECTION_ID}`,
+        {
+          method: "POST",
+          body: "webhook_id=1",
+        },
+      ),
+    );
+    const result = await ingestWooCommerceWebhook({
+      rawBody: "webhook_id=2",
+      connectionId: CONNECTION_ID,
+      headers: { topic: "", deliveryId: "", signature: "" },
+      db: db.client,
+    });
+
+    expect(response.status).toBe(200);
+    expect(result).toMatchObject({ httpStatus: 200, status: "ignored" });
+    expect(db.orders).toHaveLength(0);
+    expect(db.events).toHaveLength(0);
+  });
+
+  it("returns 401 for a real order without a signature", async () => {
+    const db = createIngestDb();
+    const body = buildWooCommerceOrderBody();
+    const result = await ingestWooCommerceWebhook({
+      rawBody: body,
+      connectionId: CONNECTION_ID,
+      headers: {
+        topic: "order.created",
+        deliveryId: "delivery-unsigned",
+        signature: "",
+      },
+      db: db.client,
+    });
+
+    expect(result.httpStatus).toBe(401);
+    expect(db.orders).toHaveLength(0);
+  });
+
+  it("returns 200 for a real order with a valid signature", async () => {
+    const db = createIngestDb();
+    const body = buildWooCommerceOrderBody();
+    const result = await ingestWooCommerceWebhook({
+      ...signedRequest(body, "delivery-signed"),
+      db: db.client,
+    });
+
+    expect(result.httpStatus).toBe(200);
+    expect(result.status).toBe("accepted");
+    expect(db.orders).toHaveLength(1);
+  });
+
   it("rejects an invalid signature", async () => {
     const db = createIngestDb();
     const body = buildWooCommerceOrderBody();

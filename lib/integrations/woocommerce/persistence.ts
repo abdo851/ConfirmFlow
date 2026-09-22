@@ -67,6 +67,7 @@ export async function persistWooCommerceConnectionForUser(
     consumerKey: string;
     consumerSecret: string;
     scope?: string | null;
+    webhookSecret?: string | null;
   },
   db: SupabaseClient = createDatabaseClient(),
 ): Promise<{ storeId: string; storeConnectionId: string }> {
@@ -77,6 +78,10 @@ export async function persistWooCommerceConnectionForUser(
   );
   const encryptedConsumerSecret = encryptSecret(
     input.consumerSecret,
+    env.WOOCOMMERCE_SESSION_SECRET,
+  );
+  const encryptedWebhookSecret = encryptSecret(
+    input.webhookSecret ?? "",
     env.WOOCOMMERCE_SESSION_SECRET,
   );
   const connectedAt = new Date().toISOString();
@@ -154,6 +159,7 @@ export async function persistWooCommerceConnectionForUser(
       store_connection_id: storeConnection.id,
       encrypted_consumer_key: encryptedConsumerKey,
       encrypted_consumer_secret: encryptedConsumerSecret,
+      encrypted_webhook_secret: encryptedWebhookSecret,
     },
     { onConflict: "store_connection_id" },
   );
@@ -179,6 +185,12 @@ export async function getWooCommerceConnectionStateForUser(
     logger.info("woocommerce_status_not_connected", {
       reason: storesError ? "stores_query_failed" : "no_store",
       detail: storesError?.message,
+      userId,
+      rowCount: stores?.length ?? 0,
+      filters: {
+        owner_id: userId,
+        platform: "woocommerce",
+      },
     });
     return { connected: false };
   }

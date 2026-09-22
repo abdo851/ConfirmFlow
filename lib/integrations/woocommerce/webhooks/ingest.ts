@@ -15,6 +15,18 @@ import { verifyWooCommerceSignature } from "./hmac";
 import type { WooCommerceWebhookHeaders } from "./headers";
 
 const ORDER_TOPICS = new Set(["order.created", "order.updated"]);
+const WEBHOOK_PING_BODY = /^webhook_id=\d+$/;
+
+function isWooCommerceActivationPing(
+  rawBody: string,
+  headers: WooCommerceWebhookHeaders,
+): boolean {
+  return (
+    !headers.signature &&
+    !headers.deliveryId &&
+    WEBHOOK_PING_BODY.test(rawBody.trim())
+  );
+}
 
 export interface WooCommerceWebhookIngestionInput {
   rawBody: string;
@@ -46,7 +58,22 @@ function hashPayload(rawBody: string): string {
 export async function ingestWooCommerceWebhook(
   input: WooCommerceWebhookIngestionInput,
 ): Promise<WooCommerceWebhookIngestionResult> {
+  if (isWooCommerceActivationPing(input.rawBody, input.headers)) {
+    logger.info("woocommerce_webhook_ping", {
+      connectionId: input.connectionId || null,
+    });
+    return { httpStatus: 200, status: "ignored" };
+  }
+
   if (!input.connectionId || !input.headers.signature || !input.headers.deliveryId) {
+    logger.info("woocommerce_webhook_unauthorized", {
+      reason: !input.connectionId
+        ? "connection_not_found"
+        : !input.headers.signature
+          ? "missing_signature_header"
+          : "missing_delivery_id",
+      connectionId: input.connectionId || null,
+    });
     return { httpStatus: 401, status: "unauthorized" };
   }
 
@@ -59,6 +86,10 @@ export async function ingestWooCommerceWebhook(
     .maybeSingle();
 
   if (connectionError || !storeConnection) {
+    logger.info("woocommerce_webhook_unauthorized", {
+      reason: "connection_not_found",
+      connectionId: input.connectionId,
+    });
     return { httpStatus: 401, status: "unauthorized" };
   }
 
@@ -81,6 +112,10 @@ export async function ingestWooCommerceWebhook(
     .maybeSingle();
 
   if (storeError || wooError || secretsError || !store || !wooConnection || !secrets) {
+    logger.info("woocommerce_webhook_unauthorized", {
+      reason: "connection_not_found",
+      connectionId: input.connectionId,
+    });
     return { httpStatus: 401, status: "unauthorized" };
   }
 
@@ -88,6 +123,10 @@ export async function ingestWooCommerceWebhook(
   try {
     sessionSecret = getWooCommerceEnv().WOOCOMMERCE_SESSION_SECRET;
   } catch {
+    logger.info("woocommerce_webhook_unauthorized", {
+      reason: "secret_decrypt_failed",
+      connectionId: input.connectionId,
+    });
     return { httpStatus: 401, status: "unauthorized" };
   }
 
@@ -96,10 +135,19 @@ export async function ingestWooCommerceWebhook(
     sessionSecret,
   );
 
-  if (
-    !webhookSecret ||
-    !verifyWooCommerceSignature(input.rawBody, input.headers.signature, webhookSecret)
-  ) {
+  if (!webhookSecret) {
+    logger.info("woocommerce_webhook_unauthorized", {
+      reason: "secret_decrypt_failed",
+      connectionId: input.connectionId,
+    });
+    return { httpStatus: 401, status: "unauthorized" };
+  }
+
+  if (!verifyWooCommerceSignature(input.rawBody, input.headers.signature, webhookSecret)) {
+    logger.info("woocommerce_webhook_unauthorized", {
+      reason: "signature_mismatch",
+      connectionId: input.connectionId,
+    });
     return { httpStatus: 401, status: "unauthorized" };
   }
 

@@ -83,6 +83,7 @@ export async function POST(request: Request) {
       .eq("id", state.userId)
       .maybeSingle();
 
+    const webhookSecret = generateWooCommerceWebhookSecret();
     const saved = await persistWooCommerceConnectionForUser({
       userId: state.userId,
       userEmail: profile?.email ?? "",
@@ -90,6 +91,7 @@ export async function POST(request: Request) {
       consumerKey: verified.credentials.consumerKey,
       consumerSecret: verified.credentials.consumerSecret,
       scope: verified.credentials.keyPermissions,
+      webhookSecret,
     });
     logger.info("woocommerce_callback_persisted", {
       storeId: saved.storeId,
@@ -115,7 +117,6 @@ export async function POST(request: Request) {
         });
       }
 
-      const webhookSecret = generateWooCommerceWebhookSecret();
       const { error: secretError } = await db
         .from("woocommerce_connection_secrets")
         .update({
