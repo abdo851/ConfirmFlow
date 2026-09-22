@@ -4,6 +4,7 @@ import {
   WooCommerceDisconnectError,
   disconnectWooCommerceForAuthenticatedUser,
 } from "@/lib/integrations/woocommerce";
+import { cleanupWooCommerceWebhooksForUser } from "@/lib/integrations/woocommerce/webhooks/cleanup";
 
 export async function POST() {
   const user = await getAuthenticatedUser();
@@ -12,6 +13,7 @@ export async function POST() {
   }
 
   try {
+    await cleanupWooCommerceWebhooksForUser(user.id);
     await disconnectWooCommerceForAuthenticatedUser();
     return NextResponse.json({ ok: true });
   } catch (error) {

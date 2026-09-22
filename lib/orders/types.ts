@@ -3,7 +3,7 @@
  * Core application code must not depend on Shopify payload shapes.
  */
 
-export type OrderProvider = "shopify" | "youcan";
+export type OrderProvider = "shopify" | "youcan" | "woocommerce";
 
 /** Confirmation lifecycle states for Confirma orders. */
 export type OrderConfirmationStatus = "pending" | "confirmed";

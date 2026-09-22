@@ -69,7 +69,7 @@ export async function persistWooCommerceConnectionForUser(
     scope?: string | null;
   },
   db: SupabaseClient = createDatabaseClient(),
-): Promise<{ storeId: string }> {
+): Promise<{ storeId: string; storeConnectionId: string }> {
   const env = getWooCommerceEnv();
   const encryptedConsumerKey = encryptSecret(
     input.consumerKey,
@@ -162,7 +162,7 @@ export async function persistWooCommerceConnectionForUser(
     throw new WooCommercePersistenceError("Unable to persist WooCommerce credentials.");
   }
 
-  return { storeId: store.id };
+  return { storeId: store.id, storeConnectionId: storeConnection.id };
 }
 
 export async function getWooCommerceConnectionStateForUser(
@@ -267,4 +267,86 @@ export async function disconnectWooCommerceConnectionForUser(
     .in("store_connection_id", connectionIds);
 
   await db.from("store_connections").delete().in("id", connectionIds);
+}
+
+export interface WooCommerceWebhookCleanupTarget {
+  store_url: string;
+  consumer_key: string;
+  consumer_secret: string;
+  webhook_ids: string[];
+}
+
+export async function getWooCommerceWebhookCleanupTargets(
+  userId: string,
+  db: SupabaseClient = createDatabaseClient(),
+): Promise<WooCommerceWebhookCleanupTarget[]> {
+  const env = getWooCommerceEnv();
+  const { data: stores, error: storesError } = await db
+    .from("stores")
+    .select("id")
+    .eq("owner_id", userId)
+    .eq("platform", "woocommerce");
+
+  if (storesError || !stores?.length) {
+    return [];
+  }
+
+  const storeIds = stores.map((store) => store.id);
+  const { data: connections, error: connectionError } = await db
+    .from("store_connections")
+    .select("id")
+    .in("store_id", storeIds)
+    .eq("connection_type", "store")
+    .eq("provider", "woocommerce");
+
+  if (connectionError || !connections?.length) {
+    return [];
+  }
+
+  const targets: WooCommerceWebhookCleanupTarget[] = [];
+
+  for (const connection of connections) {
+    const { data: wooConnection } = await db
+      .from("woocommerce_connections")
+      .select("store_url, webhook_ids")
+      .eq("store_connection_id", connection.id)
+      .maybeSingle();
+
+    const { data: secrets } = await db
+      .from("woocommerce_connection_secrets")
+      .select("encrypted_consumer_key, encrypted_consumer_secret")
+      .eq("store_connection_id", connection.id)
+      .maybeSingle();
+
+    if (!wooConnection?.store_url || !secrets) {
+      continue;
+    }
+
+    const { decryptSecret } = await import("./oauth/crypto");
+    const consumerKey = decryptSecret(
+      secrets.encrypted_consumer_key,
+      env.WOOCOMMERCE_SESSION_SECRET,
+    );
+    const consumerSecret = decryptSecret(
+      secrets.encrypted_consumer_secret,
+      env.WOOCOMMERCE_SESSION_SECRET,
+    );
+
+    if (!consumerKey || !consumerSecret) {
+      continue;
+    }
+
+    const webhookIds = Array.isArray(wooConnection.webhook_ids)
+      ? wooConnection.webhook_ids.map((id: unknown) => String(id)).filter(Boolean)
+      : [];
+
+    targets.push({
+      store_url: wooConnection.store_url,
+      consumer_key: consumerKey,
+      consumer_secret: consumerSecret,
+      webhook_ids: webhookIds,
+    });
+  }
+
+  return targets;
 }

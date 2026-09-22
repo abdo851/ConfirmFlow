@@ -11,6 +11,13 @@ import {
   verifyState,
   verifyWooCommerceCallbackPayload,
 } from "@/lib/integrations/woocommerce";
+import { encryptSecret } from "@/lib/integrations/woocommerce/oauth/crypto";
+import {
+  buildWooCommerceWebhookDeliveryUrl,
+  generateWooCommerceWebhookSecret,
+  registerOrderWebhooks,
+} from "@/lib/integrations/woocommerce/webhooks/register";
+import { unregisterWebhooks } from "@/lib/integrations/woocommerce/webhooks/unregister";
 
 async function redirectWithReason(path: string): Promise<NextResponse> {
   const localizedPath = await getLocalizedPath(path);
@@ -88,6 +95,71 @@ export async function POST(request: Request) {
       storeId: saved.storeId,
       userId: state.userId,
     });
+
+    try {
+      const { data: existingWoo } = await db
+        .from("woocommerce_connections")
+        .select("webhook_ids")
+        .eq("store_connection_id", saved.storeConnectionId)
+        .maybeSingle();
+      const previousIds = Array.isArray(existingWoo?.webhook_ids)
+        ? existingWoo.webhook_ids.map((id: unknown) => String(id)).filter(Boolean)
+        : [];
+
+      if (previousIds.length > 0) {
+        await unregisterWebhooks({
+          store_url: state.storeUrl,
+          consumer_key: verified.credentials.consumerKey,
+          consumer_secret: verified.credentials.consumerSecret,
+          webhook_ids: previousIds,
+        });
+      }
+
+      const webhookSecret = generateWooCommerceWebhookSecret();
+      const { error: secretError } = await db
+        .from("woocommerce_connection_secrets")
+        .update({
+          encrypted_webhook_secret: encryptSecret(
+            webhookSecret,
+            env.WOOCOMMERCE_SESSION_SECRET,
+          ),
+        })
+        .eq("store_connection_id", saved.storeConnectionId);
+
+      if (secretError) {
+        throw new Error(secretError.message);
+      }
+
+      const webhookIds = await registerOrderWebhooks({
+        store_url: state.storeUrl,
+        consumer_key: verified.credentials.consumerKey,
+        consumer_secret: verified.credentials.consumerSecret,
+        delivery_url: buildWooCommerceWebhookDeliveryUrl(
+          env.NEXT_PUBLIC_APP_URL,
+          saved.storeConnectionId,
+        ),
+        secret: webhookSecret,
+      });
+
+      const { error: idsError } = await db
+        .from("woocommerce_connections")
+        .update({ webhook_ids: webhookIds })
+        .eq("store_connection_id", saved.storeConnectionId);
+
+      if (idsError) {
+        throw new Error(idsError.message);
+      }
+
+      logger.info("woocommerce_webhooks_registered", {
+        storeId: saved.storeId,
+        count: webhookIds.length,
+      });
+    } catch (webhookError) {
+      logger.error("woocommerce_webhook_registration_failed", {
+        message: webhookError instanceof Error ? webhookError.message : "unknown",
+        storeId: saved.storeId,
+      });
+    }
   } catch (error) {
     logger.error("woocommerce_callback_persist_failed", {
       message: error instanceof Error ? error.message : "unknown",

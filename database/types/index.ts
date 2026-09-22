@@ -19,8 +19,8 @@ export type WebhookIngestionStatus =
   | "duplicate"
   | "rejected";
 
-export type WebhookProvider = "shopify" | "youcan";
-export type OrderProvider = "shopify" | "youcan";
+export type WebhookProvider = "shopify" | "youcan" | "woocommerce";
+export type OrderProvider = "shopify" | "youcan" | "woocommerce";
 export type OrderConfirmationStatus = "pending" | "confirmed";
 
 export interface Profile {

@@ -51,12 +51,15 @@ async function applySupabaseSession(
   return user;
 }
 
-function isWooCommerceCallbackPath(pathname: string): boolean {
-  return pathname === "/api/integrations/woocommerce/callback";
+function isWooCommercePublicPath(pathname: string): boolean {
+  return (
+    pathname === "/api/integrations/woocommerce/callback" ||
+    pathname === "/api/integrations/woocommerce/webhooks"
+  );
 }
 
 function isProtectedWooCommerceApiPath(pathname: string): boolean {
-  if (isWooCommerceCallbackPath(pathname)) {
+  if (isWooCommercePublicPath(pathname)) {
     return false;
   }
 
