@@ -11,22 +11,33 @@ import type { OrderConfirmationStatus } from "@/lib/orders/types";
 
 interface OrderDetailActionsProps {
   orderId: string;
+  orderNumber: string;
   status: OrderConfirmationStatus;
+  metaFailed: boolean;
+  wooAdminUrl: string | null;
 }
 
-export function OrderDetailActions({ orderId, status }: OrderDetailActionsProps) {
+export function OrderDetailActions({
+  orderId,
+  orderNumber,
+  status,
+  metaFailed,
+  wooAdminUrl,
+}: OrderDetailActionsProps) {
   const t = useTranslations("orders");
+  const pages = useTranslations("dashboard.pages.features.timeline");
   const router = useRouter();
-  const [pending, setPending] = useState<"confirm" | "reject" | "archive" | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [ok, setOk] = useState(true);
 
   async function confirm() {
     setPending("confirm");
-    setError(null);
     const result = await confirmOrderRequest(orderId);
     setPending(null);
     if (!result.ok) {
-      setError(t(`errors.${result.errorKey}`));
+      setOk(false);
+      setMessage(t(`errors.${result.errorKey}`));
       return;
     }
     router.refresh();
@@ -34,7 +45,6 @@ export function OrderDetailActions({ orderId, status }: OrderDetailActionsProps)
 
   async function reject() {
     setPending("reject");
-    setError(null);
     await rejectOrderAction(orderId);
     setPending(null);
     router.refresh();
@@ -42,30 +52,69 @@ export function OrderDetailActions({ orderId, status }: OrderDetailActionsProps)
 
   async function archive() {
     setPending("archive");
-    setError(null);
     await archiveOrderAction(orderId);
     setPending(null);
     router.refresh();
   }
 
+  async function resend() {
+    setPending("meta");
+    const response = await fetch("/api/orders/meta-delivery/retry", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId }),
+    });
+    const body = (await response.json().catch(() => null)) as { message?: string } | null;
+    setOk(response.ok);
+    setMessage(body?.message || (response.ok ? pages("resent") : pages("resendFailed")));
+    setPending(null);
+    router.refresh();
+  }
+
+  async function copyNumber() {
+    await navigator.clipboard.writeText(orderNumber);
+    setOk(true);
+    setMessage(pages("copied"));
+  }
+
   return (
-    <div className="flex flex-wrap gap-2">
-      {status === "pending" ? (
-        <Button type="button" loading={pending === "confirm"} disabled={pending !== null} onClick={() => void confirm()}>
-          {t("confirmShort")}
+    <div className="space-y-3">
+      <div className="flex flex-wrap gap-2">
+        {status === "pending" ? (
+          <Button type="button" loading={pending === "confirm"} disabled={pending !== null} onClick={() => void confirm()}>
+            {pages("confirm")}
+          </Button>
+        ) : null}
+        {status === "pending" ? (
+          <Button type="button" variant="outline" loading={pending === "reject"} disabled={pending !== null} onClick={() => void reject()}>
+            {pages("reject")}
+          </Button>
+        ) : null}
+        {status === "confirmed" || status === "rejected" ? (
+          <Button type="button" variant="outline" loading={pending === "archive"} disabled={pending !== null} onClick={() => void archive()}>
+            {pages("archive")}
+          </Button>
+        ) : null}
+        {metaFailed ? (
+          <Button type="button" variant="outline" loading={pending === "meta"} disabled={pending !== null} onClick={() => void resend()}>
+            {pages("resendMeta")}
+          </Button>
+        ) : null}
+        <Button type="button" variant="outline" onClick={() => void copyNumber()}>
+          {pages("copyNumber")}
         </Button>
-      ) : null}
-      {status === "pending" ? (
-        <Button type="button" variant="outline" loading={pending === "reject"} disabled={pending !== null} onClick={() => void reject()}>
-          {t("rejectOrder")}
-        </Button>
-      ) : null}
-      {status === "confirmed" || status === "rejected" ? (
-        <Button type="button" variant="outline" loading={pending === "archive"} disabled={pending !== null} onClick={() => void archive()}>
-          {t("archiveOrder")}
-        </Button>
-      ) : null}
-      {error ? <Toast tone="danger">{error}</Toast> : null}
+        {wooAdminUrl ? (
+          <a
+            href={wooAdminUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex min-h-11 items-center rounded-xl border border-line bg-surface px-4 text-sm font-medium"
+          >
+            {pages("openWoo")}
+          </a>
+        ) : null}
+      </div>
+      {message ? <Toast tone={ok ? "success" : "danger"}>{message}</Toast> : null}
     </div>
   );
 }

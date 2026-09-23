@@ -38,6 +38,7 @@ function verificationMessageKey(
 
 export function MetaConnectForm() {
   const t = useTranslations("connections.meta");
+  const pages = useTranslations("dashboard.pages.features.meta");
   const connections = useTranslations("connections");
   const [pixelId, setPixelId] = useState("");
   const [accessToken, setAccessToken] = useState("");
@@ -60,7 +61,8 @@ export function MetaConnectForm() {
   }, []);
 
   const canConnect =
-    pixelId.trim().length > 0 && accessToken.trim().length > 0 && !isSubmitting;
+    /^\d+$/.test(pixelId.trim()) && accessToken.trim().length > 0 && !isSubmitting;
+  const pixelInvalid = pixelId.trim().length > 0 && !/^\d+$/.test(pixelId.trim());
 
   const verificationKey = verificationMessageKey(status.verificationStatus);
   const showVerifyButton =
@@ -95,6 +97,11 @@ export function MetaConnectForm() {
             onChange={(event) => setPixelId(event.target.value)}
             autoComplete="off"
           />
+          {pixelInvalid ? (
+            <p className="text-sm text-rose-700" role="alert">
+              {pages("pixelInvalid")}
+            </p>
+          ) : null}
           <Input
             label={t("accessTokenLabel")}
             name="accessToken"
@@ -127,7 +134,7 @@ export function MetaConnectForm() {
               if (response.ok) {
                 setAccessToken("");
                 await refreshStatus();
-                setFlashMessage(t("connectedSuccess"));
+                setFlashMessage(`${t("connectedSuccess")} ${pages("nextSteps")}`);
               } else if (response.status === 409) {
                 setFlashMessage(t("storeRequired"));
               } else {
