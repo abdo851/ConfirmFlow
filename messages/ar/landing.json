@@ -46,5 +46,29 @@
     "proName": "احترافي",
     "proPrice": "للمتاجر النامية",
     "proDetail": "معاينة بصرية لخطة أعلى. الفوترة غير مفعّلة."
-  }
+  },
+  "heroLine1": "شاهد الطلبات المؤكدة",
+  "heroLine2": "تصل إلى Meta",
+  "marquee": "WooCommerce • Meta CAPI • TikTok Events • Google Ads • YouCan • Shopify • Conversions API • Instagram • ChatGPT •",
+  "showcase": {
+    "analyticsTitle": "تحليلات فورية",
+    "analyticsBody": "شاهد الطلبات المؤكدة لحظة وصولها.",
+    "metaTitle": "Meta CAPI",
+    "metaBody": "أرسل المشتريات المؤكدة إلى Conversions API.",
+    "adsTitle": "TikTok & Google Ads",
+    "adsBody": "اجعل منصات الإعلان ترى الطلبات الحقيقية.",
+    "privacyTitle": "بيانات مشفرة",
+    "privacyBody": "تبقى أسرار الربط مشفرة على الخادم.",
+    "rtlTitle": "دعم عربي كامل",
+    "rtlBody": "واجهة عربية كاملة من اليمين إلى اليسار.",
+    "fastTitle": "بدون مراجعة، بدون انتظار",
+    "fastBody": "ابدأ التأكيد مباشرة دون طابور مراجعة."
+  },
+  "ctaReady": "جاهز لتحسين إعلاناتك؟",
+  "ctaStart": "ابدأ الآن مجاناً",
+  "ctaTalk": "تحدث معنا",
+  "footerFeatures": "الميزات",
+  "footerSupport": "الدعم",
+  "footerLegal": "قانوني",
+  "footerCopyright": "© {year} Confirma"
 }

@@ -46,5 +46,29 @@
     "proName": "Pro",
     "proPrice": "For growing stores",
     "proDetail": "A visual preview of a higher tier. Billing is not enabled."
-  }
+  },
+  "heroLine1": "See confirmed orders",
+  "heroLine2": "reach Meta",
+  "marquee": "WooCommerce • Meta CAPI • TikTok Events • Google Ads • YouCan • Shopify • Conversions API • Instagram • ChatGPT •",
+  "showcase": {
+    "analyticsTitle": "Instant analytics",
+    "analyticsBody": "Watch confirmed orders as they arrive.",
+    "metaTitle": "Meta CAPI",
+    "metaBody": "Send confirmed purchases to the Conversions API.",
+    "adsTitle": "TikTok & Google Ads",
+    "adsBody": "Keep ad platforms aligned with real orders.",
+    "privacyTitle": "Encrypted data",
+    "privacyBody": "Connection secrets stay encrypted on the server.",
+    "rtlTitle": "Full Arabic support",
+    "rtlBody": "Arabic and English, including right to left.",
+    "fastTitle": "No review, no waiting",
+    "fastBody": "Start confirming orders without a queue."
+  },
+  "ctaReady": "Ready to improve your ads?",
+  "ctaStart": "Start free now",
+  "ctaTalk": "Talk to us",
+  "footerFeatures": "Features",
+  "footerSupport": "Support",
+  "footerLegal": "Legal",
+  "footerCopyright": "© {year} Confirma"
 }

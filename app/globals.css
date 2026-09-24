@@ -371,6 +371,204 @@ html[dir="rtl"] .animate-drawer-end {
   color: var(--primary-foreground);
 }
 
+.hero-mesh {
+  background-color: #eef2ff;
+  background-image:
+    radial-gradient(circle at 12% 18%, rgb(79 70 229 / 0.45), transparent 36%),
+    radial-gradient(circle at 88% 12%, rgb(13 148 136 / 0.38), transparent 34%),
+    radial-gradient(circle at 70% 78%, rgb(139 92 246 / 0.32), transparent 32%),
+    radial-gradient(circle at 24% 82%, rgb(16 185 129 / 0.28), transparent 30%),
+    linear-gradient(145deg, #eef2ff, #f0fdfa 48%, #f5f3ff);
+  background-size: 180% 180%;
+  animation: cf-mesh 22s ease-in-out infinite;
+}
+
+.hero-orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(28px);
+  opacity: 0.7;
+}
+
+.hero-orb-a {
+  top: -4rem;
+  inset-inline-start: -3rem;
+  width: 18rem;
+  height: 18rem;
+  background: rgb(79 70 229 / 0.35);
+  animation: cf-float 9s ease-in-out infinite;
+}
+
+.hero-orb-b {
+  top: 2rem;
+  inset-inline-end: -4rem;
+  width: 16rem;
+  height: 16rem;
+  background: rgb(13 148 136 / 0.32);
+  animation: cf-float 11s ease-in-out 0.6s infinite;
+}
+
+.hero-orb-c {
+  bottom: -5rem;
+  inset-inline-start: 30%;
+  width: 20rem;
+  height: 12rem;
+  background: rgb(167 139 250 / 0.35);
+  animation: cf-float 13s ease-in-out 1s infinite;
+}
+
+.gradient-indigo {
+  background-image: linear-gradient(100deg, #4338ca, #7c3aed, #4338ca);
+  background-size: 200% auto;
+  background-clip: text;
+  color: transparent;
+  animation: cf-gradient-text 8s linear infinite;
+}
+
+.gradient-teal {
+  background-image: linear-gradient(100deg, #0f766e, #059669, #14b8a6);
+  background-size: 200% auto;
+  background-clip: text;
+  color: transparent;
+  animation: cf-gradient-text 8s linear infinite reverse;
+}
+
+@keyframes cf-hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-rise {
+  animation: cf-hero-rise 700ms ease both;
+}
+
+.cta-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 32%, rgb(255 255 255 / 0.4) 50%, transparent 68%);
+  transform: translateX(-130%);
+}
+
+.cta-shimmer:hover::after {
+  animation: cf-shimmer-slide 800ms ease;
+}
+
+@keyframes cf-shimmer-slide {
+  from {
+    transform: translateX(-130%);
+  }
+  to {
+    transform: translateX(130%);
+  }
+}
+
+html[dir="rtl"] .cta-shimmer::after {
+  transform: translateX(130%);
+}
+
+html[dir="rtl"] .cta-shimmer:hover::after {
+  animation-name: cf-shimmer-slide-rtl;
+}
+
+@keyframes cf-shimmer-slide-rtl {
+  from {
+    transform: translateX(130%);
+  }
+  to {
+    transform: translateX(-130%);
+  }
+}
+
+@keyframes cf-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.logo-bob {
+  animation: cf-bob 3s ease-in-out infinite;
+}
+
+.logo-glow {
+  transition:
+    transform 200ms ease,
+    filter 200ms ease;
+}
+
+.logo-glow:hover {
+  transform: scale(1.12);
+  filter: drop-shadow(0 10px 18px rgb(67 56 202 / 0.35));
+}
+
+.marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: cf-marquee 30s linear infinite;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes cf-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+html[dir="rtl"] .marquee-track {
+  animation-name: cf-marquee-rtl;
+}
+
+@keyframes cf-marquee-rtl {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(50%);
+  }
+}
+
+.step-line {
+  background-image: linear-gradient(90deg, #4338ca, #14b8a6, #a78bfa, #4338ca);
+  background-size: 200% 100%;
+  animation: cf-gradient-text 8s linear infinite;
+}
+
+html[dir="rtl"] .step-line {
+  background-image: linear-gradient(270deg, #4338ca, #14b8a6, #a78bfa, #4338ca);
+}
+
+.cta-band {
+  background-image: linear-gradient(120deg, #4338ca, #0f766e, #6366f1, #0f766e);
+  background-size: 220% 220%;
+  animation: cf-mesh 14s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in,
   .animate-slide-up,
@@ -386,6 +584,18 @@ html[dir="rtl"] .animate-drawer-end {
   .animate-count,
   .spark-bar,
   .gradient-text,
+  .hero-mesh,
+  .hero-orb-a,
+  .hero-orb-b,
+  .hero-orb-c,
+  .gradient-indigo,
+  .gradient-teal,
+  .hero-rise,
+  .cta-shimmer::after,
+  .logo-bob,
+  .marquee-track,
+  .step-line,
+  .cta-band,
   .tab-underline::after,
   .accordion-panel,
   [role="tooltip"] {
@@ -394,7 +604,8 @@ html[dir="rtl"] .animate-drawer-end {
   }
 
   .pressable:active,
-  .hover-lift:hover {
+  .hover-lift:hover,
+  .logo-glow:hover {
     transform: none;
   }
 }
