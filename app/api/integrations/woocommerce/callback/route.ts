@@ -47,6 +47,9 @@ export async function POST(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const stateToken = searchParams.get("state");
+  logger.info("woocommerce_callback_received", {
+    hasState: Boolean(stateToken),
+  });
   const state = stateToken
     ? verifyState(
         stateToken,
@@ -56,6 +59,9 @@ export async function POST(request: Request) {
     : null;
 
   if (!state) {
+    logger.info("woocommerce_callback_state_invalid", {
+      hasState: Boolean(stateToken),
+    });
     return NextResponse.json({ error: "invalid_state" }, { status: 400 });
   }
 
@@ -168,6 +174,10 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ error: "persistence_failed" }, { status: 400 });
   }
+
+  logger.info("woocommerce_callback_success", {
+    store_url: state.storeUrl,
+  });
 
   return new NextResponse("OK", {
     status: 200,

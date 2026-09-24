@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildAuthorizeUrl } from "@/lib/integrations/woocommerce/oauth/authorize-url";
 import { verifyWooCommerceCallbackPayload } from "@/lib/integrations/woocommerce/oauth/callback-verify";
+import { resolveWooCommerceBrowserOrigin } from "@/lib/integrations/woocommerce/oauth/return-origin";
 import { signStoreUrl, verifyState } from "@/lib/integrations/woocommerce/oauth/state";
 import { normalizeStoreUrl } from "@/lib/integrations/woocommerce/validation";
 
@@ -60,6 +61,39 @@ describe("WooCommerce connect foundation", () => {
       expect(result.credentials.consumerKey).toBe("ck_test");
       expect(result.credentials.consumerSecret).toBe("cs_test");
     }
+  });
+
+  it("returns the browser to localhost when connect started there", () => {
+    expect(
+      resolveWooCommerceBrowserOrigin({
+        requestUrl: "http://localhost:3000/api/integrations/woocommerce/connect",
+        forwardedHost: null,
+        forwardedProto: null,
+        appBaseUrl: "https://ignore-savings-joyfully.ngrok-free.dev",
+      }),
+    ).toBe("http://localhost:3000");
+  });
+
+  it("returns the browser to the public app origin when a proxy forwarded that host", () => {
+    expect(
+      resolveWooCommerceBrowserOrigin({
+        requestUrl: "http://localhost:3000/api/integrations/woocommerce/connect",
+        forwardedHost: "ignore-savings-joyfully.ngrok-free.dev",
+        forwardedProto: "https",
+        appBaseUrl: "https://ignore-savings-joyfully.ngrok-free.dev",
+      }),
+    ).toBe("https://ignore-savings-joyfully.ngrok-free.dev");
+  });
+
+  it("ignores an untrusted forwarded host", () => {
+    expect(
+      resolveWooCommerceBrowserOrigin({
+        requestUrl: "https://evil.example/api/integrations/woocommerce/connect",
+        forwardedHost: "evil.example",
+        forwardedProto: "https",
+        appBaseUrl: "https://app.example.com",
+      }),
+    ).toBe("https://app.example.com");
   });
 
   it("rejects a callback body without credentials", () => {
