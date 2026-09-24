@@ -25,4 +25,6 @@ export interface MetaCapiRequestPayload {
 export interface MetaCapiSendResult {
   success: boolean;
   error?: string;
+  status?: number;
+  body?: unknown;
 }

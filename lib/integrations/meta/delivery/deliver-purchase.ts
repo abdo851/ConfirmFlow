@@ -3,6 +3,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { buildPurchaseConversionEvent } from "@/lib/conversions/purchase-event";
 import { validateConversionEvent } from "@/lib/conversions/validation";
+import { logger } from "@/lib/logging/logger";
 import { MetaCapiClient, type MetaCapiTransport } from "../capi/client";
 import { defaultMetaCapiTransport } from "../capi/transport";
 import { loadEligibleMetaConnectionForStore } from "./eligibility";
@@ -61,6 +62,19 @@ function buildPurchaseEventFromOrder(order: OrderForPurchaseDelivery) {
   });
 }
 
+function redactLoggedBody(body: unknown): unknown {
+  try {
+    return JSON.parse(
+      JSON.stringify(body ?? null).replace(
+        /access_token=[^&\s"]+/gi,
+        "access_token=[REDACTED]",
+      ),
+    );
+  } catch {
+    return null;
+  }
+}
+
 async function attemptMetaPurchaseSend(input: {
   delivery: MetaConversionDeliveryRecord;
   order: OrderForPurchaseDelivery;
@@ -76,6 +90,10 @@ async function attemptMetaPurchaseSend(input: {
   });
 
   if (!eligibility.eligible) {
+    logger.info("meta_delivery_eligibility_failed", {
+      order_id: input.order.id,
+      reason: eligibility.message,
+    });
     await markMetaPurchaseDeliveryNotEligible({
       deliveryId: input.delivery.id,
       errorMessage: eligibility.message,
@@ -93,6 +111,10 @@ async function attemptMetaPurchaseSend(input: {
   const validated = validateConversionEvent(event);
   if (!validated.ok) {
     const message = "Order is missing required Purchase information.";
+    logger.error("meta_delivery_failed", {
+      order_id: input.order.id,
+      error: message,
+    });
     await markMetaPurchaseDeliveryFailed({
       deliveryId: input.delivery.id,
       errorMessage: message,
@@ -130,16 +152,30 @@ async function attemptMetaPurchaseSend(input: {
   }
 
   const client = new MetaCapiClient(input.transport ?? defaultMetaCapiTransport);
+  const url = client.buildEventsUrl(eligibility.connection.pixelId);
+  logger.info("meta_delivery_http_request", {
+    order_id: input.order.id,
+    url,
+  });
   const sendResult = await client.sendEvent({
     pixelId: eligibility.connection.pixelId,
     accessToken: eligibility.connection.accessToken,
     event: validated.value,
+  });
+  logger.info("meta_delivery_http_response", {
+    order_id: input.order.id,
+    status: sendResult.status ?? null,
+    body: redactLoggedBody(sendResult.body),
   });
 
   if (sendResult.success) {
     await markMetaPurchaseDeliverySent({
       deliveryId: claimed.id,
       db: input.db,
+    });
+    logger.info("meta_delivery_success", {
+      order_id: input.order.id,
+      event_id: claimed.event_id,
     });
 
     return {
@@ -149,6 +185,10 @@ async function attemptMetaPurchaseSend(input: {
   }
 
   const failureMessage = sendResult.error ?? "Meta Purchase delivery failed.";
+  logger.error("meta_delivery_failed", {
+    order_id: input.order.id,
+    error: failureMessage,
+  });
   await markMetaPurchaseDeliveryFailed({
     deliveryId: claimed.id,
     errorMessage: failureMessage,
@@ -171,6 +211,8 @@ export async function processMetaPurchaseDelivery(input: {
   transport?: MetaCapiTransport;
   now?: number;
 }): Promise<MetaPurchaseDeliveryOutcome | null> {
+  logger.info("meta_delivery_started", { order_id: input.orderId });
+
   const orderResult = await loadOrderForPurchaseDelivery({
     orderId: input.orderId,
     userId: input.userId,
@@ -178,6 +220,10 @@ export async function processMetaPurchaseDelivery(input: {
   });
 
   if (!orderResult.ok) {
+    logger.error("meta_delivery_failed", {
+      order_id: input.orderId,
+      error: orderResult.reason,
+    });
     return null;
   }
 
