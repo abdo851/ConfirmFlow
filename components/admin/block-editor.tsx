@@ -9,7 +9,7 @@ import { deleteBlockAction, reorderBlocksAction, toggleBlockAction } from "@/lib
 import type { ContentBlock, ContentBlockType } from "@/lib/content/schema";
 import { BlockPreview } from "./block-preview";
 
-const TYPES: ContentBlockType[] = ["banner", "video", "ad", "text"];
+const TYPES: ContentBlockType[] = ["text", "video", "banner"];
 
 export function BlockEditor({ blocks }: { blocks: ContentBlock[] }) {
   const t = useTranslations("admin");
@@ -43,7 +43,7 @@ export function BlockEditor({ blocks }: { blocks: ContentBlock[] }) {
     <div className="space-y-6">
       <div className="flex flex-wrap gap-2">
         {TYPES.map((type) => (
-          <Button key={type} href={`/admin/content/new?type=${type}`} variant="outline">
+          <Button key={type} href={`/dashboard/admin/content/new?type=${type}`} variant="outline" className="min-h-11">
             {t("addType", { type: t(`types.${type}`) })}
           </Button>
         ))}
@@ -95,7 +95,7 @@ export function BlockEditor({ blocks }: { blocks: ContentBlock[] }) {
                 >
                   {block.is_active ? t("deactivate") : t("activate")}
                 </Button>
-                <Button href={`/admin/content/${block.id}`} variant="outline">
+                <Button href={`/dashboard/admin/content/${block.id}`} variant="outline">
                   {t("edit")}
                 </Button>
                 <Button

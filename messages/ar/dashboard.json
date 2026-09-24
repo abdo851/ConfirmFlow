@@ -1,5 +1,8 @@
 {
   "welcomeTitle": "مرحباً بعودتك",
+  "metaLive": "Meta CAPI",
+  "trendUp": "ارتفاع",
+  "trendDown": "انخفاض",
   "quickActions": "إجراءات سريعة",
   "overviewTitle": "نظرة عامة",
   "overviewDescription": "راقب تقدم الإعداد وحالة الاتصالات لحساب Confirma.",
@@ -34,6 +37,8 @@
   "metaSection": "Meta CAPI",
   "pages": {
     "comingSoon": "قريباً",
+    "comingSoonShort": "قريباً",
+    "comingSoonHint": "قيد التطوير — سيُفعّل قريباً",
     "comingSoonBody": "هذا القسم في الطريق. اترك بريدك وسنخبرك عند فتحه.",
     "notifyMe": "أخبرني",
     "waitlistSaved": "تمت إضافتك إلى القائمة.",

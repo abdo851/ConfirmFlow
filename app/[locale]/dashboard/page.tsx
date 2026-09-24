@@ -57,11 +57,16 @@ export default async function DashboardPage({
   ]);
   const recent = (recentResult?.orders ?? []).slice(0, 5);
   const currency = recent[0]?.currency ?? "USD";
+  const seriesStart = series[0] ? series[0].new + series[0].confirmed : 0;
+  const seriesEnd = series.length
+    ? series[series.length - 1].new + series[series.length - 1].confirmed
+    : 0;
+  const rising = seriesEnd >= seriesStart;
   const cards = [
-    { label: t("stats.new"), value: String(stats.new_orders) },
-    { label: t("stats.confirmed"), value: String(stats.confirmed_orders) },
-    { label: t("stats.rejected"), value: String(stats.rejected_orders) },
-    { label: t("stats.archived"), value: String(stats.archived_orders) },
+    { label: t("stats.new"), value: String(stats.new_orders), tone: "indigo" as const },
+    { label: t("stats.confirmed"), value: String(stats.confirmed_orders), tone: "teal" as const },
+    { label: t("stats.rejected"), value: String(stats.rejected_orders), tone: "amber" as const },
+    { label: t("stats.archived"), value: String(stats.archived_orders), tone: "emerald" as const },
   ];
 
   return (
@@ -69,8 +74,8 @@ export default async function DashboardPage({
       <section className="overflow-hidden rounded-3xl border border-line bg-gradient-to-br from-indigo-600 via-indigo-500 to-teal-500 p-6 text-white shadow-medium sm:p-8">
         <p className="text-sm font-medium text-white/80">{t("welcomeTitle")}</p>
         <p className="mt-1 text-xs text-white/75">{today}</p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-          {t("overviewTitle")}
+        <h1 className="mt-2 text-3xl leading-[1.1] font-semibold tracking-tight sm:text-4xl">
+          {user.email ?? t("overviewTitle")}
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-white/85 sm:text-base">
           {t("overviewDescription")}
@@ -94,9 +99,16 @@ export default async function DashboardPage({
         </div>
       </section>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {cards.map((card) => (
-          <StatCard key={card.label} label={card.label} value={card.value} icon={<StatIcon />} />
+          <StatCard
+            key={card.label}
+            label={card.label}
+            value={card.value}
+            tone={card.tone}
+            trend={rising ? t("trendUp") : t("trendDown")}
+            icon={<StatIcon />}
+          />
         ))}
       </div>
       <Sparkline
@@ -117,24 +129,21 @@ export default async function DashboardPage({
           ) : (
             <ul className="divide-y divide-line">
               {recent.map((order) => (
-                <li key={order.id}>
-                  <Link
-                    href={`/dashboard/orders/${order.id}`}
-                    className="flex items-center justify-between gap-3 py-3 text-sm"
-                  >
-                    <span>
-                      <span className="font-medium">{formatOrderDisplayIdentifier(order)}</span>
-                      <span className="mt-1 block text-muted">
-                        {formatOrderCustomerContact(order) ?? ordersT("customerUnavailable")}
-                      </span>
+                <li key={order.id} className="flex items-start justify-between gap-3 py-3">
+                  <div className="min-w-0">
+                    <Link href={`/dashboard/orders/${order.id}`} className="font-medium">
+                      {formatOrderDisplayIdentifier(order)}
+                    </Link>
+                    <span className="mt-1 block truncate text-sm text-muted">
+                      {formatOrderCustomerContact(order) ?? ordersT("customerUnavailable")}
                     </span>
-                    <span className="text-end">
-                      <span className="block">{formatMoneyMinor(order.totalAmountMinor, order.currency)}</span>
-                      <span className="mt-1 inline-flex">
-                        <OrderStatusBadge status={order.confirmationStatus} />
-                      </span>
+                  </div>
+                  <div className="text-end">
+                    <span className="block text-sm">{formatMoneyMinor(order.totalAmountMinor, order.currency)}</span>
+                    <span className="mt-1 inline-flex">
+                      <OrderStatusBadge status={order.confirmationStatus} />
                     </span>
-                  </Link>
+                  </div>
                 </li>
               ))}
             </ul>

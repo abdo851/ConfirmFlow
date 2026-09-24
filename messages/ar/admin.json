@@ -14,6 +14,8 @@
   "deactivate": "إخفاء",
   "watchNow": "شاهد الآن",
   "addType": "إضافة {type}",
+  "chooseType": "اختر نوع الكتلة",
+  "publish": "نشر",
   "policiesTitle": "محرر السياسات",
   "policiesDescription": "عدّل JSON لصفحات السياسة بالعربية والإنجليزية. الصفحات العامة تستخدم هذا النص بعد الحفظ.",
   "policiesJson": "JSON السياسات",

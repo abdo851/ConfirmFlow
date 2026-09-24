@@ -1,5 +1,15 @@
 {
   "title": "Setup Confirma",
+  "checklistTitle": "Setup checklist",
+  "checklistProgress": "{completed}/{total} completed",
+  "checklistDone": "Done",
+  "checklistPending": "Pending",
+  "checklist": {
+    "store": "Connect the store",
+    "meta": "Connect Meta",
+    "product": "Add a product",
+    "order": "Try an order"
+  },
   "description": "Complete these three steps in order to prepare your account for verified conversions.",
   "setupSequence": "Setup sequence",
   "sequenceSteps": {

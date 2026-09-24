@@ -87,21 +87,21 @@ export default async function AnalyticsPage({
           </a>
         ))}
       </div>
-      <form action={`/${locale}/dashboard/analytics`} method="get" className="flex flex-wrap items-end gap-3">
+      <form action={`/${locale}/dashboard/analytics`} method="get" className="grid grid-cols-1 items-end gap-3 sm:grid-cols-[1fr_1fr_auto]">
         <input type="hidden" name="range" value="custom" />
-        <label className="text-sm">
+        <label className="w-full text-sm">
           <span className="mb-1 block text-muted">{pages("from")}</span>
-          <input name="from" type="date" className="min-h-11 rounded-xl border border-line bg-surface px-3" />
+          <input name="from" type="date" className="min-h-11 w-full rounded-xl border border-line bg-surface px-3 text-sm sm:text-base" />
         </label>
-        <label className="text-sm">
+        <label className="w-full text-sm">
           <span className="mb-1 block text-muted">{pages("to")}</span>
-          <input name="to" type="date" className="min-h-11 rounded-xl border border-line bg-surface px-3" />
+          <input name="to" type="date" className="min-h-11 w-full rounded-xl border border-line bg-surface px-3 text-sm sm:text-base" />
         </label>
         <button type="submit" className="min-h-11 rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground">
           {pages("apply")}
         </button>
       </form>
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label={t("stats.new")} value={String(stats.new_orders)} icon={<StatIcon />} />
         <StatCard label={t("stats.confirmed")} value={String(stats.confirmed_orders)} icon={<StatIcon />} />
         <StatCard label={t("stats.rejected")} value={String(stats.rejected_orders)} icon={<StatIcon />} />

@@ -3,7 +3,22 @@ import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
 
-const logos = ["WooCommerce", "YouCan", "Shopify", "Meta", "ChatGPT"] as const;
+const featureTones = [
+  "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-200",
+  "bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-200",
+  "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-200",
+  "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200",
+  "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-200",
+  "bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-200",
+] as const;
+
+function FeatureIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-5" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M12 3.5 18.5 7v5.2c0 3.4-2.3 6-6.5 7.8-4.2-1.8-6.5-4.4-6.5-7.8V7L12 3.5z" />
+    </svg>
+  );
+}
 
 export default async function LandingPage() {
   const t = await getTranslations("landing");
@@ -48,13 +63,11 @@ export default async function LandingPage() {
           <p className="mb-4 text-xs font-semibold tracking-[0.18em] text-secondary uppercase sm:text-sm">
             {t("tagline")}
           </p>
-          <h1 className="mx-auto max-w-4xl text-4xl leading-[1.15] font-bold tracking-tight text-balance sm:text-5xl lg:text-6xl">
-            <span className="bg-gradient-to-br from-indigo-700 via-indigo-500 to-teal-500 bg-clip-text text-transparent dark:from-indigo-200 dark:via-indigo-300 dark:to-teal-200">
-              {t("heroTitle")}
-            </span>
+          <h1 className="mx-auto max-w-4xl text-4xl leading-[1.1] font-bold tracking-tight text-balance sm:text-5xl lg:text-6xl">
+            <span className="gradient-text">{t("heroHeadline")}</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-normal text-muted sm:text-lg">
-            {t("heroDescription")}
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-muted">
+            {t("heroLine")}
           </p>
           <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
             <Button href="/signup" size="lg">
@@ -65,7 +78,7 @@ export default async function LandingPage() {
             </Button>
           </div>
           <ul className="mx-auto mt-12 flex max-w-3xl flex-wrap items-center justify-center gap-3">
-            {logos.map((name) => (
+            {["WooCommerce", "YouCan", "Shopify", "Meta", "ChatGPT"].map((name) => (
               <li
                 key={name}
                 className="rounded-full border border-line bg-surface/80 px-3 py-1.5 text-xs font-medium text-muted"
@@ -83,14 +96,18 @@ export default async function LandingPage() {
       >
         <div className="mx-auto max-w-6xl">
           <SectionHeading title={t("howItWorks")} />
-          <ol className="mt-10 grid gap-4 md:grid-cols-3">
+          <ol className="relative mt-10 grid gap-4 md:grid-cols-3">
+            <span
+              aria-hidden
+              className="absolute top-9 start-8 end-8 hidden h-px bg-gradient-to-r from-indigo-500 via-teal-400 to-amber-400 md:block rtl:bg-gradient-to-l"
+            />
             {setupSteps.map((step, index) => (
-              <li key={step.title} className="hover-lift rounded-2xl border border-line bg-surface p-4 shadow-soft sm:p-6">
-                <span className="inline-flex size-10 items-center justify-center rounded-xl bg-primary text-sm font-semibold text-primary-foreground">
+              <li key={step.title} className="hover-lift relative rounded-2xl border border-line bg-surface p-5 shadow-soft sm:p-6">
+                <span className="relative z-10 inline-flex size-10 items-center justify-center rounded-xl bg-primary text-sm font-semibold text-primary-foreground">
                   {index + 1}
                 </span>
-                <h3 className="mt-4 text-lg font-semibold">{step.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-muted">{step.description}</p>
+                <h3 className="mt-4 text-lg leading-[1.1] font-semibold">{step.title}</h3>
+                <p className="mt-2 text-base leading-7 text-muted">{step.description}</p>
               </li>
             ))}
           </ol>
@@ -110,8 +127,11 @@ export default async function LandingPage() {
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           {features.map((feature, index) => (
             <Reveal key={feature} delay={index * 40}>
-              <article className="hover-lift h-full rounded-2xl border border-line bg-surface p-4 shadow-soft sm:p-6">
-                <h3 className="text-base font-semibold">{feature}</h3>
+              <article className="hover-lift h-full rounded-2xl border border-line bg-surface p-5 shadow-soft sm:p-6">
+                <span className={`inline-flex size-10 items-center justify-center rounded-xl ${featureTones[index] ?? featureTones[0]}`}>
+                  <FeatureIcon />
+                </span>
+                <h3 className="mt-4 text-base leading-7 font-semibold">{feature}</h3>
               </article>
             </Reveal>
           ))}

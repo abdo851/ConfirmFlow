@@ -19,6 +19,17 @@ export async function ConnectionStatus() {
 
   return (
     <div className="space-y-6">
+      <p className="flex items-center gap-2 text-sm font-medium">
+        <span
+          aria-hidden
+          className={`size-2 rounded-full ${
+            metaConnection.status === "connected"
+              ? "animate-pulse-dot bg-emerald-500"
+              : "bg-amber-400"
+          }`}
+        />
+        {t("metaLive")}
+      </p>
       <Card title={t("storesSection")} description={t("connectionsDescription")} interactive>
         <ul className="grid gap-3">
           <ConnectionStateItem connection={storeConnection} />

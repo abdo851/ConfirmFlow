@@ -53,29 +53,25 @@ export default async function LoginPage({
         </p>
         {errorMessage ? <Toast tone="danger" role="alert">{errorMessage}</Toast> : null}
         <Button type="submit" className="w-full">
-          {t("signIn")}
+          {t("signInShort")}
         </Button>
         <button
           type="button"
           disabled
-          className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-line text-sm font-medium text-muted"
+          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-line text-sm font-medium text-muted"
         >
           {t("googleSignIn")}
+          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-950/50 dark:text-amber-200">
+            {t("googleNote")}
+          </span>
         </button>
-        <p className="text-xs text-muted">{t("googleNote")}</p>
       </form>
-      <p className="mt-4 text-sm text-muted">{t("trustHint")}</p>
       <p className="mt-4 text-sm">
         <span className="text-neutral-600 dark:text-neutral-400">
           {t("noAccount")}{" "}
         </span>
         <Link href="/signup" className="underline">
           {t("createAccount")}
-        </Link>
-      </p>
-      <p className="mt-2 text-sm">
-        <Link href="/" className="underline">
-          {t("backToHome")}
         </Link>
       </p>
     </Card>

@@ -43,6 +43,10 @@
     "account": "Account",
     "language": "Language",
     "notifications": "Notifications",
-    "api": "API"
+    "api": "API",
+    "groupAnalytics": "Analytics",
+    "groupSetup": "Setup",
+    "support": "Support",
+    "liveData": "Live data"
   }
 }

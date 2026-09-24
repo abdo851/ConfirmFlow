@@ -1,5 +1,15 @@
 {
   "title": "إعداد Confirma",
+  "checklistTitle": "قائمة الإعداد",
+  "checklistProgress": "{completed}/{total} مكتمل",
+  "checklistDone": "تم",
+  "checklistPending": "قيد الانتظار",
+  "checklist": {
+    "store": "اربط المتجر",
+    "meta": "اربط Meta",
+    "product": "أضف منتجاً",
+    "order": "جرّب طلباً"
+  },
   "description": "أكمل هذه الخطوات الثلاث بالترتيب لتحضير حسابك للتحويلات الموثقة.",
   "setupSequence": "تسلسل الإعداد",
   "sequenceSteps": {

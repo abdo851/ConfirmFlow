@@ -39,7 +39,37 @@ export function MetaConnectionActions({
 
   return (
     <div className="space-y-4">
-      <div className="overflow-x-auto rounded-2xl border border-line">
+      <div className="grid gap-3 md:hidden">
+        {deliveries.length === 0 ? (
+          <p className="rounded-2xl border border-line p-4 text-sm text-muted">{t("noDeliveries")}</p>
+        ) : (
+          deliveries.slice(0, 5).map((row) => (
+            <article key={row.order_id} className="rounded-2xl border border-line bg-surface p-4 text-sm">
+              <p className="font-mono text-xs">{row.order_id.slice(0, 8)}</p>
+              <dl className="mt-3 space-y-2">
+                <div className="flex justify-between gap-3">
+                  <dt className="text-muted">{t("event")}</dt>
+                  <dd>{row.event_type}</dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-muted">{t("status")}</dt>
+                  <dd>{row.status}</dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-muted">{t("attempts")}</dt>
+                  <dd>{row.attempts}</dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-muted">{t("attemptedAt")}</dt>
+                  <dd>{row.last_attempted_at ? new Date(row.last_attempted_at).toLocaleString() : "—"}</dd>
+                </div>
+              </dl>
+              <p className="mt-2 break-words text-muted">{row.last_error ?? "—"}</p>
+            </article>
+          ))
+        )}
+      </div>
+      <div className="hidden overflow-x-auto rounded-2xl border border-line md:block">
         <table className="min-w-full text-sm">
           <thead className="border-b border-line text-muted">
             <tr>

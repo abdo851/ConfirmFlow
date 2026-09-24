@@ -3,7 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { ContentBlockFeed } from "@/components/content/content-block-feed";
-import { OnboardingOverviewSteps, OnboardingStepNav } from "@/components/onboarding";
+import { OnboardingOverviewSteps, OnboardingStepNav, SetupChecklist } from "@/components/onboarding";
 import { listActiveBlocks } from "@/lib/content/blocks";
 
 export default async function OnboardingPage({
@@ -26,6 +26,8 @@ export default async function OnboardingPage({
         </p>
       </div>
 
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
+        <div>
       <OnboardingStepNav />
 
       <div className="mb-8 rounded-2xl border border-line bg-surface px-4 py-5 shadow-soft sm:px-6">
@@ -51,6 +53,9 @@ export default async function OnboardingPage({
           {t("backToDashboard")}
         </Link>
       </p>
+        </div>
+        <SetupChecklist />
+      </div>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import { logoutAction } from "@/lib/auth/actions";
+import { ComingSoonBadge } from "@/components/dashboard/coming-soon-badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip } from "@/components/ui/tooltip";
 import {
@@ -31,6 +32,33 @@ function Icon({ children }: { children: ReactNode }) {
     </svg>
   );
 }
+
+const iconTone: Record<string, string> = {
+  overview: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-200",
+  orders: "bg-teal-100 text-teal-700 dark:bg-teal-950/50 dark:text-teal-200",
+  analytics: "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-200",
+  connections: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200",
+  tracking: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-200",
+  marketing: "bg-teal-100 text-teal-700 dark:bg-teal-950/50 dark:text-teal-200",
+  wallet: "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-200",
+  team: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200",
+  admin: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-200",
+  settings: "bg-teal-100 text-teal-700 dark:bg-teal-950/50 dark:text-teal-200",
+};
+
+const analyticsKeys = new Set(["overview", "orders", "analytics"]);
+
+const comingSoonHrefs = new Set([
+  "/dashboard/tracking/gtm",
+  "/dashboard/tracking/tiktok",
+  "/dashboard/marketing",
+  "/dashboard/marketing/campaigns",
+  "/dashboard/marketing/audiences",
+  "/dashboard/marketing/templates",
+  "/dashboard/wallet/transactions",
+  "/dashboard/wallet/invoices",
+  "/dashboard/team",
+]);
 
 const icons: Record<string, ReactNode> = {
   overview: (
@@ -179,19 +207,45 @@ export function DashboardSidebar({
           </button>
         </div>
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 pb-4">
-          {groups.map((group) => (
-            <GroupRow
-              key={group.key}
-              group={group}
-              collapsed={collapsed}
-              expanded={group.items.length === 0 ? false : Boolean(open[group.key])}
-              pathname={pathname}
-              search={search}
-              label={t(group.key)}
-              onToggle={() => toggle(group.key)}
-              childLabel={(key) => t(key)}
-            />
-          ))}
+          <Link
+            href="/dashboard/settings"
+            className={`mb-2 inline-flex min-h-11 items-center gap-2 rounded-xl bg-emerald-50 px-3 text-sm font-medium text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200 ${
+              collapsed ? "justify-center" : ""
+            }`}
+          >
+            <span aria-hidden className="size-2 shrink-0 rounded-full bg-emerald-500 animate-pulse-dot" />
+            {collapsed ? <span className="sr-only">{t("support")}</span> : t("support")}
+          </Link>
+          {(["analytics", "setup"] as const).map((section) => {
+            const sectionGroups = groups.filter((group) =>
+              section === "analytics" ? analyticsKeys.has(group.key) : !analyticsKeys.has(group.key),
+            );
+            if (!sectionGroups.length) {
+              return null;
+            }
+            return (
+              <div key={section} className="mb-2">
+                {collapsed ? null : (
+                  <p className="px-3 py-2 text-xs font-semibold tracking-wide text-muted uppercase">
+                    {t(section === "analytics" ? "groupAnalytics" : "groupSetup")}
+                  </p>
+                )}
+                {sectionGroups.map((group) => (
+                  <GroupRow
+                    key={group.key}
+                    group={group}
+                    collapsed={collapsed}
+                    expanded={group.items.length === 0 ? false : Boolean(open[group.key])}
+                    pathname={pathname}
+                    search={search}
+                    label={t(group.key)}
+                    onToggle={() => toggle(group.key)}
+                    childLabel={(key) => t(key)}
+                  />
+                ))}
+              </div>
+            );
+          })}
         </nav>
         <div className="border-t border-line p-3">
           <div className={`mb-2 flex items-center gap-3 rounded-xl px-2 py-2 ${collapsed ? "justify-center" : ""}`}>
@@ -201,7 +255,10 @@ export function DashboardSidebar({
             {collapsed ? null : (
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium">{brand("account")}</p>
-                <p className="truncate text-xs text-muted">{brand("brand")}</p>
+                <p className="flex items-center gap-2 truncate text-xs text-muted">
+                  <span aria-hidden className="size-2 rounded-full bg-emerald-500 animate-pulse-dot" />
+                  {t("liveData")}
+                </p>
               </div>
             )}
           </div>
@@ -268,13 +325,20 @@ function GroupRow({
       aria-current={active ? "page" : undefined}
       className={`relative inline-flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-xl px-3 text-sm font-medium ${
         collapsed ? "justify-center" : ""
-      } ${active ? "bg-indigo-50 text-primary dark:bg-indigo-950/60" : "text-muted hover:bg-surface-muted hover:text-foreground"}`}
+      } ${active ? "bg-primary text-primary-foreground" : "text-muted hover:bg-surface-muted hover:text-foreground"}`}
     >
       {active ? (
-        <span aria-hidden className="absolute inset-y-2 start-0 w-1 rounded-full bg-gradient-to-b from-indigo-500 to-teal-400" />
+        <span aria-hidden className="absolute inset-y-2 start-0 w-1 rounded-full bg-white" />
       ) : null}
-      {icons[group.key]}
+      <span
+        className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${
+          active ? "bg-white/15 text-white" : iconTone[group.key] ?? iconTone.overview
+        }`}
+      >
+        {icons[group.key]}
+      </span>
       {collapsed ? <span className="sr-only">{label}</span> : <span className="truncate">{label}</span>}
+      {!collapsed && comingSoonHrefs.has(group.href) ? <ComingSoonBadge /> : null}
     </Link>
   );
 
@@ -303,25 +367,30 @@ function GroupRow({
           </button>
         ) : null}
       </div>
-      {!collapsed && expanded ? (
-        <ul className="ms-4 space-y-1 border-s border-line py-1 ps-2">
-          {group.items.map((item) => {
-            const childActive = itemIsActive(item.href, pathname, search);
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  aria-current={childActive ? "page" : undefined}
-                  className={`block rounded-lg px-3 py-2 text-sm ${
-                    childActive ? "bg-indigo-50 font-medium text-primary dark:bg-indigo-950/60" : "text-muted hover:bg-surface-muted hover:text-foreground"
-                  }`}
-                >
-                  {childLabel(item.labelKey)}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+      {!collapsed ? (
+        <div className={`accordion-panel ${expanded ? "is-open" : ""}`}>
+          <ul className="ms-4 space-y-1 border-s border-line py-1 ps-2">
+            {group.items.map((item) => {
+              const childActive = itemIsActive(item.href, pathname, search);
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    aria-current={childActive ? "page" : undefined}
+                    className={`tab-underline block rounded-lg px-3 py-2 text-sm ${
+                      childActive ? "bg-indigo-50 font-medium text-primary dark:bg-indigo-950/60" : "text-muted hover:bg-surface-muted hover:text-foreground"
+                    }`}
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      {childLabel(item.labelKey)}
+                      {comingSoonHrefs.has(item.href) ? <ComingSoonBadge /> : null}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       ) : null}
     </div>
   );

@@ -14,6 +14,8 @@
   "deactivate": "Hide",
   "watchNow": "Watch now",
   "addType": "Add {type}",
+  "chooseType": "Choose a block type",
+  "publish": "Publish",
   "policiesTitle": "Policy editor",
   "policiesDescription": "Edit the JSON for English and Arabic policy pages. Public pages use this text when it is saved.",
   "policiesJson": "Policy JSON",

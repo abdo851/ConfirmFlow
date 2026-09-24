@@ -43,6 +43,10 @@
     "account": "الحساب",
     "language": "اللغة",
     "notifications": "الإشعارات",
-    "api": "API"
+    "api": "API",
+    "groupAnalytics": "التحليلات",
+    "groupSetup": "الإعداد",
+    "support": "الدعم",
+    "liveData": "بيانات مباشرة"
   }
 }

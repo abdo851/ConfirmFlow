@@ -15,8 +15,8 @@ export default async function WalletPage() {
       </Card>
       <NavCards
         items={[
-          { href: "/dashboard/wallet/transactions", title: nav("transactions"), description: pages("transactionsEmpty") },
-          { href: "/dashboard/wallet/invoices", title: nav("invoices"), description: pages("invoicesEmpty") },
+          { href: "/dashboard/wallet/transactions", title: nav("transactions"), description: pages("transactionsEmpty"), soon: true },
+          { href: "/dashboard/wallet/invoices", title: nav("invoices"), description: pages("invoicesEmpty"), soon: true },
         ]}
       />
     </DashboardSection>

@@ -1,5 +1,8 @@
 {
   "welcomeTitle": "Welcome back",
+  "metaLive": "Meta CAPI",
+  "trendUp": "Up",
+  "trendDown": "Down",
   "quickActions": "Quick actions",
   "overviewTitle": "Overview",
   "overviewDescription": "Monitor setup progress and connection status for your Confirma account.",
@@ -34,6 +37,8 @@
   "metaSection": "Meta CAPI",
   "pages": {
     "comingSoon": "Coming soon",
+    "comingSoonShort": "قريباً",
+    "comingSoonHint": "In development — this will turn on soon.",
     "comingSoonBody": "This area is on the way. Leave your email and we will tell you when it opens.",
     "notifyMe": "Notify me",
     "waitlistSaved": "You are on the list.",

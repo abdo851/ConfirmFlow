@@ -4,16 +4,10 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Toast } from "@/components/ui/toast";
-import {
-  applyOrderConfirmation,
-  confirmOrderRequest,
-  isConfirmButtonDisabled,
-  shouldShowConfirmButton,
-} from "@/lib/orders/confirm-client";
+import { applyOrderConfirmation } from "@/lib/orders/confirm-client";
+import { OrderActionsMenu } from "./order-actions-menu";
 import {
   formatMoneyMinor,
   formatOrderCustomerContact,
@@ -73,11 +67,7 @@ function OrdersListBody({ initialOrders }: OrdersListProps) {
   const searchParams = useSearchParams();
   const status = searchParams.get("status");
   const [orders, setOrders] = useState(initialOrders);
-  const [confirmingOrderId, setConfirmingOrderId] = useState<string | null>(
-    null,
-  );
   const [successOrderId, setSuccessOrderId] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [tab, setTab] = useState<OrderTab>(statusToTab(status));
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const router = useRouter();
@@ -86,29 +76,6 @@ function OrdersListBody({ initialOrders }: OrdersListProps) {
     setTab(statusToTab(status));
     setVisibleCount(PAGE_SIZE);
   }, [status]);
-
-  async function handleConfirm(orderId: string) {
-    if (confirmingOrderId) {
-      return;
-    }
-
-    setConfirmingOrderId(orderId);
-    setErrorMessage(null);
-    setSuccessOrderId(null);
-
-    const result = await confirmOrderRequest(orderId);
-
-    if (result.ok) {
-      setOrders((current) =>
-        applyOrderConfirmation(current, orderId, result.confirmedAt),
-      );
-      setSuccessOrderId(orderId);
-    } else {
-      setErrorMessage(t(`errors.${result.errorKey}`));
-    }
-
-    setConfirmingOrderId(null);
-  }
 
   const filtered = orders.filter((order) => matchesTab(order.confirmationStatus, tab));
   const visible = filtered.slice(0, visibleCount);
@@ -123,9 +90,6 @@ function OrdersListBody({ initialOrders }: OrdersListProps) {
 
   return (
     <div className="space-y-4">
-      {confirmingOrderId ? <Skeleton className="h-1.5 w-full" /> : null}
-      {errorMessage ? <Toast tone="danger" role="alert">{errorMessage}</Toast> : null}
-
       <div className="flex gap-2 overflow-x-auto pb-1" role="tablist">
         {TABS.map((item) => {
           const count =
@@ -163,9 +127,6 @@ function OrdersListBody({ initialOrders }: OrdersListProps) {
       <div className="grid gap-3 md:hidden">
         {visible.map((order) => {
           const customer = formatOrderCustomerContact(order);
-          const isConfirming = confirmingOrderId === order.id;
-          const confirmDisabled = isConfirmButtonDisabled(confirmingOrderId);
-          const showConfirm = shouldShowConfirmButton(order.confirmationStatus);
 
           return (
             <article
@@ -198,23 +159,15 @@ function OrdersListBody({ initialOrders }: OrdersListProps) {
                 </div>
               </dl>
               <div className="mt-4">
-                {showConfirm ? (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    loading={isConfirming}
-                    disabled={isConfirming || confirmDisabled}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      void handleConfirm(order.id);
-                    }}
-                  >
-                    {isConfirming ? t("confirming") : t("confirmOrder")}
-                  </Button>
-                ) : successOrderId === order.id ? (
-                  <Toast tone="success">{t("confirmSuccess")}</Toast>
-                ) : null}
+                <OrderActionsMenu
+                  orderId={order.id}
+                  confirmationStatus={order.confirmationStatus}
+                  onConfirmed={(confirmedAt) => {
+                    setOrders((current) => applyOrderConfirmation(current, order.id, confirmedAt));
+                    setSuccessOrderId(order.id);
+                  }}
+                />
+                {successOrderId === order.id ? <Toast tone="success">{t("confirmSuccess")}</Toast> : null}
               </div>
             </article>
           );
@@ -248,9 +201,6 @@ function OrdersListBody({ initialOrders }: OrdersListProps) {
           <tbody className="divide-y divide-line">
             {visible.map((order) => {
               const customer = formatOrderCustomerContact(order);
-              const isConfirming = confirmingOrderId === order.id;
-              const confirmDisabled = isConfirmButtonDisabled(confirmingOrderId);
-              const showConfirm = shouldShowConfirmButton(order.confirmationStatus);
 
               return (
                 <tr
@@ -280,22 +230,15 @@ function OrdersListBody({ initialOrders }: OrdersListProps) {
                     <OrderStatusBadge status={order.confirmationStatus} />
                   </td>
                   <td className="px-4 py-4">
-                    {showConfirm ? (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        loading={isConfirming}
-                        disabled={isConfirming || confirmDisabled}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          void handleConfirm(order.id);
-                        }}
-                      >
-                        {isConfirming ? t("confirming") : t("confirmOrder")}
-                      </Button>
-                    ) : successOrderId === order.id ? (
-                      <Toast tone="success">{t("confirmSuccess")}</Toast>
-                    ) : null}
+                    <OrderActionsMenu
+                      orderId={order.id}
+                      confirmationStatus={order.confirmationStatus}
+                      onConfirmed={(confirmedAt) => {
+                        setOrders((current) => applyOrderConfirmation(current, order.id, confirmedAt));
+                        setSuccessOrderId(order.id);
+                      }}
+                    />
+                    {successOrderId === order.id ? <Toast tone="success">{t("confirmSuccess")}</Toast> : null}
                   </td>
                 </tr>
               );

@@ -47,7 +47,67 @@ export function WebhooksTable({ webhooks }: { webhooks: UserWebhook[] }) {
       {webhooks.length === 0 ? (
         <EmptyState title={t("emptyTitle")} description={t("emptyBody")} />
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-line bg-surface">
+        <>
+        <div className="grid gap-3 md:hidden">
+          {webhooks.map((webhook) => (
+            <article key={`${webhook.connection_id}-${webhook.webhook_id}`} className="rounded-2xl border border-line bg-surface p-4">
+              <div className="flex items-center justify-between gap-2">
+                <Badge variant="accent">WooCommerce</Badge>
+                <span className="text-sm">{webhook.status === "active" ? t("active") : t("paused")}</span>
+              </div>
+              <p className="mt-3 text-sm font-medium">{webhook.topic}</p>
+              <p className="mt-1 break-all text-sm text-muted" title={webhook.delivery_url}>
+                {truncate(webhook.delivery_url)}
+              </p>
+              <p className="mt-2 text-sm text-muted">
+                {webhook.last_delivery_at ? new Date(webhook.last_delivery_at).toLocaleString() : "—"}
+                {webhook.last_delivery_status ? ` · ${webhook.last_delivery_status}` : ""}
+              </p>
+              <div className="mt-3 flex flex-col gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  loading={pending === `test-${webhook.webhook_id}`}
+                  onClick={() =>
+                    void post(
+                      "/api/dashboard/webhooks/test",
+                      { connectionId: webhook.connection_id },
+                      `test-${webhook.webhook_id}`,
+                    )
+                  }
+                >
+                  {t("test")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  loading={pending === `reg-${webhook.webhook_id}`}
+                  onClick={() => void post("/api/dashboard/webhooks/reregister", {}, `reg-${webhook.webhook_id}`)}
+                >
+                  {t("reregister")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  loading={pending === `del-${webhook.webhook_id}`}
+                  onClick={() =>
+                    void post(
+                      "/api/dashboard/webhooks/delete",
+                      { connectionId: webhook.connection_id, webhookId: webhook.webhook_id },
+                      `del-${webhook.webhook_id}`,
+                    )
+                  }
+                >
+                  {t("delete")}
+                </Button>
+              </div>
+            </article>
+          ))}
+        </div>
+        <div className="hidden overflow-x-auto rounded-2xl border border-line bg-surface md:block">
           <table className="min-w-full text-sm">
             <thead className="border-b border-line text-muted">
               <tr>
@@ -119,6 +179,7 @@ export function WebhooksTable({ webhooks }: { webhooks: UserWebhook[] }) {
             </tbody>
           </table>
         </div>
+        </>
       )}
       {message ? <Toast tone={ok ? "success" : "danger"}>{message}</Toast> : null}
     </div>

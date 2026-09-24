@@ -5,8 +5,7 @@ import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Toast } from "@/components/ui/toast";
-import { archiveOrderAction, rejectOrderAction } from "@/lib/confirmation/order-actions";
-import { confirmOrderRequest } from "@/lib/orders/confirm-client";
+import { OrderActionsMenu } from "@/components/orders/order-actions-menu";
 import type { OrderConfirmationStatus } from "@/lib/orders/types";
 
 interface OrderDetailActionsProps {
@@ -24,38 +23,11 @@ export function OrderDetailActions({
   metaFailed,
   wooAdminUrl,
 }: OrderDetailActionsProps) {
-  const t = useTranslations("orders");
   const pages = useTranslations("dashboard.pages.features.timeline");
   const router = useRouter();
   const [pending, setPending] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [ok, setOk] = useState(true);
-
-  async function confirm() {
-    setPending("confirm");
-    const result = await confirmOrderRequest(orderId);
-    setPending(null);
-    if (!result.ok) {
-      setOk(false);
-      setMessage(t(`errors.${result.errorKey}`));
-      return;
-    }
-    router.refresh();
-  }
-
-  async function reject() {
-    setPending("reject");
-    await rejectOrderAction(orderId);
-    setPending(null);
-    router.refresh();
-  }
-
-  async function archive() {
-    setPending("archive");
-    await archiveOrderAction(orderId);
-    setPending(null);
-    router.refresh();
-  }
 
   async function resend() {
     setPending("meta");
@@ -80,21 +52,7 @@ export function OrderDetailActions({
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap gap-2">
-        {status === "pending" ? (
-          <Button type="button" loading={pending === "confirm"} disabled={pending !== null} onClick={() => void confirm()}>
-            {pages("confirm")}
-          </Button>
-        ) : null}
-        {status === "pending" ? (
-          <Button type="button" variant="outline" loading={pending === "reject"} disabled={pending !== null} onClick={() => void reject()}>
-            {pages("reject")}
-          </Button>
-        ) : null}
-        {status === "confirmed" || status === "rejected" ? (
-          <Button type="button" variant="outline" loading={pending === "archive"} disabled={pending !== null} onClick={() => void archive()}>
-            {pages("archive")}
-          </Button>
-        ) : null}
+        <OrderActionsMenu orderId={orderId} confirmationStatus={status} />
         {metaFailed ? (
           <Button type="button" variant="outline" loading={pending === "meta"} disabled={pending !== null} onClick={() => void resend()}>
             {pages("resendMeta")}

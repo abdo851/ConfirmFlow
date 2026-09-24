@@ -11,7 +11,7 @@ export function Sparkline({ label, caption, values }: SparklineProps) {
   const peak = Math.max(...source, 1);
 
   return (
-    <figure className="rounded-2xl border border-line bg-surface p-4 shadow-soft sm:p-6">
+    <figure className="w-full rounded-2xl border border-line bg-surface p-4 shadow-soft sm:p-6 lg:p-8">
       <figcaption className="text-sm font-medium">{label}</figcaption>
       <div className="mt-4 flex h-24 items-end gap-2" aria-hidden>
         {source.map((value, index) => (

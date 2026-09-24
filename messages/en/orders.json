@@ -50,5 +50,18 @@
     "notFound": "This order could not be found.",
     "invalidState": "This order cannot be confirmed in its current state.",
     "unexpected": "Unable to confirm the order. Please try again."
+  },
+  "actionsMenu": {
+    "label": "Actions",
+    "soon": "قريباً",
+    "current": "Current",
+    "pending": "In review",
+    "confirmed": "Confirmed",
+    "rejected": "Rejected",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "returned": "Returned",
+    "cancelled": "Cancelled",
+    "archived": "Archived"
   }
 }
