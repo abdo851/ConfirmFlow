@@ -1,0 +1,169 @@
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import type { GoogleConnectionPublicState } from "@/lib/integrations/google/types";
+
+export interface GoogleFormCopy {
+  conversionId: string;
+  conversionLabel: string;
+  accessToken: string;
+  connect: string;
+  disconnect: string;
+  verify: string;
+  connected: string;
+  notConnected: string;
+  error: string;
+  status: {
+    unverified: string;
+    verified: string;
+  };
+}
+
+export function GoogleConnectForm({
+  copy,
+  initialStatus,
+}: {
+  copy: GoogleFormCopy;
+  initialStatus: GoogleConnectionPublicState;
+}) {
+  const [conversionId, setConversionId] = useState("");
+  const [conversionLabel, setConversionLabel] = useState("");
+  const [accessToken, setAccessToken] = useState("");
+  const [status, setStatus] = useState(initialStatus);
+  const [message, setMessage] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  const connected = status.status === "connected";
+  const canConnect =
+    conversionId.trim().length >= 3 &&
+    conversionLabel.trim().length >= 1 &&
+    accessToken.trim().length >= 10 &&
+    !pending;
+
+  async function refresh() {
+    const response = await fetch("/api/integrations/google/status");
+    if (response.ok) {
+      setStatus((await response.json()) as GoogleConnectionPublicState);
+    }
+  }
+
+  async function connect() {
+    setPending(true);
+    setMessage(null);
+    try {
+      const response = await fetch("/api/integrations/google/connect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ conversionId, conversionLabel, accessToken }),
+      });
+      if (!response.ok) {
+        setMessage(copy.error);
+        return;
+      }
+      setAccessToken("");
+      setConversionId("");
+      setConversionLabel("");
+      await refresh();
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function verify() {
+    setPending(true);
+    setMessage(null);
+    try {
+      const response = await fetch("/api/integrations/google/verify", { method: "POST" });
+      const body = (await response.json()) as { message?: string };
+      if (body.message) {
+        setMessage(body.message);
+      } else if (!response.ok) {
+        setMessage(copy.error);
+      }
+      await refresh();
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function disconnect() {
+    setPending(true);
+    setMessage(null);
+    try {
+      const response = await fetch("/api/integrations/google/disconnect", { method: "POST" });
+      if (!response.ok) {
+        setMessage(copy.error);
+        return;
+      }
+      setStatus({ provider: "google", status: "not_connected" });
+    } finally {
+      setPending(false);
+    }
+  }
+
+  const verificationLabel =
+    status.verificationStatus === "verified" ? copy.status.verified : copy.status.unverified;
+
+  return (
+    <div className="max-w-xl rounded-2xl border border-line bg-surface p-4 shadow-soft sm:p-6">
+      <p className="text-sm font-medium text-foreground">
+        {connected ? copy.connected : copy.notConnected}
+        {connected ? ` · ${verificationLabel}` : ""}
+      </p>
+      {status.conversionId ? (
+        <p className="mt-2 text-sm text-muted">
+          {status.conversionId}
+          {status.conversionLabel ? ` · ${status.conversionLabel}` : ""}
+        </p>
+      ) : null}
+      {status.errorMessage ? (
+        <p className="mt-2 text-sm text-rose-700" role="alert">
+          {status.errorMessage}
+        </p>
+      ) : null}
+
+      {connected ? (
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+          <Button type="button" onClick={() => void verify()} disabled={pending}>
+            {copy.verify}
+          </Button>
+          <Button type="button" variant="outline" onClick={() => void disconnect()} disabled={pending}>
+            {copy.disconnect}
+          </Button>
+        </div>
+      ) : (
+        <div className="mt-4 space-y-4">
+          <Input
+            label={copy.conversionId}
+            name="conversionId"
+            value={conversionId}
+            onChange={(event) => setConversionId(event.target.value)}
+            autoComplete="off"
+          />
+          <Input
+            label={copy.conversionLabel}
+            name="conversionLabel"
+            value={conversionLabel}
+            onChange={(event) => setConversionLabel(event.target.value)}
+            autoComplete="off"
+          />
+          <Input
+            label={copy.accessToken}
+            name="accessToken"
+            type="password"
+            value={accessToken}
+            onChange={(event) => setAccessToken(event.target.value)}
+            autoComplete="off"
+          />
+          <Button type="button" className="w-full sm:w-auto" disabled={!canConnect} onClick={() => void connect()}>
+            {copy.connect}
+          </Button>
+        </div>
+      )}
+
+      {message ? <p className="mt-3 text-sm text-muted">{message}</p> : null}
+    </div>
+  );
+}

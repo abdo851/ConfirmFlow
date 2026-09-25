@@ -1,9 +1,19 @@
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
+import { CinematicReveal } from "@/components/marketing/cinematic-reveal";
+import { DashboardPreview } from "@/components/marketing/dashboard-preview";
+import { ExampleBlock } from "@/components/marketing/example-block";
+import { FaqList } from "@/components/marketing/faq-list";
+import { FlowTimeline } from "@/components/marketing/flow-timeline";
+import { FounderLine } from "@/components/marketing/founder-line";
+import { HeroWords } from "@/components/marketing/hero-words";
+import { LandingHeading } from "@/components/marketing/landing-heading";
 import { PlatformRow } from "@/components/marketing/platform-row";
+import { SetupTrack } from "@/components/marketing/setup-track";
+import { StickyCta } from "@/components/marketing/sticky-cta";
+import { VideoEmbed } from "@/components/marketing/video-embed";
+import { getVideoForPlacement } from "@/lib/videos/queries";
 import { Button } from "@/components/ui/button";
-import { Reveal } from "@/components/ui/reveal";
-import { SectionHeading } from "@/components/ui/section-heading";
 
 const featureTones = [
   "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-200",
@@ -24,7 +34,7 @@ function FeatureIcon() {
 
 function Mark({ children, className }: { children: ReactNode; className: string }) {
   return (
-    <span className={`inline-flex size-12 items-center justify-center rounded-full ${className}`}>
+    <span className={`appear-pulse inline-flex size-12 items-center justify-center rounded-full ${className}`}>
       <svg viewBox="0 0 24 24" className="size-6" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.8">
         {children}
       </svg>
@@ -108,37 +118,59 @@ export default async function LandingPage() {
   ];
 
   const marquee = t("marquee");
+  const faqs = [
+    { question: t("faq1q"), answer: t("faq1a") },
+    { question: t("faq2q"), answer: t("faq2a") },
+    { question: t("faq3q"), answer: t("faq3a") },
+    { question: t("faq4q"), answer: t("faq4a") },
+  ];
+  const heroVideo = await getVideoForPlacement("landing_hero");
 
   return (
-    <div className="animate-fade-in">
-      <section className="hero-mesh relative overflow-hidden">
+    <div className="landing-canvas animate-fade-in pb-24 md:pb-0">
+      <section id="hero" className="hero-mesh relative overflow-hidden">
         <span aria-hidden className="hero-orb hero-orb-a" />
         <span aria-hidden className="hero-orb hero-orb-b" />
         <span aria-hidden className="hero-orb hero-orb-c" />
-        <div className="relative mx-auto max-w-6xl px-4 py-16 text-center sm:px-6 sm:py-24 lg:px-8">
+        <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-24">
+          <div className="text-center lg:text-start">
           <p className="hero-rise mb-4 text-xs font-semibold tracking-[0.18em] text-secondary uppercase sm:text-sm">
             {t("tagline")}
           </p>
-          <h1 className="mx-auto max-w-4xl text-4xl leading-[1.1] font-bold tracking-tight text-balance sm:text-5xl lg:text-6xl">
-            <span className="hero-rise gradient-indigo block">{t("heroLine1")}</span>
-            <span className="hero-rise gradient-teal mt-2 block" style={{ animationDelay: "140ms" }}>
-              {t("heroLine2")}
-            </span>
+          <h1 className="mx-auto max-w-4xl text-3xl leading-[1.1] font-bold tracking-tight text-balance sm:text-5xl lg:mx-0 lg:text-6xl">
+            <HeroWords text={t("heroLine1")} className="block" wordClassName="gradient-indigo" />
+            <HeroWords text={t("heroLine2")} className="mt-2 block" wordClassName="gradient-teal" />
           </h1>
-          <p className="hero-rise mx-auto mt-6 max-w-2xl text-base leading-7 text-muted sm:text-lg" style={{ animationDelay: "280ms" }}>
+          <p className="hero-rise mx-auto mt-6 max-w-2xl text-base leading-7 text-muted lg:mx-0">
             {t("heroLine")}
           </p>
-          <div className="hero-rise mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center" style={{ animationDelay: "420ms" }}>
-            <Button href="/signup" size="lg" className="cta-shimmer">
+          <div className="hero-rise mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center lg:justify-start">
+            <Button href="/signup" size="lg" className="cta-shimmer w-full sm:w-auto">
               {t("ctaStart")}
             </Button>
-            <Button variant="ghost" href="/login" size="lg">
+            <Button variant="ghost" href="/login" size="lg" className="w-full sm:w-auto">
               {nav("signIn")}
             </Button>
           </div>
-          <div className="hero-rise" style={{ animationDelay: "560ms" }}>
-            <PlatformRow />
           </div>
+          <DashboardPreview
+            title={t("dashboardTitle")}
+            newLabel={t("dashboardNew")}
+            confirmedLabel={t("dashboardConfirmed")}
+            sentLabel={t("dashboardSent")}
+          />
+          {heroVideo ? <div className="lg:col-span-2"><VideoEmbed video={heroVideo} variant="hero" /></div> : null}
+        </div>
+        <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+          <ExampleBlock
+            label={t("exampleLabel")}
+            title={t("exampleTitle")}
+            orders={t("exampleOrders")}
+            confirmed={t("exampleConfirmed")}
+            purchases={t("examplePurchases")}
+            note={t("exampleNote")}
+          />
+          <PlatformRow trusted={t("trustedBy")} liveLabel={t("badgeLive")} soonLabel={t("badgeSoon")} />
           <div className="marquee mt-10" aria-hidden>
             <div className="marquee-track">
               <p className="px-4 text-sm font-semibold tracking-wide text-indigo-900/80">{marquee}</p>
@@ -148,34 +180,37 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <section id="features" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <section id="features" className="section-premium wash-plain px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+        <div className="mx-auto max-w-7xl">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {showcase.map((item, index) => (
-            <Reveal key={item.title} delay={index * 60}>
-              <article className="hover-lift h-full rounded-2xl border border-line bg-surface p-5 shadow-soft sm:p-6">
+            <CinematicReveal key={item.title} delay={index * 100}>
+              <article className="feature-card landing-card h-full rounded-2xl border border-line bg-surface p-5 shadow-soft sm:p-6">
                 <Mark className={item.chip}>{item.icon}</Mark>
                 <h2 className="mt-4 text-lg font-semibold">{item.title}</h2>
                 <p className="mt-2 text-sm leading-6 text-muted sm:text-base">{item.body}</p>
               </article>
-            </Reveal>
+            </CinematicReveal>
           ))}
+        </div>
         </div>
       </section>
 
       <section
         id="how-it-works"
-        className="border-y border-line bg-surface-muted/70 px-4 py-16 sm:px-6 sm:py-24 lg:px-8"
+        className="section-premium wash-teal px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
       >
-        <div className="mx-auto max-w-6xl">
-          <SectionHeading title={t("howItWorks")} />
-          <ol className="relative mt-10 grid gap-4 md:grid-cols-3">
+        <div className="mx-auto max-w-7xl space-y-10 lg:space-y-16">
+          <LandingHeading title={t("howItWorks")} />
+          <SetupTrack>
+          <ol className="relative grid gap-4 md:grid-cols-3">
             <span aria-hidden className="step-line absolute top-9 start-8 end-8 hidden h-1 rounded-full md:block" />
             {setupSteps.map((step, index) => (
               <li key={step.title}>
-                <Reveal delay={index * 90}>
-                  <article className="hover-lift relative rounded-2xl border border-line bg-surface p-5 shadow-soft sm:p-6">
+                <CinematicReveal delay={index * 100}>
+                  <article className="landing-card relative rounded-2xl border border-line bg-surface p-5 shadow-soft sm:p-6">
                     <div className="flex items-center gap-3">
-                      <span className="relative z-10 inline-flex size-10 items-center justify-center rounded-xl bg-primary text-sm font-semibold text-primary-foreground">
+                      <span className="setup-pop relative z-10 inline-flex size-12 items-center justify-center rounded-full border-2 border-indigo-600 bg-white text-sm font-bold text-indigo-600">
                         {index + 1}
                       </span>
                       <Mark className={featureTones[index] ?? featureTones[0]}>
@@ -191,95 +226,79 @@ export default async function LandingPage() {
                     <h3 className="mt-4 text-lg leading-[1.1] font-semibold">{step.title}</h3>
                     <p className="mt-2 text-base leading-7 text-muted">{step.description}</p>
                   </article>
-                </Reveal>
+                </CinematicReveal>
               </li>
             ))}
           </ol>
-          <ol className="mt-6 grid gap-3 md:grid-cols-5">
-            {flowSteps.map((step, index) => (
-              <li key={step} className="rounded-2xl border border-line bg-surface p-4 text-sm font-medium">
-                <span className="text-xs text-muted">{index + 1}</span>
-                <p className="mt-2">{step}</p>
-              </li>
-            ))}
-          </ol>
+          </SetupTrack>
+          <FlowTimeline steps={flowSteps} />
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-        <SectionHeading title={t("stepsTitle")} />
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
+      <section className="section-premium wash-indigo px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+        <div className="mx-auto max-w-7xl space-y-10 lg:space-y-16">
+        <LandingHeading title={t("stepsTitle")} />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature, index) => (
-            <Reveal key={feature} delay={index * 40}>
-              <article className="hover-lift h-full rounded-2xl border border-line bg-surface p-5 shadow-soft sm:p-6">
-                <span className={`inline-flex size-10 items-center justify-center rounded-xl ${featureTones[index] ?? featureTones[0]}`}>
+            <CinematicReveal key={feature} delay={index * 100}>
+              <article className="feature-card landing-card h-full rounded-2xl border border-line bg-surface p-5 shadow-soft sm:p-6">
+                <span className={`feature-mark inline-flex size-10 items-center justify-center rounded-xl ${featureTones[index] ?? featureTones[0]}`}>
                   <FeatureIcon />
                 </span>
                 <h3 className="mt-4 text-base leading-7 font-semibold">{feature}</h3>
               </article>
-            </Reveal>
+            </CinematicReveal>
           ))}
         </div>
-      </section>
-
-      <section className="border-y border-line bg-surface-muted/60 px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-        <div className="mx-auto grid max-w-6xl gap-4 md:grid-cols-2">
-          <article className="hover-lift rounded-2xl border border-line bg-surface p-6 shadow-soft">
-            <p className="text-sm font-semibold text-secondary">{t("pricing.basicName")}</p>
-            <p className="mt-3 text-3xl font-semibold">{t("pricing.basicPrice")}</p>
-            <p className="mt-2 text-sm leading-6 text-muted">{t("pricing.basicDetail")}</p>
-          </article>
-          <article className="hover-lift rounded-2xl border border-indigo-200 bg-gradient-to-br from-indigo-600 to-teal-500 p-6 text-white shadow-medium">
-            <p className="text-sm font-semibold text-white/80">{t("pricing.proName")}</p>
-            <p className="mt-3 text-3xl font-semibold">{t("pricing.proPrice")}</p>
-            <p className="mt-2 text-sm leading-6 text-white/85">{t("pricing.proDetail")}</p>
-          </article>
         </div>
       </section>
 
-      <section id="proof" className="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-        <Reveal>
-          <div className="mx-auto max-w-6xl rounded-3xl bg-gradient-to-br from-indigo-700 via-indigo-600 to-teal-500 p-8 text-white shadow-large sm:p-12">
-            <p className="text-sm font-semibold tracking-wide uppercase opacity-80">
-              {t("proofTitle")}
-            </p>
-            <h2 className="mt-4 max-w-3xl text-3xl leading-[1.15] font-semibold text-balance sm:text-4xl">
-              {t("ctaTitle")}
-            </h2>
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/85 sm:text-base">
-              {t("ctaDescription")}
-            </p>
-            <blockquote className="mt-6 max-w-3xl text-lg leading-snug font-medium">
-              “{t("proofQuote")}”
-            </blockquote>
-            <p className="mt-4 text-sm opacity-90">{t("proofRole")}</p>
-            <div className="mt-8">
-              <Button href="/signup" variant="secondary" size="lg">
-                {nav("getStarted")}
-              </Button>
-            </div>
-          </div>
-        </Reveal>
+      <section className="section-premium wash-indigo px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+        <div className="mx-auto max-w-xl">
+          <CinematicReveal>
+            <article className="landing-card rounded-2xl border border-line bg-surface p-6 text-center shadow-soft">
+              <p className="text-sm font-semibold text-secondary">{t("pricing.basicName")}</p>
+              <p className="mt-3 text-3xl font-semibold">{t("pricing.basicPrice")}</p>
+              <p className="mt-2 text-sm leading-6 text-muted">{t("pricing.basicDetail")}</p>
+            </article>
+          </CinematicReveal>
+        </div>
       </section>
 
-      <section className="px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
-        <div className="cta-band mx-auto max-w-6xl rounded-3xl px-6 py-12 text-center text-white shadow-large sm:px-10 sm:py-16">
-          <h2 className="mx-auto max-w-3xl text-3xl leading-[1.15] font-semibold text-balance sm:text-5xl">
+      <section id="proof" className="section-premium wash-plain px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+        <CinematicReveal>
+          <FounderLine quote={t("founderQuote")} role={t("founderRole")} />
+        </CinematicReveal>
+      </section>
+
+      <section id="faq" className="section-premium wash-teal px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+        <div className="mx-auto max-w-3xl space-y-10 lg:space-y-16">
+          <LandingHeading title={t("faqTitle")} />
+          <FaqList items={faqs} />
+        </div>
+      </section>
+
+      <section className="section-premium wash-indigo px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+        <CinematicReveal>
+        <div className="cta-band mx-auto max-w-7xl rounded-3xl px-6 py-12 text-center text-white shadow-large sm:px-10 sm:py-16">
+          <h2 className="mx-auto max-w-3xl text-2xl leading-tight font-bold text-balance sm:text-3xl lg:text-4xl">
             {t("ctaReady")}
           </h2>
           <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
-            <Button href="/signup" variant="secondary" size="lg" className="cta-shimmer">
+            <Button href="/signup" variant="secondary" size="lg" className="cta-shimmer cta-pulse w-full sm:w-auto">
               {t("ctaStart")}
             </Button>
             <a
               href="mailto:privacy@confirma.local"
-              className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/40 px-5 text-base font-medium text-white hover:bg-white/10"
+              className="inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-white/40 px-5 text-base font-medium text-white hover:bg-white/10 sm:w-auto"
             >
               {t("ctaTalk")}
             </a>
           </div>
         </div>
+        </CinematicReveal>
       </section>
+      <StickyCta label={t("stickyCta")} />
     </div>
   );
 }

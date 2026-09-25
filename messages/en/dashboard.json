@@ -6,6 +6,7 @@
   "quickActions": "Quick actions",
   "overviewTitle": "Overview",
   "overviewDescription": "Monitor setup progress and connection status for your Confirma account.",
+  "videoDismiss": "Dismiss",
   "connectionsTitle": "Connections",
   "connectionsDescription": "Integration status for your account.",
   "connectionsManageDescription": "Manage your store, Meta, and confirmation integrations.",

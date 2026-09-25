@@ -66,6 +66,14 @@ function isProtectedWooCommerceApiPath(pathname: string): boolean {
   return pathname.startsWith("/api/integrations/woocommerce");
 }
 
+function isProtectedTikTokApiPath(pathname: string): boolean {
+  return pathname.startsWith("/api/integrations/tiktok");
+}
+
+function isProtectedGoogleApiPath(pathname: string): boolean {
+  return pathname.startsWith("/api/integrations/google");
+}
+
 /** Path + query for post-login redirect (e.g. connect routes with ?shop=). */
 function buildLoginNextPath(request: NextRequest): string {
   const { pathname, search } = request.nextUrl;
@@ -115,6 +123,14 @@ export async function middleware(request: NextRequest) {
     }
 
     if (isProtectedMetaApiPath(pathname) && !user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (isProtectedTikTokApiPath(pathname) && !user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (isProtectedGoogleApiPath(pathname) && !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

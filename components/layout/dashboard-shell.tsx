@@ -4,6 +4,7 @@ import { Suspense, useCallback, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
+import { UserMenu } from "./user-menu";
 import { LanguageSwitcher } from "./language-switcher";
 
 export function DashboardShell({
@@ -69,12 +70,7 @@ export function DashboardShell({
               <Link href="/" className="hidden min-h-11 items-center text-sm text-muted sm:inline-flex">
                 {brand("home")}
               </Link>
-              <span
-                aria-label={brand("account")}
-                className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground"
-              >
-                C
-              </span>
+              <UserMenu />
             </div>
           </div>
         </header>

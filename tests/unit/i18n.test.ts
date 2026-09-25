@@ -27,6 +27,7 @@ const namespaces = [
   "orders",
   "admin",
   "policies",
+  "tracking",
 ];
 
 function loadJson(locale: string, namespace: string) {

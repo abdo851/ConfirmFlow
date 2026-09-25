@@ -115,3 +115,19 @@ Existing translation keys were not renamed or removed. New keys were added under
 ## 11. Status
 
 uncommitted, awaiting user approval
+
+## 12. Animation helpers
+
+Use the client hooks in `lib/animations` and the keyframes in `app/globals.css`. No new packages.
+
+A block reveals when it scrolls into view:
+
+```html
+<div data-animate="fade-up" data-delay="200">...</div>
+```
+
+`data-animate` accepts `fade-in`, `fade-up`, `fade-down`, `fade-left`, `fade-right`, `scale-in`, and `rotate-in`. Set `data-visible="true"` when `useReveal` reports the element is on screen. `data-delay` is milliseconds and maps to `animation-delay`.
+
+`useCountUp(target, active)` eases a number from 0 to `target` with `requestAnimationFrame`. It jumps to the final number when the user prefers reduced motion.
+
+Other keyframes: `pulse-soft`, `glow`, `float`, `shimmer`. Icons inside a revealed block can use the class `appear-pulse` to pulse once.

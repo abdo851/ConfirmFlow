@@ -45,5 +45,32 @@
     "both": "Arabic and English",
     "ar": "Arabic",
     "en": "English"
+  },
+  "videos": {
+    "title": "Videos",
+    "description": "Place a YouTube video on the landing hero, onboarding, or dashboard. This is separate from content blocks.",
+    "empty": "No videos yet.",
+    "untitled": "Untitled video",
+    "titleField": "Title",
+    "descriptionField": "Description",
+    "youtubeUrl": "YouTube URL",
+    "placement": "Placement",
+    "position": "Position",
+    "active": "Active",
+    "hidden": "Hidden",
+    "create": "Create video",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "saved": "Saved.",
+    "failed": "Could not save that video.",
+    "placements": {
+      "landing_hero": "Landing hero",
+      "landing_below_hero": "Below the hero",
+      "onboarding_top": "Onboarding top",
+      "dashboard_top": "Dashboard top",
+      "global": "Global"
+    }
   }
 }

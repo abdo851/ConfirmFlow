@@ -8,7 +8,9 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Sparkline } from "@/components/ui/sparkline";
 import { StatCard } from "@/components/ui/stat-card";
 import { getAuthenticatedUser } from "@/lib/auth/session";
+import { PlacementVideo } from "@/components/marketing/placement-video";
 import { ContentBlockFeed } from "@/components/content/content-block-feed";
+import { getVideoForPlacement } from "@/lib/videos/queries";
 import { listActiveBlocks } from "@/lib/content/blocks";
 import { getDashboardStats } from "@/lib/dashboard/get-dashboard-stats";
 import { getDashboardTimeseries } from "@/lib/dashboard/get-dashboard-timeseries";
@@ -56,6 +58,7 @@ export default async function DashboardPage({
     listActiveBlocks(locale === "ar" ? "ar" : "en"),
   ]);
   const recent = (recentResult?.orders ?? []).slice(0, 5);
+  const topVideo = await getVideoForPlacement("dashboard_top");
   const currency = recent[0]?.currency ?? "USD";
   const seriesStart = series[0] ? series[0].new + series[0].confirmed : 0;
   const seriesEnd = series.length
@@ -71,6 +74,7 @@ export default async function DashboardPage({
 
   return (
     <div className="animate-fade-in space-y-6 sm:space-y-8">
+      {topVideo ? <PlacementVideo video={topVideo} dismissLabel={t("videoDismiss")} /> : null}
       <section className="overflow-hidden rounded-3xl border border-line bg-gradient-to-br from-indigo-600 via-indigo-500 to-teal-500 p-6 text-white shadow-medium sm:p-8">
         <p className="text-sm font-medium text-white/80">{t("welcomeTitle")}</p>
         <p className="mt-1 text-xs text-white/75">{today}</p>

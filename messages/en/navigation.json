@@ -24,6 +24,7 @@
     "pixelSettings": "Pixel settings",
     "capi": "Conversion API",
     "gtm": "Google Tag Manager",
+    "googleAds": "Google Ads",
     "tiktok": "TikTok Events",
     "marketing": "Marketing tools",
     "campaigns": "Campaigns",
@@ -47,6 +48,16 @@
     "groupAnalytics": "Analytics",
     "groupSetup": "Setup",
     "support": "Support",
-    "liveData": "Live data"
+    "liveData": "Live data",
+    "videos": "Videos"
+  },
+  "userMenu": {
+    "open": "Account menu",
+    "account": "Account info",
+    "profile": "Profile",
+    "settings": "Settings",
+    "notifications": "Notifications",
+    "language": "Language",
+    "logout": "Log out"
   }
 }

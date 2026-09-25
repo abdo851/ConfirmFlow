@@ -1,0 +1,43 @@
+{
+  "tiktok": {
+    "title": "TikTok Events",
+    "subtitle": "نرسل المشتريات المؤكدة إلى TikTok. الإرسال الحي يحتاج توكناً حقيقياً لاحقاً.",
+    "pixelCode": "رمز البكسل",
+    "accessToken": "رمز الوصول",
+    "connect": "اربط",
+    "disconnect": "افصل",
+    "verify": "تحقق",
+    "connected": "مربوط",
+    "notConnected": "غير مربوط",
+    "deliveries": "إرسالات Purchase",
+    "sent": "أُرسلت",
+    "failed": "فشلت",
+    "pending": "قيد الانتظار",
+    "error": "تعذر الحفظ. تأكد أن المتجر مربوط.",
+    "status": {
+      "unverified": "غير مُتحقق",
+      "verified": "مُتحقق"
+    }
+  },
+  "google": {
+    "title": "Google Ads",
+    "subtitle": "تحويلات محسّنة. التحقق الآن يفحص صيغة التوكن فقط.",
+    "conversionId": "معرّف التحويل",
+    "conversionLabel": "تسمية التحويل",
+    "accessToken": "رمز الوصول",
+    "connect": "اربط",
+    "disconnect": "افصل",
+    "verify": "تحقق",
+    "connected": "مربوط",
+    "notConnected": "غير مربوط",
+    "deliveries": "إرسالات Purchase",
+    "sent": "أُرسلت",
+    "failed": "فشلت",
+    "pending": "قيد الانتظار",
+    "error": "تعذر الحفظ. تأكد أن المتجر مربوط.",
+    "status": {
+      "unverified": "غير مُتحقق",
+      "verified": "مُتحقق"
+    }
+  }
+}

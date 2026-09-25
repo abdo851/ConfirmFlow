@@ -71,6 +71,7 @@ export const sidebarGroups: SidebarGroup[] = [
       { labelKey: "policies", href: "/dashboard/admin/policies" },
       { labelKey: "users", href: "/dashboard/admin/users" },
       { labelKey: "generalSettings", href: "/dashboard/admin/settings" },
+      { labelKey: "videos", href: "/dashboard/admin/videos" },
     ],
   },
   {

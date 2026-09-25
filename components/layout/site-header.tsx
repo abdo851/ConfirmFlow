@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { UserMenu } from "./user-menu";
 import { LanguageSwitcher } from "./language-switcher";
 
-export function SiteHeader() {
+export function SiteHeader({ signedIn = false }: { signedIn?: boolean }) {
   const t = useTranslations("navigation");
   const landing = useTranslations("landing");
   const brand = useTranslations("common");
@@ -71,10 +72,16 @@ export function SiteHeader() {
 
         <div className="hidden items-center gap-2 lg:flex">
           <LanguageSwitcher />
-          <Button variant="ghost" href="/login">
-            {t("signIn")}
-          </Button>
-          <Button href="/signup">{t("getStarted")}</Button>
+          {signedIn ? (
+            <UserMenu />
+          ) : (
+            <>
+              <Button variant="ghost" href="/login">
+                {t("signIn")}
+              </Button>
+              <Button href="/signup">{t("getStarted")}</Button>
+            </>
+          )}
         </div>
 
         <button
@@ -115,12 +122,18 @@ export function SiteHeader() {
               </a>
             ))}
             <LanguageSwitcher />
-            <Button variant="outline" href="/login" className="w-full">
-              {t("signIn")}
-            </Button>
-            <Button href="/signup" className="w-full">
-              {t("getStarted")}
-            </Button>
+            {signedIn ? (
+              <UserMenu />
+            ) : (
+              <>
+                <Button variant="outline" href="/login" className="w-full">
+                  {t("signIn")}
+                </Button>
+                <Button href="/signup" className="w-full">
+                  {t("getStarted")}
+                </Button>
+              </>
+            )}
           </div>
         </div>
       ) : null}

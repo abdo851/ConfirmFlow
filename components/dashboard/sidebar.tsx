@@ -4,9 +4,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
-import { logoutAction } from "@/lib/auth/actions";
+import { UserMenu } from "@/components/layout/user-menu";
 import { ComingSoonBadge } from "@/components/dashboard/coming-soon-badge";
-import { Button } from "@/components/ui/button";
 import { Tooltip } from "@/components/ui/tooltip";
 import {
   groupIsActive,
@@ -49,8 +48,6 @@ const iconTone: Record<string, string> = {
 const analyticsKeys = new Set(["overview", "orders", "analytics"]);
 
 const comingSoonHrefs = new Set([
-  "/dashboard/tracking/gtm",
-  "/dashboard/tracking/tiktok",
   "/dashboard/marketing",
   "/dashboard/marketing/campaigns",
   "/dashboard/marketing/audiences",
@@ -152,7 +149,6 @@ export function DashboardSidebar({
   const searchParams = useSearchParams();
   const search = searchParams.toString();
   const t = useTranslations("navigation.sidebar");
-  const nav = useTranslations("navigation");
   const brand = useTranslations("common");
   const groups = visibleSidebarGroups(isAdmin);
   const [open, setOpen] = useState<Record<string, boolean>>({});
@@ -248,26 +244,7 @@ export function DashboardSidebar({
           })}
         </nav>
         <div className="border-t border-line p-3">
-          <div className={`mb-2 flex items-center gap-3 rounded-xl px-2 py-2 ${collapsed ? "justify-center" : ""}`}>
-            <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
-              C
-            </span>
-            {collapsed ? null : (
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium">{brand("account")}</p>
-                <p className="flex items-center gap-2 truncate text-xs text-muted">
-                  <span aria-hidden className="size-2 rounded-full bg-emerald-500 animate-pulse-dot" />
-                  {t("liveData")}
-                </p>
-              </div>
-            )}
-          </div>
-          <form action={logoutAction}>
-            <Button type="submit" variant="ghost" className={collapsed ? "w-11 px-0" : "w-full justify-start"}>
-              {collapsed ? <span className="sr-only">{nav("signOut")}</span> : nav("signOut")}
-              {collapsed ? <span aria-hidden>↪</span> : null}
-            </Button>
-          </form>
+          <UserMenu variant="card" menuSide="top" collapsed={collapsed} />
         </div>
       </div>
     );
@@ -371,19 +348,23 @@ function GroupRow({
         <div className={`accordion-panel ${expanded ? "is-open" : ""}`}>
           <ul className="ms-4 space-y-1 border-s border-line py-1 ps-2">
             {group.items.map((item) => {
-              const childActive = itemIsActive(item.href, pathname, search);
+              const link =
+                item.href === "/dashboard/tracking/gtm"
+                  ? { labelKey: "googleAds", href: "/dashboard/tracking/google" }
+                  : item;
+              const childActive = itemIsActive(link.href, pathname, search);
               return (
-                <li key={item.href}>
+                <li key={link.href}>
                   <Link
-                    href={item.href}
+                    href={link.href}
                     aria-current={childActive ? "page" : undefined}
                     className={`tab-underline block rounded-lg px-3 py-2 text-sm ${
                       childActive ? "bg-indigo-50 font-medium text-primary dark:bg-indigo-950/60" : "text-muted hover:bg-surface-muted hover:text-foreground"
                     }`}
                   >
                     <span className="inline-flex items-center gap-2">
-                      {childLabel(item.labelKey)}
-                      {comingSoonHrefs.has(item.href) ? <ComingSoonBadge /> : null}
+                      {childLabel(link.labelKey)}
+                      {comingSoonHrefs.has(link.href) ? <ComingSoonBadge /> : null}
                     </span>
                   </Link>
                 </li>

@@ -24,6 +24,7 @@
     "pixelSettings": "إعدادات البيكسل",
     "capi": "Conversion API",
     "gtm": "Google Tag Manager",
+    "googleAds": "Google Ads",
     "tiktok": "TikTok Events",
     "marketing": "أدوات التسويق",
     "campaigns": "الحملات",
@@ -47,6 +48,16 @@
     "groupAnalytics": "التحليلات",
     "groupSetup": "الإعداد",
     "support": "الدعم",
-    "liveData": "بيانات مباشرة"
+    "liveData": "بيانات مباشرة",
+    "videos": "الفيديوهات"
+  },
+  "userMenu": {
+    "open": "قائمة الحساب",
+    "account": "معلومات الحساب",
+    "profile": "الملف الشخصي",
+    "settings": "الإعدادات",
+    "notifications": "الإشعارات",
+    "language": "اللغة",
+    "logout": "تسجيل الخروج"
   }
 }

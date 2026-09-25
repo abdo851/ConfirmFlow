@@ -1,0 +1,43 @@
+{
+  "tiktok": {
+    "title": "TikTok Events",
+    "subtitle": "Send confirmed purchases to TikTok. Live sending needs a real token later.",
+    "pixelCode": "Pixel code",
+    "accessToken": "Access token",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "verify": "Verify",
+    "connected": "Connected",
+    "notConnected": "Not connected",
+    "deliveries": "Purchase deliveries",
+    "sent": "Sent",
+    "failed": "Failed",
+    "pending": "Pending",
+    "error": "Could not save. Check the store is connected.",
+    "status": {
+      "unverified": "Unverified",
+      "verified": "Verified"
+    }
+  },
+  "google": {
+    "title": "Google Ads",
+    "subtitle": "Enhanced conversions. Verify only checks the token format for now.",
+    "conversionId": "Conversion ID",
+    "conversionLabel": "Conversion label",
+    "accessToken": "Access token",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "verify": "Verify",
+    "connected": "Connected",
+    "notConnected": "Not connected",
+    "deliveries": "Purchase deliveries",
+    "sent": "Sent",
+    "failed": "Failed",
+    "pending": "Pending",
+    "error": "Could not save. Check the store is connected.",
+    "status": {
+      "unverified": "Unverified",
+      "verified": "Verified"
+    }
+  }
+}
