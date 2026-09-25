@@ -58,6 +58,10 @@
     "settings": "الإعدادات",
     "notifications": "الإشعارات",
     "language": "اللغة",
+    "theme": "المظهر",
+    "themeLight": "فاتح",
+    "themeDark": "داكن",
+    "themeSystem": "النظام",
     "logout": "تسجيل الخروج"
   }
 }

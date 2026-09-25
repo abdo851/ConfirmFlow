@@ -84,9 +84,11 @@ export function SiteHeader({ signedIn = false }: { signedIn?: boolean }) {
           )}
         </div>
 
+        <div className="flex items-center gap-2 lg:hidden">
+          <LanguageSwitcher />
         <button
           type="button"
-          className="inline-flex size-11 items-center justify-center rounded-xl border border-line bg-surface lg:hidden"
+          className="inline-flex size-11 items-center justify-center rounded-xl border border-line bg-surface"
           aria-expanded={open}
           aria-label={open ? brand("closeMenu") : brand("openMenu")}
           onClick={() => setOpen((current) => !current)}
@@ -100,6 +102,7 @@ export function SiteHeader({ signedIn = false }: { signedIn?: boolean }) {
             <span className="h-0.5 rounded-full bg-foreground" />
           </span>
         </button>
+        </div>
       </nav>
 
       {open ? (

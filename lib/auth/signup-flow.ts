@@ -14,6 +14,7 @@ export function resolveSignupFlow(input: {
   authError: boolean;
   hasSession: boolean;
   hasUser: boolean;
+  fullName?: string;
 }): SignupFlowResult {
   if (!input.hasRequiredFields) {
     return { type: "error", code: "missing_fields" };

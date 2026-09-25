@@ -5,6 +5,7 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { getLocaleDirection, isAppLocale } from "@/lib/i18n/locales";
+import { ThemeWatcher } from "@/components/theme/theme-watcher";
 import "../globals.css";
 
 const inter = Inter({
@@ -54,10 +55,19 @@ export default async function LocaleLayout({
       dir={getLocaleDirection(locale)}
       className={`${inter.variable} ${cairo.variable}`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var k='confirma-theme';var s=localStorage.getItem(k)||'system';var d=s==='dark'||(s!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.dataset.theme=s;}catch(e){}",
+          }}
+        />
+      </head>
       <body
         className={`${locale === "ar" ? cairo.className : inter.className} bg-background text-foreground antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
+          <ThemeWatcher />
           {children}
         </NextIntlClientProvider>
       </body>

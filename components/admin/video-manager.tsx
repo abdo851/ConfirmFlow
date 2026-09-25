@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createVideoAction, deleteVideoAction, updateVideoAction } from "@/lib/videos/actions";
 import type { VideoBlock } from "@/lib/videos/types";
-import { videoPlacements } from "@/lib/videos/types";
 
 export function VideoManager({ videos }: { videos: VideoBlock[] }) {
   const t = useTranslations("admin.videos");
@@ -53,6 +52,14 @@ function VideoForm({ video, onCancel }: { video: VideoBlock | null; onCancel: ()
   const [url, setUrl] = useState(video?.youtube_url ?? "");
   const [title, setTitle] = useState(video?.title ?? "");
   const [description, setDescription] = useState(video?.description ?? "");
+  const [surface, setSurface] = useState<"dashboard" | "landing" | "onboarding">(
+    video?.placement === "onboarding_top"
+      ? "onboarding"
+      : video?.placement === "landing_hero" || video?.placement === "landing_below_hero"
+        ? "landing"
+        : "dashboard",
+  );
+  const [position, setPosition] = useState(String(video?.position && video.position > 0 ? video.position : 1));
   const [message, setMessage] = useState<string | null>(null);
   const action = video ? updateVideoAction : createVideoAction;
 
@@ -84,21 +91,41 @@ function VideoForm({ video, onCancel }: { video: VideoBlock | null; onCancel: ()
         />
       </label>
       <Input label={t("youtubeUrl")} name="youtube_url" value={url} onChange={(event) => setUrl(event.target.value)} required />
-      <label className="flex flex-col gap-1.5 text-sm font-medium">
-        {t("placement")}
-        <select
-          name="placement"
-          defaultValue={video?.placement ?? "landing_hero"}
-          className="min-h-11 rounded-xl border border-line bg-surface px-3 text-sm font-normal"
-        >
-          {videoPlacements.map((placement) => (
-            <option key={placement} value={placement}>
-              {t(`placements.${placement}`)}
-            </option>
-          ))}
-        </select>
-      </label>
-      <Input label={t("position")} name="position" type="number" defaultValue={video?.position ?? 0} />
+      <fieldset className="grid gap-2 text-sm font-medium">
+        <legend>{t("surface")}</legend>
+        {(
+          [
+            ["dashboard", t("surfaceDashboard")],
+            ["landing", t("surfaceLanding")],
+            ["onboarding", t("surfaceOnboarding")],
+          ] as const
+        ).map(([value, label]) => (
+          <label key={value} className="inline-flex min-h-11 items-center gap-2 font-normal">
+            <input
+              type="radio"
+              name="surface"
+              checked={surface === value}
+              onChange={() => setSurface(value)}
+            />
+            {label}
+          </label>
+        ))}
+      </fieldset>
+      <input
+        type="hidden"
+        name="placement"
+        value={surface === "landing" ? "landing_hero" : surface === "onboarding" ? "onboarding_top" : "dashboard_top"}
+      />
+      <Input
+        label={t("position")}
+        name="position"
+        type="number"
+        min={1}
+        value={surface === "landing" ? "1" : position}
+        readOnly={surface === "landing"}
+        onChange={(event) => setPosition(event.target.value)}
+        helperText={surface === "landing" ? t("landingPosition") : t("positionHint")}
+      />
       <label className="flex min-h-11 items-center gap-2 text-sm font-medium">
         <input type="checkbox" name="is_active" defaultChecked={video?.is_active ?? true} />
         {t("active")}

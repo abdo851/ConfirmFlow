@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
-import { PlacementVideo } from "@/components/marketing/placement-video";
+import { DashboardVideoBar } from "@/components/marketing/dashboard-video-bar";
 import { ContentBlockFeed } from "@/components/content/content-block-feed";
 import { getVideoForPlacement } from "@/lib/videos/queries";
 import { OnboardingOverviewSteps, OnboardingStepNav, SetupChecklist } from "@/components/onboarding";
@@ -14,6 +14,7 @@ export default async function OnboardingPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const dashboard = await getTranslations("dashboard");
   const t = await getTranslations("onboarding");
   const common = await getTranslations("common");
   const blocks = await listActiveBlocks(locale === "ar" ? "ar" : "en");
@@ -21,7 +22,13 @@ export default async function OnboardingPage({
 
   return (
     <div>
-      {topVideo ? <PlacementVideo video={topVideo} /> : null}
+      {topVideo ? (
+        <DashboardVideoBar
+          video={topVideo}
+          watchLabel={dashboard("watchNow")}
+          dismissLabel={dashboard("videoDismiss")}
+        />
+      ) : null}
       <BackButton href="/dashboard" label={common("back")} />
       <div className="mb-8">
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{t("title")}</h1>

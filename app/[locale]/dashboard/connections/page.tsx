@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { AddStoreDialog } from "@/components/connections/add-store-dialog";
 import { ProviderStatusList } from "@/components/connections/provider-status-list";
 import { BackButton } from "@/components/ui/back-button";
 import { getLatestMetaDeliverySummary } from "@/lib/connections/meta-delivery-summary";
@@ -30,13 +31,16 @@ export default async function DashboardConnectionsPage() {
   return (
     <div className="animate-fade-in space-y-6 sm:space-y-8">
       <BackButton href="/dashboard" label={common("back")} />
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          {t("connectionsTitle")}
-        </h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted sm:text-base">
-          {t("connectionsManageDescription")}
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            {t("connectionsTitle")}
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted sm:text-base">
+            {t("connectionsManageDescription")}
+          </p>
+        </div>
+        <AddStoreDialog />
       </div>
       <ProviderStatusList
         providers={[

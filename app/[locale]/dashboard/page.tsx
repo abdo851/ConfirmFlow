@@ -8,7 +8,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Sparkline } from "@/components/ui/sparkline";
 import { StatCard } from "@/components/ui/stat-card";
 import { getAuthenticatedUser } from "@/lib/auth/session";
-import { PlacementVideo } from "@/components/marketing/placement-video";
+import { createUserDatabaseClient } from "@/lib/database/user-client";
+import { DashboardVideoBar } from "@/components/marketing/dashboard-video-bar";
 import { ContentBlockFeed } from "@/components/content/content-block-feed";
 import { getVideoForPlacement } from "@/lib/videos/queries";
 import { listActiveBlocks } from "@/lib/content/blocks";
@@ -29,6 +30,30 @@ function StatIcon() {
   );
 }
 
+async function readDisplayName(user: {
+  id: string;
+  email?: string | null;
+  user_metadata?: { full_name?: unknown } | null;
+}) {
+  let profileName = "";
+  try {
+    const db = await createUserDatabaseClient();
+    const { data } = await db.from("profiles").select("full_name").eq("id", user.id).maybeSingle();
+    const row = data as { full_name?: string | null } | null;
+    profileName = row?.full_name?.trim() ?? "";
+  } catch {
+    profileName = "";
+  }
+  if (profileName) {
+    return profileName;
+  }
+  const metadataName = user.user_metadata?.full_name;
+  if (typeof metadataName === "string" && metadataName.trim()) {
+    return metadataName.trim();
+  }
+  return user.email?.split("@")[0]?.trim() ?? "";
+}
+
 function last30Days() {
   const to = new Date();
   const from = new Date(to);
@@ -47,6 +72,7 @@ export default async function DashboardPage({
     return redirect({ href: "/login", locale });
   }
 
+  const displayName = await readDisplayName(user);
   const t = await getTranslations("dashboard");
   const ordersT = await getTranslations("orders");
   const nav = await getTranslations("navigation");
@@ -74,12 +100,14 @@ export default async function DashboardPage({
 
   return (
     <div className="animate-fade-in space-y-6 sm:space-y-8">
-      {topVideo ? <PlacementVideo video={topVideo} dismissLabel={t("videoDismiss")} /> : null}
+      {topVideo ? (
+        <DashboardVideoBar video={topVideo} watchLabel={t("watchNow")} dismissLabel={t("videoDismiss")} />
+      ) : null}
       <section className="overflow-hidden rounded-3xl border border-line bg-gradient-to-br from-indigo-600 via-indigo-500 to-teal-500 p-6 text-white shadow-medium sm:p-8">
         <p className="text-sm font-medium text-white/80">{t("welcomeTitle")}</p>
         <p className="mt-1 text-xs text-white/75">{today}</p>
         <h1 className="mt-2 text-3xl leading-[1.1] font-semibold tracking-tight sm:text-4xl">
-          {user.email ?? t("overviewTitle")}
+          {displayName || t("greetingFallback")}
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-white/85 sm:text-base">
           {t("overviewDescription")}

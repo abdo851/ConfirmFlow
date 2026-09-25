@@ -64,6 +64,7 @@ export async function signupAction(formData: FormData): Promise<void> {
   const email = getString(formData, "email");
   const password = getString(formData, "password");
   const confirmPassword = getString(formData, "confirmPassword");
+  const fullName = getString(formData, "fullName");
 
   const preSignupResult = resolveSignupFlow({
     hasRequiredFields: Boolean(email && password && confirmPassword),
@@ -71,6 +72,7 @@ export async function signupAction(formData: FormData): Promise<void> {
     authError: false,
     hasSession: false,
     hasUser: false,
+    fullName,
   });
 
   if (preSignupResult.type === "error") {
@@ -83,6 +85,9 @@ export async function signupAction(formData: FormData): Promise<void> {
     password,
     options: {
       emailRedirectTo: getAuthCallbackUrl("/onboarding"),
+      data: {
+        full_name: fullName,
+      },
     },
   });
 
@@ -92,6 +97,7 @@ export async function signupAction(formData: FormData): Promise<void> {
     authError: Boolean(error),
     hasSession: Boolean(data.session),
     hasUser: Boolean(data.user),
+    fullName,
   });
 
   if (result.type === "error") {

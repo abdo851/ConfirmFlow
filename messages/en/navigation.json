@@ -58,6 +58,10 @@
     "settings": "Settings",
     "notifications": "Notifications",
     "language": "Language",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
     "logout": "Log out"
   }
 }

@@ -10,20 +10,27 @@ export function LanguageSwitcher() {
   const router = useRouter();
   const pathname = usePathname();
 
+  function choose(next: AppLocale) {
+    if (next !== locale) {
+      router.replace(pathname, { locale: next });
+    }
+  }
+
+  const optionClass = (active: boolean) =>
+    `inline-flex min-h-11 items-center gap-1 rounded-xl px-2 text-sm ${
+      active ? "bg-surface font-medium text-foreground shadow-soft" : "text-muted hover:text-foreground"
+    }`;
+
   return (
-    <label className="inline-flex min-h-11 items-center gap-2 text-sm">
-      <span className="sr-only">{t("switchLabel")}</span>
-      <select
-        aria-label={t("switchLabel")}
-        className="min-h-11 rounded-xl border border-line bg-surface px-3 text-sm text-foreground shadow-soft outline-none focus:border-primary focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--ring)_28%,transparent)]"
-        value={locale}
-        onChange={(event) => {
-          router.replace(pathname, { locale: event.target.value as AppLocale });
-        }}
-      >
-        <option value="en">{t("english")}</option>
-        <option value="ar">{t("arabic")}</option>
-      </select>
-    </label>
+    <div className="inline-flex items-center rounded-xl border border-line bg-surface-muted p-0.5" role="group" aria-label={t("switchLabel")}>
+      <button type="button" className={optionClass(locale === "en")} aria-pressed={locale === "en"} onClick={() => choose("en")}>
+        <span aria-hidden>🇬🇧</span>
+        {t("english")}
+      </button>
+      <button type="button" className={optionClass(locale === "ar")} aria-pressed={locale === "ar"} onClick={() => choose("ar")}>
+        <span aria-hidden>🇲🇦</span>
+        {t("arabic")}
+      </button>
+    </div>
   );
 }

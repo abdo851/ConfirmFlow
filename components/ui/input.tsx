@@ -48,7 +48,7 @@ export function Input({
           {...props}
         />
         {suffix ? (
-          <span className="pointer-events-none absolute inset-y-0 end-0 flex items-center pe-3 text-muted">
+          <span className="absolute inset-y-0 end-0 flex items-center pe-1 text-muted">
             {suffix}
           </span>
         ) : null}
