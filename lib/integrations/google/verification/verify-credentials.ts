@@ -1,5 +1,11 @@
 import "server-only";
 
+import { buildGA4Purchase } from "../capi/payload-builder";
+import {
+  readGa4ValidationMessages,
+  sendGA4Event,
+  type Ga4Transport,
+} from "../capi/client";
 import type { GoogleCredentialVerificationResult } from "../types";
 import {
   GooglePersistenceError,
@@ -7,28 +13,51 @@ import {
   persistGoogleVerificationResult,
 } from "../persistence";
 
-/**
- * Format-only check. Real Google OAuth and a developer-token call are later work.
- */
 export async function verifyGoogleCredentials(input: {
-  conversionId: string;
-  accessToken: string;
+  measurementId: string;
+  apiSecret: string;
+  transport?: Ga4Transport;
 }): Promise<GoogleCredentialVerificationResult> {
-  const conversionId = input.conversionId.trim();
-  const accessToken = input.accessToken.trim();
+  const measurementId = input.measurementId.trim();
+  const apiSecret = input.apiSecret.trim();
 
-  if (conversionId.length < 3 || accessToken.length < 10) {
+  if (!/^G-[A-Z0-9]+$/.test(measurementId) || apiSecret.length < 20) {
     return { status: "failed", message: "Google credentials are incomplete." };
   }
 
+  const event = buildGA4Purchase({
+    event_id: "ga4-verify",
+    order: {
+      id: "ga4-verify",
+      external_order_id: "confirma.ga4.verify",
+      order_number: "verify",
+      total_amount_minor: 100,
+      currency: "USD",
+    },
+  });
+
+  const result = await sendGA4Event({
+    measurement_id: measurementId,
+    api_secret: apiSecret,
+    event,
+    debug: true,
+    transport: input.transport,
+  });
+
+  const messages = readGa4ValidationMessages(result.body);
+  if (result.status >= 200 && result.status < 300 && messages.length === 0) {
+    return { status: "verified" };
+  }
+
   return {
-    status: "verified",
-    message: "Token format accepted. Live Google OAuth is not connected yet.",
+    status: "failed",
+    message: messages[0] ?? "GA4 credential check did not succeed.",
   };
 }
 
 export async function verifyGoogleConnectionForUser(input: {
   ownerId: string;
+  transport?: Ga4Transport;
 }): Promise<GoogleCredentialVerificationResult> {
   const context = await loadGoogleConnectionForVerification(input.ownerId);
   if (!context) {
@@ -36,8 +65,9 @@ export async function verifyGoogleConnectionForUser(input: {
   }
 
   const result = await verifyGoogleCredentials({
-    conversionId: context.conversionId,
-    accessToken: context.accessToken,
+    measurementId: context.conversionId,
+    apiSecret: context.accessToken,
+    transport: input.transport,
   });
 
   await persistGoogleVerificationResult({

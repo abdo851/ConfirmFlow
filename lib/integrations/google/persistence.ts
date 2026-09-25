@@ -82,16 +82,24 @@ export async function assertConversionAvailableForUser(
 
 export async function persistGoogleConnection(input: {
   owner_id: string;
-  conversion_id: string;
-  conversion_label: string;
-  access_token: string;
+  measurement_id?: string;
+  api_secret?: string;
+  conversion_id?: string;
+  conversion_label?: string | null;
+  access_token?: string;
 }): Promise<void> {
+  const measurementId = (input.measurement_id ?? input.conversion_id ?? "").trim();
+  const apiSecret = (input.api_secret ?? input.access_token ?? "").trim();
+  if (!measurementId || !apiSecret) {
+    throw new GooglePersistenceError("Google credentials are incomplete.");
+  }
+
   const db = createDatabaseClient();
   const env = getGoogleEnv();
-  const encryptedAccessToken = encryptSecret(input.access_token, env.GOOGLE_SESSION_SECRET);
+  const encryptedAccessToken = encryptSecret(apiSecret, env.GOOGLE_SESSION_SECRET);
   const connectedAt = new Date().toISOString();
 
-  await assertConversionAvailableForUser(db, input.conversion_id, input.owner_id);
+  await assertConversionAvailableForUser(db, measurementId, input.owner_id);
   const storeId = await resolveOwnedStoreId(db, input.owner_id);
 
   const { data: storeConnection, error: connectionError } = await db
@@ -115,8 +123,8 @@ export async function persistGoogleConnection(input: {
   const { error: connectionRowError } = await db.from("google_connections").upsert(
     {
       store_connection_id: storeConnection.id,
-      conversion_id: input.conversion_id,
-      conversion_label: input.conversion_label,
+      conversion_id: measurementId,
+      conversion_label: input.conversion_label ?? null,
       connected_at: connectedAt,
       verification_status: "unverified",
       verified_at: null,
@@ -187,6 +195,8 @@ export async function getGoogleConnectionStateForUser(
   return {
     provider: "google",
     status,
+    measurementId:
+      status === "connected" ? maskConversionId(googleConnection.conversion_id) : undefined,
     conversionId:
       status === "connected" ? maskConversionId(googleConnection.conversion_id) : undefined,
     conversionLabel: googleConnection.conversion_label ?? undefined,

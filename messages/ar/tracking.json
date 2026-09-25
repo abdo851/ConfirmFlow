@@ -20,11 +20,13 @@
     }
   },
   "google": {
-    "title": "Google Ads",
-    "subtitle": "تحويلات محسّنة. التحقق الآن يفحص صيغة التوكن فقط.",
+    "title": "Google Analytics",
+    "subtitle": "المشتريات المؤكدة تذهب إلى GA4. Google Ads لاحقاً.",
     "conversionId": "معرّف التحويل",
     "conversionLabel": "تسمية التحويل",
     "accessToken": "رمز الوصول",
+    "measurementId": "معرّف القياس",
+    "apiSecret": "سر API",
     "connect": "اربط",
     "disconnect": "افصل",
     "verify": "تحقق",

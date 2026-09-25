@@ -3,10 +3,8 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createDatabaseClient } from "@/lib/database/client";
 import { logger } from "@/lib/logging/logger";
-import { minorUnitsToMajorAmount } from "@/lib/orders/money";
-import { googleResponseAccepted, sendEvent, type GoogleAdsTransport } from "../capi/client";
-import { buildGooglePayload } from "../capi/payload-builder";
-import { googleCustomerId } from "../validation";
+import { googleResponseAccepted, sendGA4Event, type Ga4Transport } from "../capi/client";
+import { buildGA4Purchase } from "../capi/payload-builder";
 import { loadEligibleGoogleConnectionForStore } from "./eligibility";
 
 const STALE_SENDING_MS = 5 * 60 * 1000;
@@ -32,8 +30,8 @@ interface OrderRow {
   confirmed_at: string | null;
   currency: string | null;
   total_amount_minor: number | null;
-  customer_email: string | null;
-  customer_phone: string | null;
+  external_order_id: string | null;
+  order_number: string | null;
 }
 
 function eventIdFor(orderId: string): string {
@@ -42,20 +40,23 @@ function eventIdFor(orderId: string): string {
 
 function safeText(value: unknown): string {
   const raw = typeof value === "string" ? value : JSON.stringify(value ?? "");
-  return raw.replace(/Bearer\s+\S+/gi, "Bearer [REDACTED]").slice(0, 2000);
+  return raw
+    .replace(/api_secret=[^&\s]+/gi, "api_secret=[REDACTED]")
+    .replace(/Bearer\s+\S+/gi, "Bearer [REDACTED]")
+    .slice(0, 2000);
 }
 
 export async function processGooglePurchaseDelivery(input: {
   order_id: string;
   db?: SupabaseClient;
-  transport?: GoogleAdsTransport;
+  transport?: Ga4Transport;
   now?: number;
 }): Promise<GooglePurchaseDeliveryOutcome | null> {
   const db = input.db ?? createDatabaseClient();
   const { data: order, error: orderError } = await db
     .from("orders")
     .select(
-      "id, store_id, confirmation_status, confirmed_at, currency, total_amount_minor, customer_email, customer_phone",
+      "id, store_id, confirmation_status, confirmed_at, currency, total_amount_minor, external_order_id, order_number",
     )
     .eq("id", input.order_id)
     .maybeSingle();
@@ -151,23 +152,20 @@ export async function processGooglePurchaseDelivery(input: {
     return { status: "in_progress", eventId: current.event_id };
   }
 
-  const payload = buildGooglePayload({
-    conversion_id: eligibility.connection.conversionId,
-    conversion_label: eligibility.connection.conversionLabel,
+  const payload = buildGA4Purchase({
     event_id: current.event_id,
-    confirmed_at: row.confirmed_at,
     order: {
       id: row.id,
+      external_order_id: row.external_order_id,
+      order_number: row.order_number,
       currency: row.currency,
-      value: minorUnitsToMajorAmount(row.total_amount_minor, row.currency),
-      email: row.customer_email,
-      phone: row.customer_phone,
+      total_amount_minor: row.total_amount_minor,
     },
   });
 
-  const sendResult = await sendEvent({
-    customer_id: googleCustomerId(eligibility.connection.conversionId),
-    access_token: eligibility.connection.accessToken,
+  const sendResult = await sendGA4Event({
+    measurement_id: eligibility.connection.measurementId,
+    api_secret: eligibility.connection.apiSecret,
     event: payload,
     transport: input.transport,
   });
@@ -179,7 +177,7 @@ export async function processGooglePurchaseDelivery(input: {
         status: "sent",
         sent_at: new Date().toISOString(),
         last_error: null,
-        response_body: safeText(sendResult.body),
+        response_body: sendResult.body == null ? "" : safeText(sendResult.body),
       })
       .eq("id", current.id);
 
@@ -187,10 +185,7 @@ export async function processGooglePurchaseDelivery(input: {
     return { status: "sent", eventId: current.event_id };
   }
 
-  const message =
-    sendResult.status === 0
-      ? "Google Ads developer token is not configured."
-      : "Google Purchase delivery failed.";
+  const message = "GA4 Purchase delivery failed.";
 
   await db
     .from("google_conversion_deliveries")

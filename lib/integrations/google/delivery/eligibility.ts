@@ -7,6 +7,8 @@ import { getGoogleEnv } from "../env";
 import type { GoogleVerificationStatus } from "../types";
 
 export interface GoogleDeliveryConnection {
+  measurementId: string;
+  apiSecret: string;
   conversionId: string;
   conversionLabel: string | null;
   accessToken: string;
@@ -95,6 +97,8 @@ export async function loadEligibleGoogleConnectionForStore(input: {
   return {
     eligible: true,
     connection: {
+      measurementId: googleConnection.conversion_id,
+      apiSecret: accessToken,
       conversionId: googleConnection.conversion_id,
       conversionLabel: googleConnection.conversion_label,
       accessToken,

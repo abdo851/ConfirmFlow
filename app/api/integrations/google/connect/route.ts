@@ -27,9 +27,8 @@ export async function POST(request: Request) {
   try {
     await persistGoogleConnection({
       owner_id: user.id,
-      conversion_id: parsed.value.conversionId,
-      conversion_label: parsed.value.conversionLabel,
-      access_token: parsed.value.accessToken,
+      measurement_id: parsed.value.measurementId,
+      api_secret: parsed.value.apiSecret,
     });
 
     return NextResponse.json({ ok: true });

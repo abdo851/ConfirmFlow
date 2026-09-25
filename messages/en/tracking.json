@@ -20,11 +20,13 @@
     }
   },
   "google": {
-    "title": "Google Ads",
-    "subtitle": "Enhanced conversions. Verify only checks the token format for now.",
+    "title": "Google Analytics",
+    "subtitle": "Confirmed purchases go to GA4. Google Ads comes later.",
     "conversionId": "Conversion ID",
     "conversionLabel": "Conversion label",
     "accessToken": "Access token",
+    "measurementId": "Measurement ID",
+    "apiSecret": "API secret",
     "connect": "Connect",
     "disconnect": "Disconnect",
     "verify": "Verify",

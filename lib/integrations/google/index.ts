@@ -18,8 +18,8 @@ export {
   verifyGoogleConnectionForUser,
   verifyGoogleCredentials,
 } from "./verification/verify-credentials";
-export { sendEvent, googleResponseAccepted } from "./capi/client";
-export { buildGooglePayload } from "./capi/payload-builder";
+export { sendEvent, sendGA4Event, googleResponseAccepted, readGa4ValidationMessages } from "./capi/client";
+export { buildGooglePayload, buildGA4Purchase } from "./capi/payload-builder";
 export { hashGoogleEmail, hashGooglePhone } from "./capi/hash-user-data";
 export {
   dispatchGooglePurchaseDelivery,

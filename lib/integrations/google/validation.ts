@@ -1,9 +1,13 @@
 import { z } from "zod";
 
+const MEASUREMENT_ID_PATTERN = /^G-[A-Z0-9]+$/;
+
 export const googleConnectionInputSchema = z.object({
-  conversionId: z.string().trim().min(3, "invalid_conversion_id"),
-  conversionLabel: z.string().trim().min(1, "invalid_conversion_label"),
-  accessToken: z.string().trim().min(10, "invalid_access_token"),
+  measurementId: z
+    .string()
+    .trim()
+    .regex(MEASUREMENT_ID_PATTERN, "invalid_measurement_id"),
+  apiSecret: z.string().trim().min(20, "invalid_api_secret"),
 });
 
 export type GoogleConnectionInput = z.infer<typeof googleConnectionInputSchema>;

@@ -6,9 +6,8 @@ import { Input } from "@/components/ui/input";
 import type { GoogleConnectionPublicState } from "@/lib/integrations/google/types";
 
 export interface GoogleFormCopy {
-  conversionId: string;
-  conversionLabel: string;
-  accessToken: string;
+  measurementId: string;
+  apiSecret: string;
   connect: string;
   disconnect: string;
   verify: string;
@@ -28,19 +27,15 @@ export function GoogleConnectForm({
   copy: GoogleFormCopy;
   initialStatus: GoogleConnectionPublicState;
 }) {
-  const [conversionId, setConversionId] = useState("");
-  const [conversionLabel, setConversionLabel] = useState("");
-  const [accessToken, setAccessToken] = useState("");
+  const [measurementId, setMeasurementId] = useState("");
+  const [apiSecret, setApiSecret] = useState("");
   const [status, setStatus] = useState(initialStatus);
   const [message, setMessage] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
   const connected = status.status === "connected";
   const canConnect =
-    conversionId.trim().length >= 3 &&
-    conversionLabel.trim().length >= 1 &&
-    accessToken.trim().length >= 10 &&
-    !pending;
+    /^G-[A-Z0-9]+$/.test(measurementId.trim()) && apiSecret.trim().length >= 20 && !pending;
 
   async function refresh() {
     const response = await fetch("/api/integrations/google/status");
@@ -56,15 +51,14 @@ export function GoogleConnectForm({
       const response = await fetch("/api/integrations/google/connect", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ conversionId, conversionLabel, accessToken }),
+        body: JSON.stringify({ measurementId, apiSecret }),
       });
       if (!response.ok) {
         setMessage(copy.error);
         return;
       }
-      setAccessToken("");
-      setConversionId("");
-      setConversionLabel("");
+      setApiSecret("");
+      setMeasurementId("");
       await refresh();
     } finally {
       setPending(false);
@@ -112,11 +106,8 @@ export function GoogleConnectForm({
         {connected ? copy.connected : copy.notConnected}
         {connected ? ` · ${verificationLabel}` : ""}
       </p>
-      {status.conversionId ? (
-        <p className="mt-2 text-sm text-muted">
-          {status.conversionId}
-          {status.conversionLabel ? ` · ${status.conversionLabel}` : ""}
-        </p>
+      {status.measurementId || status.conversionId ? (
+        <p className="mt-2 text-sm text-muted">{status.measurementId ?? status.conversionId}</p>
       ) : null}
       {status.errorMessage ? (
         <p className="mt-2 text-sm text-rose-700" role="alert">
@@ -136,25 +127,18 @@ export function GoogleConnectForm({
       ) : (
         <div className="mt-4 space-y-4">
           <Input
-            label={copy.conversionId}
-            name="conversionId"
-            value={conversionId}
-            onChange={(event) => setConversionId(event.target.value)}
+            label={copy.measurementId}
+            name="measurementId"
+            value={measurementId}
+            onChange={(event) => setMeasurementId(event.target.value)}
             autoComplete="off"
           />
           <Input
-            label={copy.conversionLabel}
-            name="conversionLabel"
-            value={conversionLabel}
-            onChange={(event) => setConversionLabel(event.target.value)}
-            autoComplete="off"
-          />
-          <Input
-            label={copy.accessToken}
-            name="accessToken"
+            label={copy.apiSecret}
+            name="apiSecret"
             type="password"
-            value={accessToken}
-            onChange={(event) => setAccessToken(event.target.value)}
+            value={apiSecret}
+            onChange={(event) => setApiSecret(event.target.value)}
             autoComplete="off"
           />
           <Button type="button" className="w-full sm:w-auto" disabled={!canConnect} onClick={() => void connect()}>

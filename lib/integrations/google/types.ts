@@ -16,6 +16,7 @@ export interface GoogleCredentialVerificationResult {
 export interface GoogleConnectionPublicState {
   provider: "google";
   status: ConnectionStatus;
+  measurementId?: string;
   conversionId?: string;
   conversionLabel?: string;
   verificationStatus?: GoogleVerificationStatus;
