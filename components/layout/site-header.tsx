@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import { UserMenu } from "./user-menu";
 import { LanguageSwitcher } from "./language-switcher";
 
 export function SiteHeader({ signedIn = false }: { signedIn?: boolean }) {
@@ -73,7 +72,9 @@ export function SiteHeader({ signedIn = false }: { signedIn?: boolean }) {
         <div className="hidden items-center gap-2 lg:flex">
           <LanguageSwitcher />
           {signedIn ? (
-            <UserMenu />
+            <Button variant="outline" href="/dashboard">
+              {t("dashboard")}
+            </Button>
           ) : (
             <>
               <Button variant="ghost" href="/login">
@@ -126,7 +127,9 @@ export function SiteHeader({ signedIn = false }: { signedIn?: boolean }) {
             ))}
             <LanguageSwitcher />
             {signedIn ? (
-              <UserMenu />
+              <Button variant="outline" href="/dashboard" className="w-full">
+                {t("dashboard")}
+              </Button>
             ) : (
               <>
                 <Button variant="outline" href="/login" className="w-full">

@@ -9,6 +9,10 @@
   "videoDismiss": "Dismiss",
   "watchNow": "Watch now",
   "greetingFallback": "there",
+  "announcement": {
+    "text": "Professional plan upgrade is available now — get 30% off",
+    "dismiss": "Dismiss announcement"
+  },
   "addStore": "Add new store",
   "addStoreTitle": "Add a store",
   "connectionsTitle": "Connections",

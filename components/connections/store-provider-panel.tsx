@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Toast } from "@/components/ui/toast";
 import { joinWaitlistAction } from "@/lib/waitlist/actions";
+import { ShopifyConnectForm } from "./shopify-connect-form";
 import { WooCommerceConnectForm } from "./woocommerce-connect-form";
 
 type StoreProviderId = "youcan" | "shopify" | "woocommerce";
@@ -34,11 +35,11 @@ function initialProvider(
   return "youcan";
 }
 
-function ComingSoonProvider({ provider }: { provider: "youcan" | "shopify" }) {
+function ComingSoonProvider({ provider }: { provider: "youcan" }) {
   const t = useTranslations("connections");
   const auth = useTranslations("auth");
   const [state, action, pending] = useActionState(joinWaitlistAction, { status: "idle" as const });
-  const label = provider === "youcan" ? t("youcanLabel") : t("shopifyLabel");
+  const label = t("youcanLabel");
 
   return (
     <div className="space-y-4">
@@ -113,7 +114,7 @@ function StoreProviderPanelContent() {
       </div>
 
       {activeProvider === "youcan" ? <ComingSoonProvider provider="youcan" /> : null}
-      {activeProvider === "shopify" ? <ComingSoonProvider provider="shopify" /> : null}
+      {activeProvider === "shopify" ? <ShopifyConnectForm /> : null}
       {activeProvider === "woocommerce" ? <WooCommerceConnectForm /> : null}
     </div>
   );

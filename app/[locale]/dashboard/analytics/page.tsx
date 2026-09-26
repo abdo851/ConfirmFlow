@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
-import { redirect } from "@/i18n/navigation";
+import { Link, redirect } from "@/i18n/navigation";
 import { DashboardSection } from "@/components/dashboard/section";
+import { ExportOrdersButton } from "@/components/orders/export-orders-button";
 import { Sparkline } from "@/components/ui/sparkline";
 import { StatCard } from "@/components/ui/stat-card";
 import { getAuthenticatedUser } from "@/lib/auth/session";
@@ -74,18 +75,22 @@ export default async function AnalyticsPage({
 
   return (
     <DashboardSection title={pages("analyticsTitle")} description={pages("analyticsDescription")}>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-2">
         {filters.map((filter) => (
-          <a
+          <Link
             key={filter.key}
-            href={`/${locale}${filter.href}`}
+            href={filter.href}
+            prefetch
             className={`inline-flex min-h-11 items-center rounded-xl px-3 text-sm ${
               range.key === filter.key ? "bg-primary text-primary-foreground" : "border border-line bg-surface"
             }`}
           >
             {filter.label}
-          </a>
+          </Link>
         ))}
+        </div>
+        <ExportOrdersButton />
       </div>
       <form action={`/${locale}/dashboard/analytics`} method="get" className="grid grid-cols-1 items-end gap-3 sm:grid-cols-[1fr_1fr_auto]">
         <input type="hidden" name="range" value="custom" />

@@ -1,21 +1,24 @@
-const logos = [
-  { name: "Meta", src: "/brands/meta.svg", glow: "8, 102, 255", status: "live" },
-  { name: "TikTok", src: "/brands/tiktok.svg", glow: "0, 0, 0", status: "soon" },
-  { name: "Google", src: "/brands/google.svg", glow: "66, 133, 244", status: "soon" },
-  { name: "WooCommerce", src: "/brands/woocommerce.svg", glow: "127, 84, 179", status: "live" },
+const logos: {
+  name: string;
+  src: string;
+  glow: string;
+  status: "live" | "soon" | "none";
+}[] = [
+  { name: "Meta", src: "/brands/meta.svg", glow: "8, 102, 255", status: "none" },
+  { name: "TikTok", src: "/brands/tiktok.svg", glow: "0, 0, 0", status: "none" },
+  { name: "Google", src: "/brands/google.svg", glow: "66, 133, 244", status: "none" },
+  { name: "WooCommerce", src: "/brands/woocommerce.svg", glow: "127, 84, 179", status: "none" },
   { name: "Shopify", src: "/brands/shopify.svg", glow: "122, 181, 92", status: "none" },
   { name: "YouCan", src: "/brands/youcan.svg", glow: "226, 59, 47", status: "none" },
   { name: "Instagram", src: "/brands/instagram.svg", glow: "238, 42, 123", status: "none" },
   { name: "ChatGPT", src: "/brands/chatgpt.svg", glow: "16, 163, 127", status: "none" },
-] as const;
+];
 
 export function PlatformRow({
   trusted,
-  liveLabel,
   soonLabel,
 }: {
   trusted: string;
-  liveLabel: string;
   soonLabel: string;
 }) {
   return (
@@ -30,7 +33,6 @@ export function PlatformRow({
             >
               <span className="brand-mark" style={{ backgroundImage: `url(${logo.src})` }} />
               <span className="sr-only">{logo.name}</span>
-              {logo.status === "live" ? <span className="brand-badge brand-badge-live">{liveLabel}</span> : null}
               {logo.status === "soon" ? <span className="brand-badge brand-badge-soon">{soonLabel}</span> : null}
             </span>
           </li>

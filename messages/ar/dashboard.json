@@ -9,6 +9,10 @@
   "videoDismiss": "إغلاق",
   "watchNow": "شاهد الآن",
   "greetingFallback": "بك",
+  "announcement": {
+    "text": "🎉 ترقية إلى الخطة الاحترافية متاحة الآن — احصل على 30% خصم",
+    "dismiss": "إخفاء الإعلان"
+  },
   "addStore": "إضافة متجر جديد",
   "addStoreTitle": "إضافة متجر",
   "connectionsTitle": "الاتصالات",

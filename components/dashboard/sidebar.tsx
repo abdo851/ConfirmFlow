@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
@@ -23,6 +23,7 @@ interface DashboardSidebarProps {
 }
 
 const STORAGE_KEY = "confirma-sidebar-groups";
+const SCROLL_KEY = "confirma-sidebar-scroll";
 
 function Icon({ children }: { children: ReactNode }) {
   return (
@@ -153,6 +154,22 @@ export function DashboardSidebar({
   const groups = visibleSidebarGroups(isAdmin);
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const hydrated = useRef(false);
+  const desktopNavRef = useRef<HTMLElement>(null);
+  const mobileNavRef = useRef<HTMLElement>(null);
+
+  useLayoutEffect(() => {
+    const saved = window.sessionStorage.getItem(SCROLL_KEY);
+    const top = saved === null ? Number.NaN : Number(saved);
+    if (!Number.isFinite(top)) {
+      return;
+    }
+    if (desktopNavRef.current) {
+      desktopNavRef.current.scrollTop = top;
+    }
+    if (mobileNavRef.current) {
+      mobileNavRef.current.scrollTop = top;
+    }
+  }, [pathname]);
 
   useEffect(() => {
     onClose();
@@ -184,12 +201,14 @@ export function DashboardSidebar({
     });
   }
 
-  function Panel() {
+  function renderPanel(navRef: RefObject<HTMLElement | null>) {
     return (
-      <div className="flex h-full flex-col">
+      <div className="flex h-full min-h-0 flex-col">
         <div className={`flex items-center gap-2 p-3 ${collapsed ? "justify-center" : "justify-between"}`}>
           {collapsed ? null : (
-            <p className="px-2 text-xs font-semibold tracking-wide text-muted uppercase">{brand("brand")}</p>
+            <Link href="/dashboard" prefetch className="px-2 text-xs font-semibold tracking-wide text-muted uppercase">
+              {brand("brand")}
+            </Link>
           )}
           <button
             type="button"
@@ -202,9 +221,16 @@ export function DashboardSidebar({
             </span>
           </button>
         </div>
-        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 pb-4">
+        <nav
+          ref={navRef}
+          onScroll={(event) => {
+            window.sessionStorage.setItem(SCROLL_KEY, String(event.currentTarget.scrollTop));
+          }}
+          className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-3 pb-4"
+        >
           <Link
             href="/dashboard/settings"
+            prefetch
             className={`mb-2 inline-flex min-h-11 items-center gap-2 rounded-xl bg-emerald-50 px-3 text-sm font-medium text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200 ${
               collapsed ? "justify-center" : ""
             }`}
@@ -253,11 +279,11 @@ export function DashboardSidebar({
   return (
     <>
       <aside
-        className={`sticky top-0 hidden h-screen shrink-0 border-e border-line bg-surface transition-[width] duration-200 lg:block ${
+        className={`hidden h-screen shrink-0 overflow-hidden border-e border-line bg-surface transition-[width] duration-200 lg:block ${
           collapsed ? "w-[4.75rem]" : "w-72"
         }`}
       >
-        <Panel />
+        {renderPanel(desktopNavRef)}
       </aside>
       {mobileOpen ? (
         <div className="lg:hidden">
@@ -267,8 +293,8 @@ export function DashboardSidebar({
             className="fixed inset-0 z-40 bg-slate-950/40"
             onClick={onClose}
           />
-          <aside className="animate-drawer-start fixed inset-y-0 start-0 z-50 w-[min(100%,18rem)] overflow-y-auto border-e border-line bg-surface shadow-large">
-            <Panel />
+          <aside className="animate-drawer-start fixed inset-y-0 start-0 z-50 h-screen w-[min(100%,18rem)] overflow-hidden border-e border-line bg-surface shadow-large">
+            {renderPanel(mobileNavRef)}
           </aside>
         </div>
       ) : null}
@@ -299,6 +325,7 @@ function GroupRow({
   const link = (
     <Link
       href={group.href}
+      prefetch
       aria-current={active ? "page" : undefined}
       className={`relative inline-flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-xl px-3 text-sm font-medium ${
         collapsed ? "justify-center" : ""
@@ -357,6 +384,7 @@ function GroupRow({
                 <li key={link.href}>
                   <Link
                     href={link.href}
+                    prefetch
                     aria-current={childActive ? "page" : undefined}
                     className={`tab-underline block rounded-lg px-3 py-2 text-sm ${
                       childActive ? "bg-indigo-50 font-medium text-primary dark:bg-indigo-950/60" : "text-muted hover:bg-surface-muted hover:text-foreground"

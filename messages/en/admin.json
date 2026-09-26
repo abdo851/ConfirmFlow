@@ -68,6 +68,7 @@
     "save": "Save",
     "edit": "Edit",
     "delete": "Delete",
+    "deleteConfirm": "Delete this video?",
     "cancel": "Cancel",
     "saved": "Saved.",
     "failed": "Could not save that video.",

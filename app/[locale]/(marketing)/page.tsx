@@ -170,7 +170,7 @@ export default async function LandingPage() {
             purchases={t("examplePurchases")}
             note={t("exampleNote")}
           />
-          <PlatformRow trusted={t("trustedBy")} liveLabel={t("badgeLive")} soonLabel={t("badgeSoon")} />
+          <PlatformRow trusted={t("trustedBy")} soonLabel={t("badgeSoon")} />
           <div className="marquee mt-10" aria-hidden>
             <div className="marquee-track">
               <p className="px-4 text-sm font-semibold tracking-wide text-indigo-900/80">{marquee}</p>

@@ -6,6 +6,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { UserMenu } from "./user-menu";
 import { LanguageSwitcher } from "./language-switcher";
+import { DashboardAnnouncement } from "./dashboard-announcement";
 
 export function DashboardShell({
   children,
@@ -15,6 +16,7 @@ export function DashboardShell({
   isAdmin: boolean;
 }) {
   const brand = useTranslations("common");
+  const rootNav = useTranslations("navigation");
   const nav = useTranslations("navigation.sidebar");
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -36,7 +38,7 @@ export function DashboardShell({
   const pageTitle = titleKey ? nav(titleKey) : brand("brand");
 
   return (
-    <div className="min-h-screen bg-background lg:grid lg:grid-cols-[auto_minmax(0,1fr)]">
+    <div className="h-screen overflow-hidden bg-background lg:grid lg:grid-cols-[auto_minmax(0,1fr)]">
       <Suspense fallback={null}>
         <DashboardSidebar
           mobileOpen={mobileOpen}
@@ -46,8 +48,9 @@ export function DashboardShell({
           onToggleCollapsed={() => setCollapsed((current) => !current)}
         />
       </Suspense>
-      <div className="flex min-w-0 flex-col">
-        <header className="sticky top-0 z-30 border-b border-line bg-white/75 backdrop-blur-xl dark:bg-slate-950/70">
+      <div className="flex h-screen min-h-0 min-w-0 flex-col overflow-hidden">
+        <header className="z-30 shrink-0 border-b border-line bg-white/95 dark:bg-slate-950/95">
+          <DashboardAnnouncement />
           <div className="flex items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
             <div className="flex min-w-0 flex-1 items-center gap-2">
               <button
@@ -67,14 +70,14 @@ export function DashboardShell({
             </div>
             <div className="flex shrink-0 items-center gap-2 sm:gap-3">
               <LanguageSwitcher />
-              <Link href="/" className="hidden min-h-11 items-center text-sm text-muted sm:inline-flex">
-                {brand("home")}
+              <Link href="/dashboard" prefetch className="hidden min-h-11 items-center text-sm text-muted sm:inline-flex">
+                {rootNav("dashboard")}
               </Link>
               <UserMenu />
             </div>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <main className="mx-auto w-full max-w-6xl min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
           {children}
         </main>
       </div>

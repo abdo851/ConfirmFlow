@@ -16,7 +16,7 @@ export default async function TrackingPage() {
         items={[
           { href: "/dashboard/tracking/pixel", title: nav("pixelSettings"), description: pages("pixelDescription") },
           { href: "/dashboard/tracking/capi", title: nav("capi"), description: pages("capiDescription") },
-          { href: "/dashboard/tracking/gtm", title: nav("gtm"), description: pages("comingSoon"), soon: true },
+          { href: "/dashboard/tracking/gtm", title: nav("gtm"), description: pages("trackingDescription") },
           { href: "/dashboard/tracking/tiktok", title: tracking.tiktok.title, description: tracking.tiktok.subtitle },
           { href: "/dashboard/tracking/google", title: tracking.google.title, description: tracking.google.subtitle },
         ]}

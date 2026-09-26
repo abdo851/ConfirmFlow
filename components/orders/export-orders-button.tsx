@@ -28,10 +28,18 @@ export function ExportOrdersButton() {
     <div className="sm:text-end">
       <button
         type="button"
-        className="inline-flex min-h-11 items-center justify-center rounded-xl border border-line bg-surface px-4 text-sm font-medium"
+        className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 text-sm font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-emerald-700"
         onClick={() => void download()}
       >
-        {t("exportCsv")}
+        <svg viewBox="0 0 24 24" className="size-4" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.8">
+          <path d="M12 4v10" strokeLinecap="round" />
+          <path d="M8 10l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M5 19h14" strokeLinecap="round" />
+        </svg>
+        <span className="flex flex-col items-start leading-tight">
+          <span>{t("exportCsv")}</span>
+          <span className="text-[11px] font-medium text-emerald-50">{t("downloadReport")}</span>
+        </span>
       </button>
       {error ? <p className="mt-2 text-xs text-rose-700">{t("exportFailed")}</p> : null}
     </div>

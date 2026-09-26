@@ -22,12 +22,16 @@ export function SignupForm({
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     const data = new FormData(event.currentTarget);
+    const username = String(data.get("username") ?? "").trim();
     const fullName = String(data.get("fullName") ?? "").trim();
     const email = String(data.get("email") ?? "").trim();
     const password = String(data.get("password") ?? "");
     const confirmPassword = String(data.get("confirmPassword") ?? "");
     const next: Record<string, string> = {};
 
+    if (!/^[a-z0-9]{3,}$/.test(username)) {
+      next.username = t("usernameInvalid");
+    }
     if (!fullName) {
       next.fullName = t("errors.missing_fields");
     }
@@ -70,6 +74,14 @@ export function SignupForm({
 
   return (
     <form action={signupAction} className="space-y-4" aria-label={t("signupTitle")} onSubmit={onSubmit}>
+      <Input
+        label={t("username")}
+        name="username"
+        autoComplete="username"
+        placeholder={t("usernamePlaceholder")}
+        required
+        error={errors.username}
+      />
       <Input
         label={t("fullName")}
         name="fullName"
