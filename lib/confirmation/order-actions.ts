@@ -25,7 +25,10 @@ export async function rejectOrderAction(orderId: string): Promise<void> {
     return;
   }
 
-  await rejectOrder({ orderId, actor: { userId } });
+  const result = await rejectOrder({ orderId, actor: { userId } });
+  if (result.status === "rejected") {
+    console.info("order_status_changed", { orderId, status: "rejected" });
+  }
   await revalidateOrder(orderId);
 }
 
@@ -35,6 +38,9 @@ export async function archiveOrderAction(orderId: string): Promise<void> {
     return;
   }
 
-  await archiveOrder({ orderId, actor: { userId } });
+  const result = await archiveOrder({ orderId, actor: { userId } });
+  if (result.status === "archived") {
+    console.info("order_status_changed", { orderId, status: "archived" });
+  }
   await revalidateOrder(orderId);
 }

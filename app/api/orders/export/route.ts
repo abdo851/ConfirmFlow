@@ -3,7 +3,7 @@ import { getOrdersForAuthenticatedUser } from "@/lib/orders/get-orders-for-user"
 import { ordersToCsv } from "@/lib/orders/csv";
 
 export async function POST() {
-  const result = await getOrdersForAuthenticatedUser();
+  const result = await getOrdersForAuthenticatedUser({ all: true });
   if (!result) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

@@ -15,6 +15,12 @@ import {
   formatOrderDisplayIdentifier,
 } from "@/lib/orders/format";
 import { getOrdersForAuthenticatedUser } from "@/lib/orders/get-orders-for-user";
+import {
+  formatDateRangeLabel,
+  ordersListHref,
+  parseOrdersListSearchParams,
+} from "@/lib/orders/list-query";
+import { collectOrderProducts, safeProductImageUrl } from "@/lib/orders/products";
 
 vi.mock("@/lib/auth/session", () => ({
   getAuthenticatedUser: vi.fn(),
@@ -56,6 +62,7 @@ describe("orders UI helpers", () => {
         id: "order_1",
         orderNumber: "1001",
         externalOrderId: "450789469",
+        provider: "woocommerce" as const,
         customerEmail: "customer@example.com",
         customerPhone: null,
         currency: "MAD",
@@ -208,13 +215,33 @@ describe("orders page data retrieval", () => {
       id: "user_1",
     } as never);
 
-    vi.mocked(createUserDatabaseClient).mockResolvedValue({
-      from: () => ({
-        select: () => ({
-          order: async () => ({
+    const calls: Array<{ method: string; args: unknown[] }> = [];
+    const filter = () => {
+      const api = {
+        eq: (...args: unknown[]) => {
+          calls.push({ method: "eq", args });
+          return api;
+        },
+        gte: (...args: unknown[]) => {
+          calls.push({ method: "gte", args });
+          return api;
+        },
+        lte: (...args: unknown[]) => {
+          calls.push({ method: "lte", args });
+          return api;
+        },
+        order: (...args: unknown[]) => {
+          calls.push({ method: "order", args });
+          return api;
+        },
+        range: async (...args: unknown[]) => {
+          calls.push({ method: "range", args });
+          return {
             data: [
               {
                 id: "order_1",
+                owner_id: "user_1",
+                provider: "woocommerce",
                 order_number: "1001",
                 external_order_id: "450789469",
                 customer_email: "customer@example.com",
@@ -227,8 +254,16 @@ describe("orders page data retrieval", () => {
               },
             ],
             error: null,
-          }),
-        }),
+            count: 1,
+          };
+        },
+      };
+      return api;
+    };
+
+    vi.mocked(createUserDatabaseClient).mockResolvedValue({
+      from: () => ({
+        select: () => filter(),
       }),
     } as never);
 
@@ -236,6 +271,163 @@ describe("orders page data retrieval", () => {
 
     expect(result?.orders).toHaveLength(1);
     expect(result?.orders[0]?.confirmationStatus).toBe("pending");
+    expect(result?.pageSize).toBe(20);
+    expect(calls).toContainEqual({ method: "eq", args: ["owner_id", "user_1"] });
+    expect(calls).toContainEqual({
+      method: "order",
+      args: ["received_at", { ascending: false }],
+    });
+    expect(calls).toContainEqual({ method: "range", args: [0, 19] });
+  });
+
+  it("drops rows that do not belong to the signed-in account", async () => {
+    const { getAuthenticatedUser } = await import("@/lib/auth/session");
+    const { createUserDatabaseClient } = await import("@/lib/database/user-client");
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    vi.mocked(getAuthenticatedUser).mockResolvedValue({
+      id: "user_1",
+    } as never);
+
+    const filter = () => {
+      const api = {
+        eq: () => api,
+        gte: () => api,
+        lte: () => api,
+        order: () => api,
+        range: async () => ({
+          data: [
+            {
+              id: "order_1",
+              owner_id: "user_1",
+              provider: "youcan",
+              order_number: "1001",
+              external_order_id: "450789469",
+              customer_email: "owner@example.com",
+              customer_phone: null,
+              currency: "MAD",
+              total_amount_minor: 1000,
+              confirmation_status: "pending",
+              confirmed_at: null,
+              received_at: "2024-06-01T12:00:00.000Z",
+            },
+            {
+              id: "order_2",
+              owner_id: "other_user",
+              provider: "woocommerce",
+              order_number: "1002",
+              external_order_id: "999",
+              customer_email: "other@example.com",
+              customer_phone: null,
+              currency: "MAD",
+              total_amount_minor: 2000,
+              confirmation_status: "pending",
+              confirmed_at: null,
+              received_at: "2024-06-02T12:00:00.000Z",
+            },
+          ],
+          error: null,
+          count: 2,
+        }),
+      };
+      return api;
+    };
+
+    vi.mocked(createUserDatabaseClient).mockResolvedValue({
+      from: () => ({
+        select: () => filter(),
+      }),
+    } as never);
+
+    const result = await getOrdersForAuthenticatedUser();
+
+    expect(result?.orders).toHaveLength(1);
+    expect(result?.orders[0]?.id).toBe("order_1");
+    expect(result?.total).toBe(1);
+    expect(warn).toHaveBeenCalledWith("orders_list_dropped_foreign_rows", { dropped: 1 });
+    warn.mockRestore();
+  });
+});
+
+describe("orders list filters", () => {
+  const now = new Date(2026, 8, 27, 15, 30, 0);
+
+  it("ignores account ids in the query string and keeps store plus status", () => {
+    const query = parseOrdersListSearchParams(
+      {
+        owner_id: "someone-else",
+        store_id: "store-2",
+        store: "youcan",
+        status: "new",
+        page: "2",
+      },
+      now,
+    );
+
+    expect(query.provider).toBe("youcan");
+    expect(query.status).toBe("pending");
+    expect(query.page).toBe(2);
+    expect("ownerId" in query).toBe(false);
+    expect(query.store).not.toBe("someone-else");
+  });
+
+  it("keeps Shopify as a disabled filter instead of a live store", () => {
+    expect(parseOrdersListSearchParams({ store: "shopify" }, now).store).toBe("all");
+  });
+
+  it("resolves date presets and custom ranges", () => {
+    const today = parseOrdersListSearchParams({ preset: "today" }, now);
+    expect(new Date(today.from ?? "").getDate()).toBe(27);
+    expect(new Date(today.to ?? "").getDate()).toBe(27);
+
+    const last7 = parseOrdersListSearchParams({ preset: "last7" }, now);
+    expect(new Date(last7.from ?? "").getDate()).toBe(21);
+
+    const month = parseOrdersListSearchParams({ preset: "month" }, now);
+    expect(new Date(month.from ?? "").getDate()).toBe(1);
+    expect(new Date(month.to ?? "").getDate()).toBe(30);
+
+    const custom = parseOrdersListSearchParams(
+      { preset: "custom", from: "2026-09-27", to: "2026-09-20" },
+      now,
+    );
+    expect(custom.fromDay).toBe("2026-09-20");
+    expect(custom.toDay).toBe("2026-09-27");
+    expect(formatDateRangeLabel(custom.from ?? "", custom.to ?? "", "en-US")).toContain("2026");
+    expect(ordersListHref(custom, { page: 2 })).toContain("preset=custom");
+    expect(ordersListHref(custom, { store: "all", tab: "all", preset: null, page: 1 })).toBe(
+      "/dashboard/orders",
+    );
+  });
+
+  it("keeps a product filter with the store tab and drops unsafe image urls", () => {
+    const query = parseOrdersListSearchParams(
+      { store: "woocommerce", product: "Blue shirt", sku: "SKU-1" },
+      now,
+    );
+    expect(query.productName).toBe("Blue shirt");
+    expect(query.productSku).toBe("SKU-1");
+    expect(query.provider).toBe("woocommerce");
+    expect(ordersListHref(query, { page: 1 })).toContain("product=");
+    expect(ordersListHref(query, { page: 1 })).toContain("sku=SKU-1");
+    expect(ordersListHref(query, { store: "youcan", page: 1 })).not.toContain("product=");
+
+    const products = collectOrderProducts([
+      {
+        provider: "woocommerce",
+        lineItems: [
+          { name: "Blue shirt", sku: "SKU-1", imageUrl: "https://cdn.example.com/shirt.jpg" },
+          { name: "Blue shirt", sku: "SKU-1", imageUrl: "javascript:alert(1)" },
+        ],
+      },
+      {
+        provider: "youcan",
+        lineItems: [{ name: "Blue shirt", sku: "SKU-1", image: "https://cdn.example.com/youcan.jpg" }],
+      },
+    ]);
+    expect(products).toHaveLength(2);
+    expect(products[0]?.imageUrl).toBe("https://cdn.example.com/shirt.jpg");
+    expect(safeProductImageUrl("javascript:alert(1)")).toBeNull();
   });
 });
 

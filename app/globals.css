@@ -94,6 +94,36 @@ body {
   }
 }
 
+@keyframes cf-pop-below {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cf-pop-above {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.orders-pop-below {
+  animation: cf-pop-below 160ms ease-out both;
+}
+
+.orders-pop-above {
+  animation: cf-pop-above 160ms ease-out both;
+}
+
 @keyframes cf-slide-up {
   from {
     opacity: 0;
