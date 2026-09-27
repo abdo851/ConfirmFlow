@@ -10,7 +10,9 @@ const youCanOAuthEnvSchema = z.object({
   YOUCAN_OAUTH_SCOPES: z
     .string()
     .min(1)
-    .default("read-orders,read-products"),
+    .default(
+      "read-orders,read-products,read-rest-hooks,edit-rest-hooks",
+    ),
   NEXT_PUBLIC_APP_URL: z.string().url(),
 });
 
@@ -22,7 +24,8 @@ export function getYouCanOAuthEnv(): YouCanOAuthEnv {
     YOUCAN_API_SECRET: process.env.YOUCAN_API_SECRET,
     YOUCAN_SESSION_SECRET: process.env.YOUCAN_SESSION_SECRET,
     YOUCAN_OAUTH_SCOPES:
-      process.env.YOUCAN_OAUTH_SCOPES ?? "read-orders,read-products",
+      process.env.YOUCAN_OAUTH_SCOPES ??
+      "read-orders,read-products,read-rest-hooks,edit-rest-hooks",
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   });
 }
@@ -32,8 +35,16 @@ export function getYouCanRedirectUri(): string {
 }
 
 export function parseYouCanOAuthScopes(scopes: string): string[] {
-  return scopes
+  const parsed = scopes
     .split(",")
     .map((scope) => scope.trim())
     .filter(Boolean);
+
+  for (const scope of ["read-rest-hooks", "edit-rest-hooks"]) {
+    if (!parsed.includes(scope)) {
+      parsed.push(scope);
+    }
+  }
+
+  return parsed;
 }

@@ -51,23 +51,63 @@ function authHeaders(accessToken: string): Record<string, string> {
   };
 }
 
+async function readJsonBody(response: Response): Promise<unknown> {
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+async function youcanWebhookRequest(
+  url: string,
+  init: RequestInit,
+  fetchImpl: typeof fetch,
+): Promise<{ ok: boolean; status: number; body: unknown }> {
+  console.log("youcan_webhook_registration_http_request", {
+    method: init.method,
+    url,
+  });
+
+  const response = await fetchImpl(url, init);
+  const body = await readJsonBody(response);
+
+  console.log("youcan_webhook_registration_http_response", {
+    status: response.status,
+    body,
+  });
+
+  return { ok: response.ok, status: response.status, body };
+}
+
+function logWebhookFailure(error: unknown): void {
+  console.log("youcan_webhook_registration_failed", {
+    error: error instanceof Error ? error.message : "unknown",
+  });
+}
+
 export async function listYouCanWebhooks(
   accessToken: string,
   fetchImpl: typeof fetch = fetch,
 ): Promise<YouCanWebhookRecord[]> {
-  const response = await fetchImpl(YOUCAN_RESTHOOKS_LIST_URL, {
-    method: "GET",
-    headers: authHeaders(accessToken),
-  });
+  const result = await youcanWebhookRequest(
+    YOUCAN_RESTHOOKS_LIST_URL,
+    {
+      method: "GET",
+      headers: authHeaders(accessToken),
+    },
+    fetchImpl,
+  );
 
-  if (!response.ok) {
-    throw new YouCanWebhookRegistrationError(
-      `youcan_webhook_list_failed:${response.status}`,
+  if (!result.ok) {
+    const error = new YouCanWebhookRegistrationError(
+      `youcan_webhook_list_failed:${result.status}`,
     );
+    logWebhookFailure(error);
+    throw error;
   }
 
-  const body = (await response.json()) as YouCanWebhookRecord[];
-  return Array.isArray(body) ? body : [];
+  return Array.isArray(result.body) ? result.body : [];
 }
 
 export async function subscribeYouCanWebhook(
@@ -76,26 +116,34 @@ export async function subscribeYouCanWebhook(
   targetUrl: string,
   fetchImpl: typeof fetch = fetch,
 ): Promise<YouCanWebhookRecord> {
-  const response = await fetchImpl(YOUCAN_RESTHOOKS_SUBSCRIBE_URL, {
-    method: "POST",
-    headers: authHeaders(accessToken),
-    body: JSON.stringify({
-      event,
-      target_url: targetUrl,
-    }),
-  });
+  const result = await youcanWebhookRequest(
+    YOUCAN_RESTHOOKS_SUBSCRIBE_URL,
+    {
+      method: "POST",
+      headers: authHeaders(accessToken),
+      body: JSON.stringify({
+        event,
+        target_url: targetUrl,
+      }),
+    },
+    fetchImpl,
+  );
 
-  if (!response.ok) {
-    throw new YouCanWebhookRegistrationError(
-      `youcan_webhook_create_failed:${response.status}`,
+  if (!result.ok) {
+    const error = new YouCanWebhookRegistrationError(
+      `youcan_webhook_create_failed:${result.status}`,
     );
+    logWebhookFailure(error);
+    throw error;
   }
 
-  const body = (await response.json()) as { id?: string };
-  if (!body.id) {
-    throw new YouCanWebhookRegistrationError(
+  const body = result.body as { id?: string };
+  if (!body?.id) {
+    const error = new YouCanWebhookRegistrationError(
       "youcan_webhook_create_missing_body",
     );
+    logWebhookFailure(error);
+    throw error;
   }
 
   return {
@@ -110,18 +158,21 @@ export async function unsubscribeYouCanWebhook(
   webhookId: string,
   fetchImpl: typeof fetch = fetch,
 ): Promise<void> {
-  const response = await fetchImpl(
+  const result = await youcanWebhookRequest(
     `${YOUCAN_RESTHOOKS_UNSUBSCRIBE_URL}/${webhookId}`,
     {
       method: "POST",
       headers: authHeaders(accessToken),
     },
+    fetchImpl,
   );
 
-  if (!response.ok && response.status !== 404) {
-    throw new YouCanWebhookRegistrationError(
-      `youcan_webhook_delete_failed:${response.status}`,
+  if (!result.ok && result.status !== 404) {
+    const error = new YouCanWebhookRegistrationError(
+      `youcan_webhook_delete_failed:${result.status}`,
     );
+    logWebhookFailure(error);
+    throw error;
   }
 }
 
@@ -169,6 +220,9 @@ export async function registerYouCanOrderCreatedWebhook(
   const exactMatch = findConfirmaOrderCreatedWebhook(existing, webhookUrl);
 
   if (exactMatch) {
+    console.log("youcan_webhook_registration_success", {
+      webhook_id: exactMatch.id,
+    });
     return {
       action: "already_registered",
       webhookId: exactMatch.id,
@@ -182,6 +236,10 @@ export async function registerYouCanOrderCreatedWebhook(
     fetchImpl,
   );
 
+  console.log("youcan_webhook_registration_success", {
+    webhook_id: created.id,
+  });
+
   return {
     action: "created",
     webhookId: created.id,
@@ -194,15 +252,26 @@ export async function registerYouCanWebhooksForStore(
 ): Promise<YouCanWebhookRegistrationResult> {
   const credentials = await getYouCanStoreCredentialsForStore(storeId);
   if (!credentials) {
-    throw new YouCanWebhookRegistrationError("youcan_store_not_found");
+    const error = new YouCanWebhookRegistrationError("youcan_store_not_found");
+    logWebhookFailure(error);
+    throw error;
   }
 
-  return registerYouCanOrderCreatedWebhook(
-    {
-      accessToken: credentials.accessToken,
-    },
-    fetchImpl,
-  );
+  console.log("youcan_webhook_registration_started", {
+    store_slug: credentials.storeSlug,
+  });
+
+  try {
+    return await registerYouCanOrderCreatedWebhook(
+      {
+        accessToken: credentials.accessToken,
+      },
+      fetchImpl,
+    );
+  } catch (error) {
+    logWebhookFailure(error);
+    throw error;
+  }
 }
 
 export function toSafeWebhookRegistrationResponse(

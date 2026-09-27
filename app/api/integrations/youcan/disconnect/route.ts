@@ -13,7 +13,7 @@ export async function POST() {
 
   try {
     await clearYouCanConnection();
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ ok: true });
   } catch (error) {
     if (error instanceof YouCanDisconnectError && error.message === "unauthenticated") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -29,7 +29,7 @@ export function SignupForm({
     const confirmPassword = String(data.get("confirmPassword") ?? "");
     const next: Record<string, string> = {};
 
-    if (!/^[a-z0-9]{3,}$/.test(username)) {
+    if (!/^[a-z0-9-]{3,}$/.test(username)) {
       next.username = t("usernameInvalid");
     }
     if (!fullName) {
@@ -79,6 +79,7 @@ export function SignupForm({
         name="username"
         autoComplete="username"
         placeholder={t("usernamePlaceholder")}
+        helperText={t("usernameHint")}
         required
         error={errors.username}
       />

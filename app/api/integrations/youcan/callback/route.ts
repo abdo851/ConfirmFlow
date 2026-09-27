@@ -48,6 +48,16 @@ export async function GET(request: Request) {
       cookieStore.get(YOUCAN_OAUTH_STATE_COOKIE)?.value ?? null;
     const stateFromQuery = query.state ?? null;
 
+    console.log("youcan_callback_state_check", {
+      hasQueryState: Boolean(stateFromQuery),
+      hasCookieState: Boolean(stateFromCookie),
+      match: Boolean(
+        stateFromCookie &&
+          stateFromQuery &&
+          stateFromCookie === stateFromQuery,
+      ),
+    });
+
     if (
       !stateFromCookie ||
       !stateFromQuery ||

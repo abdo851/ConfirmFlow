@@ -33,6 +33,8 @@ export const sidebarGroups: SidebarGroup[] = [
       { labelKey: "webhooks", href: "/dashboard/connections/webhooks" },
     ],
   },
+  { key: "shipping", href: "/dashboard/shipping", items: [] },
+  { key: "workflow", href: "/dashboard/workflow", items: [] },
   {
     key: "tracking",
     href: "/dashboard/tracking",

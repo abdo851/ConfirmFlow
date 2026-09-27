@@ -50,7 +50,7 @@ export async function GET(request: Request) {
 
     response.cookies.set(YOUCAN_OAUTH_STATE_COOKIE, state, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "lax",
       path: "/",
       maxAge: YOUCAN_OAUTH_STATE_TTL_SECONDS,

@@ -312,7 +312,7 @@ export async function getYouCanStoreIdForUser(
 
 async function removeYouCanConnectionRecordsForStore(
   storeId: string,
-): Promise<void> {
+): Promise<string | null> {
   const db = createDatabaseClient();
 
   const { data: storeConnection, error: connectionError } = await db
@@ -324,7 +324,7 @@ async function removeYouCanConnectionRecordsForStore(
     .maybeSingle();
 
   if (connectionError || !storeConnection) {
-    return;
+    return null;
   }
 
   await db
@@ -333,17 +333,23 @@ async function removeYouCanConnectionRecordsForStore(
     .eq("store_connection_id", storeConnection.id);
 
   await db
-    .from("store_connections")
-    .update({ status: "inactive" })
-    .eq("id", storeConnection.id);
-
-  await db
     .from("youcan_connections")
-    .update({
-      connected_at: null,
-      error_message: null,
-    })
+    .delete()
     .eq("store_connection_id", storeConnection.id);
+
+  await db.from("store_connections").delete().eq("id", storeConnection.id);
+
+  const { data: remaining } = await db
+    .from("store_connections")
+    .select("id")
+    .eq("store_id", storeId)
+    .limit(1);
+
+  if (!remaining?.length) {
+    await db.from("stores").delete().eq("id", storeId);
+  }
+
+  return storeConnection.id;
 }
 
 export async function disconnectYouCanStoreForUser(
@@ -369,16 +375,30 @@ export async function disconnectYouCanStoreForUser(
   }
 
   const credentials = await getYouCanStoreCredentialsForStore(storeId);
+  console.log("youcan_disconnect_started", {
+    store_slug: credentials?.storeSlug ?? null,
+  });
+
   if (credentials) {
-    await unregisterYouCanOrderCreatedWebhook(
-      {
-        accessToken: credentials.accessToken,
-      },
-      fetchImpl,
-    );
+    try {
+      await unregisterYouCanOrderCreatedWebhook(
+        {
+          accessToken: credentials.accessToken,
+        },
+        fetchImpl,
+      );
+    } catch (error) {
+      console.log("youcan_disconnect_webhooks_failed", {
+        error: error instanceof Error ? error.message : "unknown",
+      });
+    }
   }
 
-  await removeYouCanConnectionRecordsForStore(storeId);
+  const connectionId = await removeYouCanConnectionRecordsForStore(storeId);
+  console.log("youcan_disconnect_db_deleted", {
+    connection_id: connectionId,
+  });
+  console.log("youcan_disconnect_success");
 }
 
 export async function disconnectYouCanConnectionForUser(

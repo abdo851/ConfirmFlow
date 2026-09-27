@@ -38,6 +38,8 @@ const iconTone: Record<string, string> = {
   orders: "bg-teal-100 text-teal-700 dark:bg-teal-950/50 dark:text-teal-200",
   analytics: "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-200",
   connections: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200",
+  shipping: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-200",
+  workflow: "bg-teal-100 text-teal-700 dark:bg-teal-950/50 dark:text-teal-200",
   tracking: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-200",
   marketing: "bg-teal-100 text-teal-700 dark:bg-teal-950/50 dark:text-teal-200",
   wallet: "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-200",
@@ -84,6 +86,20 @@ const icons: Record<string, ReactNode> = {
       <circle cx="17" cy="7" r="2.2" />
       <circle cx="17" cy="17" r="2.2" />
       <path d="M9 11.2 15 8.2M9 12.8l6 3" />
+    </Icon>
+  ),
+  shipping: (
+    <Icon>
+      <path d="M3 7h11v8H3z" />
+      <path d="M14 10h4l3 3v2h-7" />
+      <circle cx="7" cy="17.5" r="1.6" />
+      <circle cx="17" cy="17.5" r="1.6" />
+    </Icon>
+  ),
+  workflow: (
+    <Icon>
+      <path d="M5 7h6v4H5zM13 13h6v4h-6z" />
+      <path d="M8 11v2h5v-2" />
     </Icon>
   ),
   tracking: (

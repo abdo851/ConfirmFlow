@@ -4,12 +4,11 @@ import { CinematicReveal } from "@/components/marketing/cinematic-reveal";
 import { DashboardPreview } from "@/components/marketing/dashboard-preview";
 import { ExampleBlock } from "@/components/marketing/example-block";
 import { FaqList } from "@/components/marketing/faq-list";
-import { FlowTimeline } from "@/components/marketing/flow-timeline";
 import { FounderLine } from "@/components/marketing/founder-line";
 import { HeroWords } from "@/components/marketing/hero-words";
 import { LandingHeading } from "@/components/marketing/landing-heading";
 import { PlatformRow } from "@/components/marketing/platform-row";
-import { SetupTrack } from "@/components/marketing/setup-track";
+import { StatsBoard } from "@/components/marketing/stats-board";
 import { StickyCta } from "@/components/marketing/sticky-cta";
 import { VideoEmbed } from "@/components/marketing/video-embed";
 import { getVideoForPlacement } from "@/lib/videos/queries";
@@ -45,29 +44,6 @@ function Mark({ children, className }: { children: ReactNode; className: string 
 export default async function LandingPage() {
   const t = await getTranslations("landing");
   const nav = await getTranslations("navigation");
-
-  const flowSteps = [
-    t("flowSteps.store"),
-    t("flowSteps.orderCreated"),
-    t("flowSteps.orderConfirmed"),
-    t("flowSteps.confirma"),
-    t("flowSteps.metaCapi"),
-  ];
-
-  const setupSteps = [
-    {
-      title: t("setupSteps.storeTitle"),
-      description: t("setupSteps.storeDescription"),
-    },
-    {
-      title: t("setupSteps.metaTitle"),
-      description: t("setupSteps.metaDescription"),
-    },
-    {
-      title: t("setupSteps.confirmationTitle"),
-      description: t("setupSteps.confirmationDescription"),
-    },
-  ];
 
   const features = [
     t("features.confirm"),
@@ -123,6 +99,8 @@ export default async function LandingPage() {
     { question: t("faq2q"), answer: t("faq2a") },
     { question: t("faq3q"), answer: t("faq3a") },
     { question: t("faq4q"), answer: t("faq4a") },
+    { question: t("faq5q"), answer: t("faq5a") },
+    { question: t("faq6q"), answer: t("faq6a") },
   ];
   const heroVideo = await getVideoForPlacement("landing_hero");
 
@@ -144,6 +122,11 @@ export default async function LandingPage() {
           <p className="hero-rise mx-auto mt-6 max-w-2xl text-base leading-7 text-muted lg:mx-0">
             {t("heroLine")}
           </p>
+          <ul className="hero-rise mx-auto mt-6 max-w-xl space-y-2 text-start text-sm text-foreground lg:mx-0">
+            <li>✓ {t("heroTrust1")}</li>
+            <li>✓ {t("heroTrust2")}</li>
+            <li>✓ {t("heroTrust3")}</li>
+          </ul>
           <div className="hero-rise mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center lg:justify-start">
             <Button href="/signup" size="lg" className="cta-shimmer w-full sm:w-auto">
               {t("ctaStart")}
@@ -200,38 +183,16 @@ export default async function LandingPage() {
         id="how-it-works"
         className="section-premium wash-teal px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
       >
-        <div className="mx-auto max-w-7xl space-y-10 lg:space-y-16">
+        <div className="mx-auto max-w-7xl space-y-10">
           <LandingHeading title={t("howItWorks")} />
-          <SetupTrack>
-          <ol className="relative grid gap-4 md:grid-cols-3">
-            <span aria-hidden className="step-line absolute top-9 start-8 end-8 hidden h-1 rounded-full md:block" />
-            {setupSteps.map((step, index) => (
-              <li key={step.title}>
-                <CinematicReveal delay={index * 100}>
-                  <article className="landing-card relative rounded-2xl border border-line bg-surface p-5 shadow-soft sm:p-6">
-                    <div className="flex items-center gap-3">
-                      <span className="setup-pop relative z-10 inline-flex size-12 items-center justify-center rounded-full border-2 border-indigo-600 bg-white text-sm font-bold text-indigo-600">
-                        {index + 1}
-                      </span>
-                      <Mark className={featureTones[index] ?? featureTones[0]}>
-                        {index === 0 ? (
-                          <path d="M4 8h16v10H4zM8 8V6h8v2" />
-                        ) : index === 1 ? (
-                          <path d="M12 4v6M8 14h8M7 18h10" />
-                        ) : (
-                          <path d="M5 12h14M13 6l6 6-6 6" />
-                        )}
-                      </Mark>
-                    </div>
-                    <h3 className="mt-4 text-lg leading-[1.1] font-semibold">{step.title}</h3>
-                    <p className="mt-2 text-base leading-7 text-muted">{step.description}</p>
-                  </article>
-                </CinematicReveal>
-              </li>
-            ))}
-          </ol>
-          </SetupTrack>
-          <FlowTimeline steps={flowSteps} />
+          <StatsBoard
+            items={[
+              { target: 100, suffix: "K+", label: t("statOrders") },
+              { target: 30, suffix: "%+", label: t("statRoas") },
+              { target: 5, suffix: " min", label: t("statSetup") },
+              { target: 3, suffix: "", label: t("statPlatformsCount") },
+            ]}
+          />
         </div>
       </section>
 

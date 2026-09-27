@@ -7,12 +7,14 @@ import {
 } from "@/components/dashboard/sidebar-model";
 
 describe("sidebar navigation", () => {
-  it("lists the ten dashboard groups in order", () => {
+  it("lists the dashboard groups in order", () => {
     expect(sidebarGroups.map((group) => group.key)).toEqual([
       "overview",
       "orders",
       "analytics",
       "connections",
+      "shipping",
+      "workflow",
       "tracking",
       "marketing",
       "wallet",
@@ -25,8 +27,8 @@ describe("sidebar navigation", () => {
   it("hides admin from a regular user and shows it for an admin", () => {
     expect(visibleSidebarGroups(false).some((group) => group.key === "admin")).toBe(false);
     expect(visibleSidebarGroups(true).some((group) => group.key === "admin")).toBe(true);
-    expect(visibleSidebarGroups(false)).toHaveLength(9);
-    expect(visibleSidebarGroups(true)).toHaveLength(10);
+    expect(visibleSidebarGroups(false)).toHaveLength(11);
+    expect(visibleSidebarGroups(true)).toHaveLength(12);
   });
 
   it("highlights a parent from a child path without treating overview as a prefix", () => {

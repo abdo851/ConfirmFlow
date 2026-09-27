@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { PasswordField } from "@/components/auth/password-field";
 import { Input } from "@/components/ui/input";
 import { Toast } from "@/components/ui/toast";
 import { loginAction } from "@/lib/auth/actions";
@@ -38,13 +39,13 @@ export default async function LoginPage({
           placeholder={t("emailPlaceholder")}
           required
         />
-        <Input
+        <PasswordField
           label={t("password")}
-          type="password"
           name="password"
           autoComplete="current-password"
           placeholder={t("passwordPlaceholder")}
-          required
+          revealLabel={t("revealField")}
+          concealLabel={t("concealField")}
         />
         <p className="text-end text-sm">
           <Link href="/forgot-password" className="underline">

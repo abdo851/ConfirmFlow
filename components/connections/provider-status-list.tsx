@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -29,11 +29,22 @@ interface ProviderStatusListProps {
 
 export function ProviderStatusList({ providers, meta }: ProviderStatusListProps) {
   const t = useTranslations("connections");
+  const locale = useLocale();
   const router = useRouter();
   const [pending, setPending] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function disconnect(item: ProviderStatusItem) {
+    if (item.id === "youcan") {
+      const confirmed = window.confirm(
+        locale === "ar"
+          ? "هل أنت متأكد من قطع الاتصال؟ بعد قطع الاتصال لن يستقبل Confirma طلبات هذا المتجر حتى تعيد ربطه."
+          : "Are you sure you want to disconnect? Once disconnected, Confirma will not receive orders from this store until you connect it again.",
+      );
+      if (!confirmed) {
+        return;
+      }
+    }
     setPending(item.id);
     setError(null);
     const response = await fetch(item.disconnectPath, { method: "POST" });
