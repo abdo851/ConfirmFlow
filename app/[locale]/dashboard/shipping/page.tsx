@@ -13,7 +13,7 @@ export default async function ShippingPage({
   const common = await getTranslations("common");
 
   return (
-    <div className="space-y-6">
+    <div className="dash-stagger animate-fade-in space-y-8">
       <BackButton href="/dashboard" label={common("back")} />
       <div>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{t("title")}</h1>

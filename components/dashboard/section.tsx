@@ -16,7 +16,7 @@ export async function DashboardSection({
   const common = await getTranslations("common");
 
   return (
-    <div className="animate-fade-in space-y-6">
+    <div className="dash-stagger animate-fade-in space-y-8">
       <BackButton href={backHref} label={common("back")} />
       <div>
         <h1 className="text-xl font-semibold tracking-tight sm:text-2xl lg:text-3xl">{title}</h1>

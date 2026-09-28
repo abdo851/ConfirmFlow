@@ -210,7 +210,7 @@ function OrdersListBody({ initialOrders, total, page, query, products }: OrdersL
                 return (
                   <tr
                     key={order.id}
-                    className={`cursor-pointer transition-colors duration-200 hover:bg-indigo-50/70 dark:hover:bg-white/5 ${
+                    className={`data-row cursor-pointer transition-colors duration-200 hover:bg-indigo-50/70 dark:hover:bg-white/5 ${
                       index % 2 === 1 ? "bg-slate-50/80 dark:bg-white/[0.03]" : "bg-surface"
                     }`}
                     onClick={() => router.push(`/dashboard/orders/${order.id}`)}

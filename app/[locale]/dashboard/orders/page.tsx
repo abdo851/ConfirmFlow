@@ -37,7 +37,7 @@ export default async function DashboardOrdersPage({
   const { orders } = result;
 
   return (
-    <div className="animate-fade-in space-y-6 sm:space-y-8">
+    <div className="dash-stagger animate-fade-in space-y-8">
       <BackButton href="/dashboard" label={common("back")} />
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>

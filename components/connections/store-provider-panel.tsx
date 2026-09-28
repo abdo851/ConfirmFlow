@@ -4,7 +4,6 @@ import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { ShopifyConnectForm } from "./shopify-connect-form";
 import { WooCommerceConnectForm } from "./woocommerce-connect-form";
 import { YouCanConnectForm } from "./youcan-connect-form";
 
@@ -23,11 +22,12 @@ function StoreProviderLoading() {
 function initialProvider(
   searchParams: { get(name: string): string | null },
 ): StoreProviderId {
+  const provider = searchParams.get("provider");
+  if (provider === "youcan" || provider === "woocommerce") {
+    return provider;
+  }
   if (searchParams.get("woocommerce")) {
     return "woocommerce";
-  }
-  if (searchParams.get("shopify")) {
-    return "shopify";
   }
   return "youcan";
 }
@@ -51,13 +51,20 @@ function StoreProviderPanelContent() {
           >
             {t("youcanLabel")}
           </Button>
-          <Button
-            type="button"
-            variant={activeProvider === "shopify" ? "default" : "outline"}
-            onClick={() => setActiveProvider("shopify")}
-          >
-            {t("shopifyLabel")}
-          </Button>
+          <span title={t("shopifyLockedHint")} className="inline-flex">
+            <Button
+              type="button"
+              variant="outline"
+              disabled
+              aria-disabled="true"
+              className="cursor-not-allowed opacity-60"
+            >
+              <span>{t("shopifyLabel")}</span>
+              <span className="ms-2 rounded-full bg-surface-muted px-2 py-0.5 text-[10px] font-semibold tracking-wide text-muted uppercase">
+                {t("comingSoon")}
+              </span>
+            </Button>
+          </span>
           <Button
             type="button"
             variant={activeProvider === "woocommerce" ? "default" : "outline"}
@@ -69,7 +76,6 @@ function StoreProviderPanelContent() {
       </div>
 
       {activeProvider === "youcan" ? <YouCanConnectForm /> : null}
-      {activeProvider === "shopify" ? <ShopifyConnectForm /> : null}
       {activeProvider === "woocommerce" ? <WooCommerceConnectForm /> : null}
     </div>
   );

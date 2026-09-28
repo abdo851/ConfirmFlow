@@ -343,16 +343,16 @@ function GroupRow({
       href={group.href}
       prefetch
       aria-current={active ? "page" : undefined}
-      className={`relative inline-flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-xl px-3 text-sm font-medium ${
+      className={`group relative inline-flex min-h-12 min-w-0 flex-1 items-center gap-3 rounded-xl px-3 text-sm font-medium transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
         collapsed ? "justify-center" : ""
-      } ${active ? "bg-primary text-primary-foreground" : "text-muted hover:bg-surface-muted hover:text-foreground"}`}
+      } ${active ? "bg-indigo-50 text-primary dark:bg-indigo-950/50" : "text-muted hover:bg-surface-muted hover:text-foreground"}`}
     >
       {active ? (
-        <span aria-hidden className="absolute inset-y-2 start-0 w-1 rounded-full bg-white" />
+        <span aria-hidden className="absolute inset-y-2 start-0 w-1 rounded-full bg-primary" />
       ) : null}
       <span
-        className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${
-          active ? "bg-white/15 text-white" : iconTone[group.key] ?? iconTone.overview
+        className={`nav-icon inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${
+          active ? "bg-white text-primary shadow-soft" : iconTone[group.key] ?? iconTone.overview
         }`}
       >
         {icons[group.key]}
@@ -377,7 +377,7 @@ function GroupRow({
             <svg
               viewBox="0 0 24 24"
               aria-hidden
-              className={`size-4 transition-transform ${expanded ? "rotate-90" : ""}`}
+              className={`size-4 transition-transform duration-200 ${expanded ? "rotate-90" : "rtl:-scale-x-100"}`}
               fill="none"
               stroke="currentColor"
               strokeWidth="1.8"
