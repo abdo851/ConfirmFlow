@@ -1,12 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { LoginForm } from "@/components/auth/login-form";
 import { BackButton } from "@/components/ui/back-button";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { PasswordField } from "@/components/auth/password-field";
-import { Input } from "@/components/ui/input";
-import { Toast } from "@/components/ui/toast";
-import { loginAction } from "@/lib/auth/actions";
 
 export default async function LoginPage({
   searchParams,
@@ -27,46 +23,7 @@ export default async function LoginPage({
     <div className="space-y-4">
     <BackButton href="/" label={common("back")} />
     <Card title={t("loginTitle")} description={t("loginDescription")} backdrop>
-      <form action={loginAction} className="space-y-4" aria-label={t("loginTitle")}>
-        {params.next ? (
-          <input type="hidden" name="next" value={params.next} />
-        ) : null}
-        <Input
-          label={t("email")}
-          type="email"
-          name="email"
-          autoComplete="email"
-          placeholder={t("emailPlaceholder")}
-          required
-        />
-        <PasswordField
-          label={t("password")}
-          name="password"
-          autoComplete="current-password"
-          placeholder={t("passwordPlaceholder")}
-          revealLabel={t("revealField")}
-          concealLabel={t("concealField")}
-        />
-        <p className="text-end text-sm">
-          <Link href="/forgot-password" className="underline">
-            {t("forgotPassword")}
-          </Link>
-        </p>
-        {errorMessage ? <Toast tone="danger" role="alert">{errorMessage}</Toast> : null}
-        <Button type="submit" className="w-full">
-          {t("signInShort")}
-        </Button>
-        <button
-          type="button"
-          disabled
-          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-line text-sm font-medium text-muted"
-        >
-          {t("googleSignIn")}
-          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-950/50 dark:text-amber-200">
-            {t("googleNote")}
-          </span>
-        </button>
-      </form>
+      <LoginForm errorMessage={errorMessage} nextPath={params.next} />
       <p className="mt-4 text-sm">
         <span className="text-neutral-600 dark:text-neutral-400">
           {t("noAccount")}{" "}
