@@ -72,12 +72,22 @@
     "cancel": "إلغاء",
     "saved": "تم الحفظ.",
     "failed": "تعذر حفظ الفيديو.",
+    "actions": "إجراءات",
     "placements": {
+      "overview": "النظرة العامة",
+      "orders": "الطلبات",
+      "analytics": "التحليلات",
+      "connections": "الاتصالات",
+      "shipping": "شركات التوصيل",
+      "tracking": "أدوات التتبع",
+      "marketing": "أدوات التسويق",
+      "wallet": "المحفظة",
+      "workflow": "سير العمل",
+      "global": "عام",
       "landing_hero": "مقدمة الصفحة",
       "landing_below_hero": "أسفل المقدمة",
       "onboarding_top": "أعلى الإعداد",
-      "dashboard_top": "أعلى لوحة التحكم",
-      "global": "عام"
+      "dashboard_top": "أعلى لوحة التحكم"
     }
   }
 }

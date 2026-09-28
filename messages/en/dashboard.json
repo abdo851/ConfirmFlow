@@ -8,6 +8,13 @@
   "overviewDescription": "Monitor setup progress and connection status for your Confirma account.",
   "videoDismiss": "Dismiss",
   "watchNow": "Watch now",
+  "helpVideoLabel": "Watch a short guide",
+  "helpVideoWatch": "Watch tutorial",
+  "helpVideoSetup": "Watch setup guide",
+  "helpVideoSetupLabel": "Setup guide",
+  "helpVideoClose": "Close",
+  "helpVideoCloseVideo": "Close video",
+  "helpVideoDialog": "Help video",
   "greetingFallback": "there",
   "announcement": {
     "text": "Professional plan upgrade is available now — get 30% off",

@@ -1,5 +1,7 @@
 import { getTranslations } from "next-intl/server";
+import { SectionHelp } from "@/components/dashboard/section-help";
 import { BackButton } from "@/components/ui/back-button";
+import { getVideoForPlacement } from "@/lib/videos/queries";
 
 const steps = [
   { key: "store", status: "ready" },
@@ -58,6 +60,7 @@ function StepIcon({ name }: { name: (typeof steps)[number]["key"] }) {
 export default async function WorkflowPage() {
   const t = await getTranslations("dashboard.workflow");
   const common = await getTranslations("common");
+  const workflowVideo = await getVideoForPlacement("workflow");
 
   return (
     <div className="space-y-6">
@@ -66,6 +69,9 @@ export default async function WorkflowPage() {
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{t("title")}</h1>
         <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800 dark:bg-amber-950/50 dark:text-amber-200">
           {t("badge")}
+        </span>
+        <span className="ms-auto">
+          <SectionHelp video={workflowVideo} />
         </span>
       </div>
       <ol className="flex flex-col gap-3 lg:flex-row lg:items-stretch">

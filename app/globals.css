@@ -1167,6 +1167,57 @@ html[dir="rtl"] .dash-slide {
   transform: scaleX(1);
 }
 
+@keyframes help-modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes help-modal-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@keyframes help-icon-pulse {
+  0% {
+    box-shadow: var(--shadow-soft), 0 0 0 0 rgb(79 70 229 / 0.28);
+  }
+  70% {
+    box-shadow: var(--shadow-soft), 0 0 0 10px rgb(79 70 229 / 0);
+  }
+  100% {
+    box-shadow: var(--shadow-soft), 0 0 0 0 rgb(79 70 229 / 0);
+  }
+}
+
+.help-modal {
+  animation: help-modal-in 200ms ease-out;
+}
+
+.help-modal-backdrop {
+  animation: help-modal-in 180ms ease-out;
+}
+
+.help-modal[data-state="closing"],
+.help-modal-backdrop[data-state="closing"] {
+  animation: help-modal-out 180ms ease-in forwards;
+}
+
+.help-icon-pulse {
+  animation: help-icon-pulse 1.4s ease-out 2;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in,
   .animate-slide-up,
@@ -1233,6 +1284,9 @@ html[dir="rtl"] .dash-slide {
   .section-premium::after,
   .play-pulse,
   .video-glow,
+  .help-icon-pulse,
+  .help-modal,
+  .help-modal-backdrop,
   .menu-pop,
   [data-animate] {
     transform: none;

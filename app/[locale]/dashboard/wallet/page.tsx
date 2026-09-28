@@ -8,7 +8,7 @@ export default async function WalletPage() {
   const nav = await getTranslations("navigation.sidebar");
 
   return (
-    <DashboardSection title={pages("walletTitle")} description={pages("walletDescription")}>
+    <DashboardSection title={pages("walletTitle")} description={pages("walletDescription")} helpPlacement="wallet">
       <Card title={pages("balanceLabel")}>
         <p className="text-3xl font-semibold tracking-tight">0</p>
         <p className="mt-2 text-sm text-muted">{pages("zeroBalance")}</p>

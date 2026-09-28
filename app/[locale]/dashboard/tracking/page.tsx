@@ -11,7 +11,7 @@ export default async function TrackingPage() {
   const tracking = locale === "ar" ? arTracking : enTracking;
 
   return (
-    <DashboardSection title={pages("trackingTitle")} description={pages("trackingDescription")}>
+    <DashboardSection title={pages("trackingTitle")} description={pages("trackingDescription")} helpPlacement="tracking">
       <NavCards
         items={[
           { href: "/dashboard/tracking/pixel", title: nav("pixelSettings"), description: pages("pixelDescription") },

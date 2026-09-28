@@ -10,6 +10,7 @@ import { StatCard } from "@/components/ui/stat-card";
 import { getAuthenticatedUser } from "@/lib/auth/session";
 import { createUserDatabaseClient } from "@/lib/database/user-client";
 import { DashboardVideoBar } from "@/components/marketing/dashboard-video-bar";
+import { SectionHelp } from "@/components/dashboard/section-help";
 import { ContentBlockFeed } from "@/components/content/content-block-feed";
 import { getVideoForPlacement } from "@/lib/videos/queries";
 import { listActiveBlocks } from "@/lib/content/blocks";
@@ -84,7 +85,10 @@ export default async function DashboardPage({
     listActiveBlocks(locale === "ar" ? "ar" : "en"),
   ]);
   const recent = (recentResult?.orders ?? []).slice(0, 5);
-  const topVideo = await getVideoForPlacement("dashboard_top");
+  const [topVideo, overviewVideo] = await Promise.all([
+    getVideoForPlacement("dashboard_top"),
+    getVideoForPlacement("overview"),
+  ]);
   const currency = recent[0]?.currency ?? "USD";
   const seriesStart = series[0] ? series[0].new + series[0].confirmed : 0;
   const seriesEnd = series.length
@@ -103,7 +107,10 @@ export default async function DashboardPage({
       {topVideo ? (
         <DashboardVideoBar video={topVideo} watchLabel={t("watchNow")} dismissLabel={t("videoDismiss")} />
       ) : null}
-      <section className="dash-hero overflow-hidden rounded-2xl border border-line p-6 shadow-soft sm:p-8">
+      <section className="dash-hero relative overflow-hidden rounded-2xl border border-line p-6 shadow-soft sm:p-8">
+        <div className="absolute end-4 top-4">
+          <SectionHelp video={overviewVideo} />
+        </div>
         <p className="text-sm font-medium text-muted">{t("welcomeTitle")}</p>
         <p className="mt-1 text-xs text-muted">{today}</p>
         <h1 className="mt-2 text-3xl leading-[1.1] font-semibold tracking-tight sm:text-4xl">

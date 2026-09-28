@@ -1,9 +1,18 @@
 export const videoPlacements = [
+  "overview",
+  "orders",
+  "analytics",
+  "connections",
+  "shipping",
+  "tracking",
+  "marketing",
+  "wallet",
+  "workflow",
+  "global",
   "landing_hero",
   "landing_below_hero",
   "onboarding_top",
   "dashboard_top",
-  "global",
 ] as const;
 
 export type VideoPlacement = (typeof videoPlacements)[number];

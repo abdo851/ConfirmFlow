@@ -8,6 +8,13 @@
   "overviewDescription": "راقب تقدم الإعداد وحالة الاتصالات لحساب Confirma.",
   "videoDismiss": "إغلاق",
   "watchNow": "شاهد الآن",
+  "helpVideoLabel": "شاهد شرحاً قصيراً",
+  "helpVideoWatch": "شاهد الفيديو التعليمي",
+  "helpVideoSetup": "شاهد طريقة الربط",
+  "helpVideoSetupLabel": "طريقة الربط",
+  "helpVideoClose": "إغلاق",
+  "helpVideoCloseVideo": "إغلاق الفيديو",
+  "helpVideoDialog": "فيديو توضيحي",
   "greetingFallback": "بك",
   "announcement": {
     "text": "🎉 ترقية إلى الخطة الاحترافية متاحة الآن — احصل على 30% خصم",

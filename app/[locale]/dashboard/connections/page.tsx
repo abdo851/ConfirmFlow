@@ -2,34 +2,30 @@ import { getTranslations } from "next-intl/server";
 import { AddStoreDialog } from "@/components/connections/add-store-dialog";
 import { ProviderStatusList } from "@/components/connections/provider-status-list";
 import { BackButton } from "@/components/ui/back-button";
+import { SectionHelp } from "@/components/dashboard/section-help";
+import { listAccountStores } from "@/lib/connections/account-stores";
 import { getLatestMetaDeliverySummary } from "@/lib/connections/meta-delivery-summary";
 import { getMetaConnectionPublicState } from "@/lib/integrations/meta/session";
-import { getShopifyConnectionPublicState } from "@/lib/integrations/shopify/session";
-import { getWooCommerceConnectionPublicState } from "@/lib/integrations/woocommerce";
-import { getYouCanConnectionPublicState } from "@/lib/integrations/youcan/session";
+import { getVideoForPlacement } from "@/lib/videos/queries";
 
 export default async function DashboardConnectionsPage() {
   const t = await getTranslations("dashboard");
   const common = await getTranslations("common");
-  const [youcan, shopify, woocommerce, meta, lastDelivery] = await Promise.all([
-    getYouCanConnectionPublicState().catch(() => ({
-      provider: "youcan" as const,
-      status: "not_connected" as const,
+  const [accountStores, meta, lastDelivery, connectionsVideo] = await Promise.all([
+    listAccountStores().catch(() => ({
+      stores: [],
+      counts: { youcan: 0, woocommerce: 0, shopify: 0 },
     })),
-    getShopifyConnectionPublicState().catch(() => ({
-      provider: "shopify" as const,
-      status: "not_connected" as const,
-    })),
-    getWooCommerceConnectionPublicState().catch(() => ({ connected: false })),
     getMetaConnectionPublicState().catch(() => ({
       provider: "meta" as const,
       status: "not_connected" as const,
     })),
     getLatestMetaDeliverySummary().catch(() => null),
+    getVideoForPlacement("connections"),
   ]);
 
   return (
-    <div className="animate-fade-in space-y-6 sm:space-y-8">
+    <div className="dash-stagger animate-fade-in space-y-8">
       <BackButton href="/dashboard" label={common("back")} />
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
@@ -40,32 +36,13 @@ export default async function DashboardConnectionsPage() {
             {t("connectionsManageDescription")}
           </p>
         </div>
-        <AddStoreDialog />
+        <div className="flex items-center gap-2">
+          <SectionHelp video={connectionsVideo} />
+          <AddStoreDialog counts={accountStores.counts} />
+        </div>
       </div>
       <ProviderStatusList
-        providers={[
-          {
-            id: "youcan",
-            connected: youcan.status === "connected",
-            target: "storeSlug" in youcan ? youcan.storeSlug : undefined,
-            connectHref: "/onboarding/store",
-            disconnectPath: "/api/integrations/youcan/disconnect",
-          },
-          {
-            id: "shopify",
-            connected: shopify.status === "connected",
-            target: "shop" in shopify ? shopify.shop : undefined,
-            connectHref: "/onboarding/store",
-            disconnectPath: "/api/integrations/shopify/disconnect",
-          },
-          {
-            id: "woocommerce",
-            connected: Boolean(woocommerce.connected),
-            target: "store_url" in woocommerce ? woocommerce.store_url : undefined,
-            connectHref: "/onboarding/store",
-            disconnectPath: "/api/integrations/woocommerce/disconnect",
-          },
-        ]}
+        stores={accountStores.stores}
         meta={{
           connected: meta.status === "connected",
           pixelId: "pixelId" in meta ? meta.pixelId : undefined,

@@ -74,7 +74,7 @@ export default async function AnalyticsPage({
   ] as const;
 
   return (
-    <DashboardSection title={pages("analyticsTitle")} description={pages("analyticsDescription")}>
+    <DashboardSection title={pages("analyticsTitle")} description={pages("analyticsDescription")} helpPlacement="analytics">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">
         {filters.map((filter) => (

@@ -30,8 +30,24 @@ function readInput(formData: FormData) {
 }
 
 function refresh() {
-  for (const path of ["/ar", "/en", "/ar/dashboard", "/en/dashboard", "/ar/onboarding", "/en/onboarding", "/ar/dashboard/admin/videos", "/en/dashboard/admin/videos"]) {
-    revalidatePath(path);
+  const pages = [
+    "",
+    "/dashboard",
+    "/onboarding",
+    "/dashboard/admin/videos",
+    "/dashboard/orders",
+    "/dashboard/analytics",
+    "/dashboard/connections",
+    "/dashboard/shipping",
+    "/dashboard/tracking",
+    "/dashboard/marketing",
+    "/dashboard/wallet",
+    "/dashboard/workflow",
+  ];
+  for (const locale of ["/ar", "/en"]) {
+    for (const page of pages) {
+      revalidatePath(`${locale}${page}`);
+    }
   }
 }
 

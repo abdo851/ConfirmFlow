@@ -1,8 +1,10 @@
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
 import { BackButton } from "@/components/ui/back-button";
+import { SectionHelp } from "@/components/dashboard/section-help";
 import { ShippingCard } from "@/components/shipping/shipping-card";
 import { SHIPPING_PROVIDERS, type ShippingProvider } from "@/lib/shipping/data";
+import { getVideoForPlacement } from "@/lib/videos/queries";
 
 export default async function ShippingPage({
   params,
@@ -14,13 +16,17 @@ export default async function ShippingPage({
   const common = await getTranslations("common");
   const direct = SHIPPING_PROVIDERS.filter((provider) => provider.integrationType === "direct");
   const soon = SHIPPING_PROVIDERS.filter((provider) => provider.integrationType === "broker-required");
+  const shippingVideo = await getVideoForPlacement("shipping");
 
   return (
     <div className="dash-stagger animate-fade-in space-y-10">
       <BackButton href="/dashboard" label={common("back")} />
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{t("title")}</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted sm:text-base">{t("subtitle")}</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{t("title")}</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted sm:text-base">{t("subtitle")}</p>
+        </div>
+        <SectionHelp video={shippingVideo} />
       </div>
 
       <section className="space-y-4" aria-labelledby="shipping-direct">

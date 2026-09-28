@@ -3,9 +3,11 @@ import { redirect } from "@/i18n/navigation";
 import { OrdersList } from "@/components/orders";
 import { BackButton } from "@/components/ui/back-button";
 import { ExportOrdersButton } from "@/components/orders/export-orders-button";
+import { SectionHelp } from "@/components/dashboard/section-help";
 import { getOrdersForAuthenticatedUser } from "@/lib/orders/get-orders-for-user";
 import { getOrderProductsForAuthenticatedUser } from "@/lib/orders/get-order-products";
 import { parseOrdersListSearchParams } from "@/lib/orders/list-query";
+import { getVideoForPlacement } from "@/lib/videos/queries";
 
 export default async function DashboardOrdersPage({
   params,
@@ -34,6 +36,7 @@ export default async function DashboardOrdersPage({
   }
 
   const products = await getOrderProductsForAuthenticatedUser({ provider: query.provider });
+  const ordersVideo = await getVideoForPlacement("orders");
   const { orders } = result;
 
   return (
@@ -48,7 +51,10 @@ export default async function DashboardOrdersPage({
             {t("pageDescription")}
           </p>
         </div>
-        <ExportOrdersButton />
+        <div className="flex items-center gap-2">
+          <SectionHelp video={ordersVideo} />
+          <ExportOrdersButton />
+        </div>
       </div>
       <OrdersList
         initialOrders={orders}
