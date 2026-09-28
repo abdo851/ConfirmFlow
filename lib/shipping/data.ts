@@ -1,3 +1,5 @@
+export type ShippingIntegrationType = "direct" | "broker-required";
+
 export interface ShippingProvider {
   slug: string;
   nameAr: string;
@@ -7,6 +9,7 @@ export interface ShippingProvider {
   logo: string;
   website: string;
   isFree: boolean;
+  integrationType: ShippingIntegrationType;
 }
 
 export const SHIPPING_PROVIDERS: ShippingProvider[] = [
@@ -18,6 +21,17 @@ export const SHIPPING_PROVIDERS: ShippingProvider[] = [
     logo: "/shipping/sendit.png",
     website: "https://sendit.ma",
     isFree: true,
+    integrationType: "direct",
+  },
+  {
+    slug: "mylerz",
+    nameAr: "Mylerz",
+    nameEn: "Mylerz",
+    descriptionAr: "توصيل للتجارة الإلكترونية داخل المغرب",
+    logo: "/shipping/mylerz.svg",
+    website: "https://www.mylerz.com",
+    isFree: true,
+    integrationType: "direct",
   },
   {
     slug: "cathedis",
@@ -27,6 +41,47 @@ export const SHIPPING_PROVIDERS: ShippingProvider[] = [
     logo: "/shipping/cathedis.png",
     website: "https://cathedis.ma",
     isFree: true,
+    integrationType: "direct",
+  },
+  {
+    slug: "chrono-diali",
+    nameAr: "Chrono Diali",
+    nameEn: "Chrono Diali",
+    descriptionAr: "توصيل سريع داخل المدن",
+    logo: "/shipping/chrono-diali.svg",
+    website: "https://www.chronodiali.ma",
+    isFree: true,
+    integrationType: "direct",
+  },
+  {
+    slug: "amana-cec",
+    nameAr: "Amana CEC",
+    nameEn: "Amana CEC",
+    descriptionAr: "شبكة بريد وتوصيل وطنية",
+    logo: "/shipping/amana-cec.svg",
+    website: "https://www.amana.ma",
+    isFree: true,
+    integrationType: "direct",
+  },
+  {
+    slug: "boxship",
+    nameAr: "Boxship",
+    nameEn: "Boxship",
+    descriptionAr: "شحن طرود للمتاجر الإلكترونية",
+    logo: "/shipping/boxship.svg",
+    website: "https://boxship.ma",
+    isFree: true,
+    integrationType: "direct",
+  },
+  {
+    slug: "coliix",
+    nameAr: "Coliix",
+    nameEn: "Coliix",
+    descriptionAr: "شائعة في السوق المغربي",
+    logo: "/shipping/coliix.png",
+    website: "https://coliix.com",
+    isFree: true,
+    integrationType: "broker-required",
   },
   {
     slug: "ameex",
@@ -37,6 +92,7 @@ export const SHIPPING_PROVIDERS: ShippingProvider[] = [
     logo: "/shipping/ameex.png",
     website: "https://ameex.ma",
     isFree: true,
+    integrationType: "broker-required",
   },
   {
     slug: "ozon-express",
@@ -46,6 +102,7 @@ export const SHIPPING_PROVIDERS: ShippingProvider[] = [
     logo: "/shipping/ozon-express.png",
     website: "https://ozonexpress.ma",
     isFree: true,
+    integrationType: "broker-required",
   },
   {
     slug: "digylog",
@@ -55,15 +112,7 @@ export const SHIPPING_PROVIDERS: ShippingProvider[] = [
     logo: "/shipping/digylog.png",
     website: "https://digylog.ma",
     isFree: true,
-  },
-  {
-    slug: "coliix",
-    nameAr: "Coliix",
-    nameEn: "Coliix",
-    descriptionAr: "شائعة في السوق المغربي",
-    logo: "/shipping/coliix.png",
-    website: "https://coliix.com",
-    isFree: true,
+    integrationType: "broker-required",
   },
   {
     slug: "tawssil",
@@ -73,15 +122,7 @@ export const SHIPPING_PROVIDERS: ShippingProvider[] = [
     logo: "/shipping/tawssil.svg",
     website: "https://tawssil.ma",
     isFree: true,
-  },
-  {
-    slug: "ozonexpress",
-    nameAr: "Ozonexpress",
-    nameEn: "Ozonexpress",
-    descriptionAr: "توصيل سريع وموثوق",
-    logo: "/shipping/ozonexpress.png",
-    website: "https://ozonexpress.ma",
-    isFree: true,
+    integrationType: "broker-required",
   },
   {
     slug: "forcelog",
@@ -91,6 +132,7 @@ export const SHIPPING_PROVIDERS: ShippingProvider[] = [
     logo: "/shipping/forcelog.png",
     website: "https://forcelog.ma",
     isFree: true,
+    integrationType: "broker-required",
   },
   {
     slug: "colis-swift",
@@ -100,6 +142,17 @@ export const SHIPPING_PROVIDERS: ShippingProvider[] = [
     logo: "/shipping/colis-swift.svg",
     website: "https://colisswift.ma",
     isFree: true,
+    integrationType: "broker-required",
+  },
+  {
+    slug: "ozonexpress",
+    nameAr: "Ozonexpress",
+    nameEn: "Ozonexpress",
+    descriptionAr: "توصيل سريع وموثوق",
+    logo: "/shipping/ozonexpress.png",
+    website: "https://ozonexpress.ma",
+    isFree: true,
+    integrationType: "broker-required",
   },
 ];
 

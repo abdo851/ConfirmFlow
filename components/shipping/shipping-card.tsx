@@ -6,7 +6,7 @@ export function ShippingCard({
   provider,
   locale,
   description,
-  freeLabel,
+  statusLabel,
   connectLabel,
   connectedLabel,
   settingsLabel,
@@ -15,7 +15,7 @@ export function ShippingCard({
   provider: ShippingProvider;
   locale: string;
   description: string;
-  freeLabel: string;
+  statusLabel: string;
   connectLabel: string;
   connectedLabel: string;
   settingsLabel: string;
@@ -25,15 +25,19 @@ export function ShippingCard({
 
   return (
     <article className="relative flex flex-col rounded-2xl bg-white p-5 shadow-soft transition duration-200 hover:-translate-y-0.5 hover:shadow-medium dark:bg-slate-950">
-      {provider.isFree ? (
-        <span className="absolute top-4 left-4 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
-          {freeLabel}
-        </span>
-      ) : null}
+      <span
+        className={
+          provider.integrationType === "direct"
+            ? "absolute top-4 start-4 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200"
+            : "absolute top-4 start-4 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+        }
+      >
+        {statusLabel}
+      </span>
       <button
         type="button"
         aria-label={settingsLabel}
-        className="absolute top-4 right-4 inline-flex size-11 items-center justify-center rounded-xl text-muted"
+        className="absolute top-4 end-4 inline-flex size-11 items-center justify-center rounded-xl text-muted"
       >
         <svg viewBox="0 0 24 24" className="size-5" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.8">
           <circle cx="12" cy="12" r="3" />
@@ -63,7 +67,7 @@ export function ShippingCard({
               aria-label={connectedLabel}
               className="relative h-7 w-12 rounded-full bg-emerald-500"
             >
-              <span className="absolute top-0.5 right-0.5 size-6 rounded-full bg-white" />
+              <span className="absolute top-0.5 end-0.5 size-6 rounded-full bg-white" />
             </button>
           </div>
         ) : (
