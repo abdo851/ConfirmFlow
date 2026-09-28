@@ -206,6 +206,25 @@ export async function deleteWooCommerceWebhook(input: {
   webhookId: string;
 }): Promise<void> {
   const db = createDatabaseClient();
+  const { data: stores, error: storesError } = await db
+    .from("stores")
+    .select("id")
+    .eq("owner_id", input.ownerId)
+    .eq("platform", "woocommerce");
+  if (storesError || !stores?.length) {
+    throw new Error("webhook_not_found");
+  }
+  const { data: ownedConnections, error: ownedError } = await db
+    .from("store_connections")
+    .select("id")
+    .in("store_id", stores.map((store) => store.id))
+    .eq("provider", "woocommerce")
+    .eq("connection_type", "store")
+    .eq("id", input.connectionId);
+  if (ownedError || !ownedConnections?.length) {
+    throw new Error("webhook_not_found");
+  }
+
   const targets = await getWooCommerceWebhookCleanupTargets(input.ownerId, db);
   const { data: woo } = await db
     .from("woocommerce_connections")

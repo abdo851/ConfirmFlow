@@ -62,7 +62,7 @@ export const SHIPPING_PROVIDERS: ShippingProvider[] = [
     nameEn: "Coliix",
     descriptionAr: "شائعة في السوق المغربي",
     logo: "/shipping/coliix.png",
-    website: "https://coliix.ma",
+    website: "https://coliix.com",
     isFree: true,
   },
   {

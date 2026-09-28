@@ -3,8 +3,21 @@
 import { useEffect, useId, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import { STORES_PER_PROVIDER_LIMIT } from "@/lib/connections/store-limit";
 
-export function AddStoreDialog() {
+export interface AddStoreCounts {
+  youcan: number;
+  woocommerce: number;
+  shopify: number;
+}
+
+const BRANDS = {
+  youcan: "/brands/youcan.svg",
+  woocommerce: "/brands/woocommerce.svg",
+  shopify: "/brands/shopify.svg",
+} as const;
+
+export function AddStoreDialog({ counts }: { counts: AddStoreCounts }) {
   const t = useTranslations("dashboard");
   const connections = useTranslations("connections");
   const [open, setOpen] = useState(false);
@@ -23,6 +36,43 @@ export function AddStoreDialog() {
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
+
+  function usage(count: number, blocked: boolean) {
+    if (blocked && count >= STORES_PER_PROVIDER_LIMIT) {
+      return t("storeLimitReached");
+    }
+    if (blocked) {
+      return connections("comingSoon");
+    }
+    if (count <= 0) {
+      return null;
+    }
+    if (count >= STORES_PER_PROVIDER_LIMIT) {
+      return t("storeLimitReached");
+    }
+    return t("storeCountHint", { count });
+  }
+
+  const rows = [
+    {
+      id: "woocommerce" as const,
+      label: "WooCommerce",
+      href: "/onboarding/store?provider=woocommerce",
+      blocked: counts.woocommerce >= STORES_PER_PROVIDER_LIMIT,
+    },
+    {
+      id: "youcan" as const,
+      label: "YouCan",
+      href: "/onboarding/store?provider=youcan",
+      blocked: counts.youcan >= STORES_PER_PROVIDER_LIMIT,
+    },
+    {
+      id: "shopify" as const,
+      label: "Shopify",
+      href: "/onboarding/store?provider=shopify",
+      blocked: true,
+    },
+  ];
 
   return (
     <>
@@ -45,29 +95,38 @@ export function AddStoreDialog() {
               {t("addStoreTitle")}
             </h2>
             <div className="mt-4 grid gap-2">
-              <button
-                type="button"
-                className="flex min-h-11 items-center justify-between rounded-xl border border-line px-3 text-start text-sm font-medium hover:bg-surface-muted"
-                onClick={() => router.push("/onboarding/store?add=new")}
-              >
-                WooCommerce
-              </button>
-              <button
-                type="button"
-                disabled
-                className="flex min-h-11 items-center justify-between rounded-xl border border-line px-3 text-start text-sm text-muted"
-              >
-                <span>YouCan</span>
-                <span className="text-xs font-semibold">{connections("comingSoon")}</span>
-              </button>
-              <button
-                type="button"
-                disabled
-                className="flex min-h-11 items-center justify-between rounded-xl border border-line px-3 text-start text-sm text-muted"
-              >
-                <span>Shopify</span>
-                <span className="text-xs font-semibold">{connections("comingSoon")}</span>
-              </button>
+              {rows.map((row) => {
+                const hint = usage(counts[row.id], row.blocked);
+                return (
+                  <button
+                    key={row.id}
+                    type="button"
+                    disabled={row.blocked}
+                    className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-line px-3 py-2 text-start text-sm font-medium enabled:hover:bg-surface-muted disabled:cursor-not-allowed disabled:text-muted disabled:opacity-60"
+                    onClick={() => router.push(row.href)}
+                  >
+                    <span className="flex items-center gap-3">
+                      <span
+                        aria-hidden="true"
+                        className="size-8 shrink-0 rounded-lg bg-surface-muted bg-contain bg-center bg-no-repeat"
+                        style={{ backgroundImage: `url(${BRANDS[row.id]})` }}
+                      />
+                      <span>
+                        <span className="block">{row.label}</span>
+                        {hint && !row.blocked ? (
+                          <span className="mt-0.5 block text-xs font-normal text-muted">
+                            {hint}
+                            <span className="ms-2">{t("storeCountBadge", { count: counts[row.id] })}</span>
+                          </span>
+                        ) : null}
+                      </span>
+                    </span>
+                    {row.blocked ? (
+                      <span className="text-xs font-semibold">{hint}</span>
+                    ) : null}
+                  </button>
+                );
+              })}
             </div>
             <button
               type="button"

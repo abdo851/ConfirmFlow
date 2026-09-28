@@ -2,17 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-export interface ProviderStatusItem {
-  id: "youcan" | "shopify" | "woocommerce";
-  connected: boolean;
-  target?: string;
-  connectHref: string;
-  disconnectPath: string;
+export interface ConnectedStoreCard {
+  id: string;
+  provider: "youcan" | "woocommerce" | "shopify";
+  name: string;
+  status: "connected" | "inactive" | "error";
 }
 
 export interface MetaStatusItem {
@@ -23,31 +22,43 @@ export interface MetaStatusItem {
 }
 
 interface ProviderStatusListProps {
-  providers: ProviderStatusItem[];
+  stores: ConnectedStoreCard[];
   meta: MetaStatusItem;
 }
 
-export function ProviderStatusList({ providers, meta }: ProviderStatusListProps) {
+const PROVIDER_ORDER = ["youcan", "woocommerce", "shopify"] as const;
+
+const LOGOS = {
+  youcan: "/brands/youcan.svg",
+  woocommerce: "/brands/woocommerce.svg",
+  shopify: "/brands/shopify.svg",
+} as const;
+
+const DISCONNECT_PATH = {
+  youcan: "/api/integrations/youcan/disconnect",
+  woocommerce: "/api/integrations/woocommerce/disconnect",
+  shopify: "/api/integrations/shopify/disconnect",
+} as const;
+
+export function ProviderStatusList({ stores, meta }: ProviderStatusListProps) {
   const t = useTranslations("connections");
-  const locale = useLocale();
+  const dashboard = useTranslations("dashboard");
   const router = useRouter();
   const [pending, setPending] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function disconnect(item: ProviderStatusItem) {
-    if (item.id === "youcan") {
-      const confirmed = window.confirm(
-        locale === "ar"
-          ? "هل أنت متأكد من قطع الاتصال؟ بعد قطع الاتصال لن يستقبل Confirma طلبات هذا المتجر حتى تعيد ربطه."
-          : "Are you sure you want to disconnect? Once disconnected, Confirma will not receive orders from this store until you connect it again.",
-      );
-      if (!confirmed) {
-        return;
-      }
+  async function disconnect(store: ConnectedStoreCard) {
+    const confirmed = window.confirm(dashboard("disconnectStoreConfirm"));
+    if (!confirmed) {
+      return;
     }
-    setPending(item.id);
+    setPending(store.id);
     setError(null);
-    const response = await fetch(item.disconnectPath, { method: "POST" });
+    const response = await fetch(DISCONNECT_PATH[store.provider], {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ storeId: store.id }),
+    });
     setPending(null);
     if (!response.ok) {
       setError(t("disconnectFailed"));
@@ -56,36 +67,54 @@ export function ProviderStatusList({ providers, meta }: ProviderStatusListProps)
     router.refresh();
   }
 
+  const groups = PROVIDER_ORDER.map((provider) => ({
+    provider,
+    stores: stores.filter((store) => store.provider === provider),
+  })).filter((group) => group.stores.length > 0);
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {error ? <p className="text-sm text-rose-700">{error}</p> : null}
-      <div className="grid gap-4 lg:grid-cols-3">
-        {providers.map((item) => (
-          <Card key={item.id} title={t(`${item.id}Label` as "youcanLabel")}>
-            <p className="text-sm">
-              {item.connected ? t("status.connected") : t("status.not_connected")}
-            </p>
-            {item.connected && item.target ? (
-              <p className="mt-1 text-sm text-muted">{item.target}</p>
-            ) : null}
-            <div className="mt-4">
-              {item.connected ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  loading={pending === item.id}
-                  disabled={pending !== null}
-                  onClick={() => void disconnect(item)}
-                >
-                  {t("disconnect")}
-                </Button>
-              ) : (
-                <Button href={item.connectHref}>{t("connect")}</Button>
-              )}
+      {groups.length === 0 ? (
+        <p className="text-sm text-muted">{dashboard("noConnectedStores")}</p>
+      ) : (
+        groups.map((group) => (
+          <section key={group.provider} className="space-y-3">
+            <h2 className="text-sm font-semibold text-muted">{t(`${group.provider}Label`)}</h2>
+            <div className="grid gap-4 lg:grid-cols-3">
+              {group.stores.map((store) => (
+                <Card key={store.id} title={store.name}>
+                  <div className="flex items-center gap-3">
+                    <span
+                      aria-hidden="true"
+                      className="size-10 shrink-0 rounded-lg bg-surface-muted bg-contain bg-center bg-no-repeat"
+                      style={{ backgroundImage: `url(${LOGOS[store.provider]})` }}
+                    />
+                    <p className="text-sm">
+                      {store.status === "error"
+                        ? t("status.error")
+                        : store.status === "connected"
+                          ? t("status.connected")
+                          : t("status.not_connected")}
+                    </p>
+                  </div>
+                  <div className="mt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      loading={pending === store.id}
+                      disabled={pending !== null}
+                      onClick={() => void disconnect(store)}
+                    >
+                      {t("disconnect")}
+                    </Button>
+                  </div>
+                </Card>
+              ))}
             </div>
-          </Card>
-        ))}
-      </div>
+          </section>
+        ))
+      )}
       <Card title={t("types.meta.label")} description={t("types.meta.description")}>
         <p className="text-sm">
           {meta.connected ? t("status.connected") : t("status.not_connected")}
