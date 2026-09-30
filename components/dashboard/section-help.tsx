@@ -75,7 +75,7 @@ export function SectionHelp({ video }: { video: VideoBlock | null }) {
             {label}
           </span>
         </button>
-        <span className="max-w-36 text-xs font-medium leading-4 text-slate-600 sm:hidden dark:text-slate-300">{label}</span>
+        <span className="hidden text-sm text-muted sm:inline">{label}</span>
       </div>
       {open ? <HelpVideoModal video={video} onClose={() => setOpen(false)} /> : null}
     </>
