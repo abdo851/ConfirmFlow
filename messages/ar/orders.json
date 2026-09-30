@@ -5,6 +5,7 @@
   "emptyDescription": "ستظهر الطلبات من متجرك المتصل هنا بعد استلامها.",
   "columns": {
     "order": "الطلب",
+    "store": "المتجر",
     "customer": "العميل",
     "total": "الإجمالي",
     "received": "تاريخ الاستلام",
@@ -36,6 +37,7 @@
     "confirmed": "تم التأكيد"
   },
   "tabs": {
+    "label": "الحالة",
     "all": "الكل",
     "new": "جديدة",
     "review": "قيد المراجعة",
@@ -43,6 +45,47 @@
     "rejected": "مرفوضة",
     "archived": "مؤرشفة"
   },
+  "stores": {
+    "label": "المتجر",
+    "all": "كل المتاجر",
+    "woocommerce": "WooCommerce",
+    "youcan": "YouCan",
+    "shopify": "Shopify",
+    "comingSoon": "قريباً"
+  },
+  "dates": {
+    "label": "النطاق الزمني",
+    "today": "اليوم",
+    "yesterday": "أمس",
+    "last7": "آخر 7 أيام",
+    "last30": "آخر 30 يوماً",
+    "month": "هذا الشهر",
+    "custom": "نطاق مخصص",
+    "clear": "مسح",
+    "apply": "تطبيق",
+    "previousMonth": "الشهر السابق",
+    "nextMonth": "الشهر التالي"
+  },
+  "pagination": {
+    "label": "صفحات الطلبات",
+    "showing": "عرض {from}–{to} من {total} طلباً",
+    "previous": "السابق",
+    "next": "التالي"
+  },
+  "products": {
+    "label": "المنتج",
+    "search": "ابحث عن منتج",
+    "empty": "لا توجد منتجات بعد",
+    "clear": "مسح"
+  },
+  "statusConfirm": {
+    "title": "تغيير حالة الطلب؟",
+    "body": "سيتم تحديث الطلب إلى {status}.",
+    "confirm": "تحديث الحالة",
+    "cancel": "إلغاء"
+  },
+  "filterEmptyTitle": "لا توجد طلبات تطابق عوامل التصفية",
+  "filterEmptyDescription": "جرّب متجراً أو حالة أو نطاقاً زمنياً آخر.",
   "filterEmpty": "لا توجد طلبات في هذه الحالة.",
   "loadMore": "عرض المزيد",
   "errors": {

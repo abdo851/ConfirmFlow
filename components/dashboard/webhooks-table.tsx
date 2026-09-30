@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Toast } from "@/components/ui/toast";
+import { CreateWebhookDialog } from "@/components/dashboard/create-webhook-dialog";
 import type { UserWebhook } from "@/lib/dashboard/get-webhooks-for-user";
 
 function truncate(value: string) {
@@ -22,6 +23,7 @@ export function WebhooksTable({ webhooks }: { webhooks: UserWebhook[] }) {
   const [pending, setPending] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [ok, setOk] = useState(false);
+  const [highlighted, setHighlighted] = useState<string | null>(null);
 
   async function post(url: string, body?: object, key?: string) {
     setPending(key ?? url);
@@ -41,16 +43,25 @@ export function WebhooksTable({ webhooks }: { webhooks: UserWebhook[] }) {
 
   return (
     <div className="space-y-4">
-      <Button type="button" loading={pending === "all"} onClick={() => void post("/api/dashboard/webhooks/reregister", {}, "all")}>
-        {t("reregisterAll")}
-      </Button>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <CreateWebhookDialog
+          onCreated={(webhookId) => {
+            setHighlighted(webhookId);
+            setOk(true);
+            setMessage(t("createOk"));
+          }}
+        />
+        <Button type="button" variant="outline" loading={pending === "all"} onClick={() => void post("/api/dashboard/webhooks/reregister", {}, "all")}>
+          {t("reregisterAll")}
+        </Button>
+      </div>
       {webhooks.length === 0 ? (
         <EmptyState title={t("emptyTitle")} description={t("emptyBody")} />
       ) : (
         <>
         <div className="grid gap-3 md:hidden">
           {webhooks.map((webhook) => (
-            <article key={`${webhook.connection_id}-${webhook.webhook_id}`} className="rounded-2xl border border-line bg-surface p-4">
+            <article key={`${webhook.connection_id}-${webhook.webhook_id}`} className={`rounded-2xl border bg-surface p-4 ${highlighted === webhook.webhook_id ? "border-primary ring-2 ring-primary" : "border-line"}`}>
               <div className="flex items-center justify-between gap-2">
                 <Badge variant="accent">WooCommerce</Badge>
                 <span className="text-sm">{webhook.status === "active" ? t("active") : t("paused")}</span>
@@ -121,7 +132,7 @@ export function WebhooksTable({ webhooks }: { webhooks: UserWebhook[] }) {
             </thead>
             <tbody>
               {webhooks.map((webhook) => (
-                <tr key={`${webhook.connection_id}-${webhook.webhook_id}`} className="border-b border-line last:border-0">
+                <tr key={`${webhook.connection_id}-${webhook.webhook_id}`} className={`data-row border-b border-line last:border-0 ${highlighted === webhook.webhook_id ? "bg-indigo-50 dark:bg-indigo-950/40" : ""}`}>
                   <td className="px-3 py-3">
                     <Badge variant="accent">WooCommerce</Badge>
                   </td>

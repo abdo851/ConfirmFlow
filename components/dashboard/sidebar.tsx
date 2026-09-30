@@ -37,7 +37,11 @@ const iconTone: Record<string, string> = {
   overview: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-200",
   orders: "bg-teal-100 text-teal-700 dark:bg-teal-950/50 dark:text-teal-200",
   analytics: "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-200",
+  adEvents: "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-200",
   connections: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200",
+  shipping: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-200",
+  customCarrier: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-200",
+  workflow: "bg-teal-100 text-teal-700 dark:bg-teal-950/50 dark:text-teal-200",
   tracking: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-200",
   marketing: "bg-teal-100 text-teal-700 dark:bg-teal-950/50 dark:text-teal-200",
   wallet: "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-200",
@@ -46,7 +50,7 @@ const iconTone: Record<string, string> = {
   settings: "bg-teal-100 text-teal-700 dark:bg-teal-950/50 dark:text-teal-200",
 };
 
-const analyticsKeys = new Set(["overview", "orders", "analytics"]);
+const analyticsKeys = new Set(["overview", "orders", "analytics", "adEvents"]);
 
 const comingSoonHrefs = new Set([
   "/dashboard/marketing",
@@ -78,12 +82,38 @@ const icons: Record<string, ReactNode> = {
       <path d="M4 19V10M10 19V5M16 19v-7M22 19H2" />
     </Icon>
   ),
+  adEvents: (
+    <Icon>
+      <path d="M4 14l4-4 3 3 5-6 4 4" />
+      <path d="M4 19h16" />
+    </Icon>
+  ),
   connections: (
     <Icon>
       <circle cx="7" cy="12" r="2.2" />
       <circle cx="17" cy="7" r="2.2" />
       <circle cx="17" cy="17" r="2.2" />
       <path d="M9 11.2 15 8.2M9 12.8l6 3" />
+    </Icon>
+  ),
+  shipping: (
+    <Icon>
+      <path d="M3 7h11v8H3z" />
+      <path d="M14 10h4l3 3v2h-7" />
+      <circle cx="7" cy="17.5" r="1.6" />
+      <circle cx="17" cy="17.5" r="1.6" />
+    </Icon>
+  ),
+  customCarrier: (
+    <Icon>
+      <circle cx="12" cy="12" r="8" />
+      <path d="M12 8v8M8 12h8" />
+    </Icon>
+  ),
+  workflow: (
+    <Icon>
+      <path d="M5 7h6v4H5zM13 13h6v4h-6z" />
+      <path d="M8 11v2h5v-2" />
     </Icon>
   ),
   tracking: (
@@ -302,6 +332,17 @@ export function DashboardSidebar({
   );
 }
 
+function TruckIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-4 shrink-0" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M3 7h11v8H3z" />
+      <path d="M14 10h4l3 3v2h-7" />
+      <circle cx="7" cy="17.5" r="1.6" />
+      <circle cx="17" cy="17.5" r="1.6" />
+    </svg>
+  );
+}
+
 function GroupRow({
   group,
   collapsed,
@@ -327,16 +368,16 @@ function GroupRow({
       href={group.href}
       prefetch
       aria-current={active ? "page" : undefined}
-      className={`relative inline-flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-xl px-3 text-sm font-medium ${
+      className={`group relative inline-flex min-h-12 min-w-0 flex-1 items-center gap-3 rounded-xl px-3 text-sm font-medium transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
         collapsed ? "justify-center" : ""
-      } ${active ? "bg-primary text-primary-foreground" : "text-muted hover:bg-surface-muted hover:text-foreground"}`}
+      } ${active ? "bg-indigo-50 text-primary dark:bg-indigo-950/50" : "text-muted hover:bg-surface-muted hover:text-foreground"}`}
     >
       {active ? (
-        <span aria-hidden className="absolute inset-y-2 start-0 w-1 rounded-full bg-white" />
+        <span aria-hidden className="absolute inset-y-2 start-0 w-1 rounded-full bg-primary" />
       ) : null}
       <span
-        className={`inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${
-          active ? "bg-white/15 text-white" : iconTone[group.key] ?? iconTone.overview
+        className={`nav-icon inline-flex size-8 shrink-0 items-center justify-center rounded-lg ${
+          active ? "bg-white text-primary shadow-soft" : iconTone[group.key] ?? iconTone.overview
         }`}
       >
         {icons[group.key]}
@@ -361,7 +402,7 @@ function GroupRow({
             <svg
               viewBox="0 0 24 24"
               aria-hidden
-              className={`size-4 transition-transform ${expanded ? "rotate-90" : ""}`}
+              className={`size-4 transition-transform duration-200 ${expanded ? "rotate-90" : "rtl:-scale-x-100"}`}
               fill="none"
               stroke="currentColor"
               strokeWidth="1.8"
@@ -391,6 +432,7 @@ function GroupRow({
                     }`}
                   >
                     <span className="inline-flex items-center gap-2">
+                      {link.href === "/dashboard/admin/shipping" ? <TruckIcon /> : null}
                       {childLabel(link.labelKey)}
                       {comingSoonHrefs.has(link.href) ? <ComingSoonBadge /> : null}
                     </span>

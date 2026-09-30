@@ -58,6 +58,9 @@ export async function createVideo(input: VideoInput): Promise<VideoBlock> {
   const user = await assertAdmin();
   const row = normalizeInput(input);
   const db = createDatabaseClient();
+  if (row.is_active) {
+    await deactivatePlacement(db, row.placement);
+  }
   const { data, error } = await db
     .from("video_blocks")
     .insert({ ...row, created_by: user.id })
@@ -75,6 +78,9 @@ export async function updateVideo(id: string, input: VideoInput): Promise<VideoB
   await assertAdmin();
   const row = normalizeInput(input);
   const db = createDatabaseClient();
+  if (row.is_active) {
+    await deactivatePlacement(db, row.placement, id);
+  }
   const { data, error } = await db.from("video_blocks").update(row).eq("id", id).select("*").single();
 
   if (error || !data) {
@@ -106,6 +112,21 @@ async function assertAdmin() {
   }
 
   return user;
+}
+
+async function deactivatePlacement(
+  db: ReturnType<typeof createDatabaseClient>,
+  placement: VideoPlacement,
+  exceptId?: string,
+) {
+  let query = db.from("video_blocks").update({ is_active: false }).eq("placement", placement).eq("is_active", true);
+  if (exceptId) {
+    query = query.neq("id", exceptId);
+  }
+  const { error } = await query;
+  if (error && !isMissingTable(error)) {
+    throw new Error(error.message);
+  }
 }
 
 function normalizeInput(input: VideoInput) {

@@ -28,7 +28,11 @@ export default async function SignupPage({
     <div className="space-y-4">
     <BackButton href="/" label={common("back")} />
     <Card title={t("signupTitle")} description={t("signupDescription")} backdrop>
-      <SignupForm errorMessage={errorMessage} infoMessage={infoMessage} />
+      <SignupForm
+        errorMessage={errorMessage}
+        infoMessage={infoMessage}
+        showEmailExists={params.error === "signup_failed"}
+      />
     </Card>
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ConnectionStatusBadge } from "./connection-status-badge";
@@ -29,6 +29,7 @@ const ERROR_REASONS = [
 
 export function YouCanConnectForm() {
   const searchParams = useSearchParams();
+  const locale = useLocale();
   const t = useTranslations("connections.youcan");
   const connections = useTranslations("connections");
   const errors = useTranslations("errors.youcan");
@@ -106,6 +107,14 @@ export function YouCanConnectForm() {
             type="button"
             variant="outline"
             onClick={async () => {
+              const confirmed = window.confirm(
+                locale === "ar"
+                  ? "هل أنت متأكد من قطع الاتصال؟ بعد قطع الاتصال لن يستقبل Confirma طلبات هذا المتجر حتى تعيد ربطه."
+                  : "Are you sure you want to disconnect? Once disconnected, Confirma will not receive orders from this store until you connect it again.",
+              );
+              if (!confirmed) {
+                return;
+              }
               const response = await fetch("/api/integrations/youcan/disconnect", {
                 method: "POST",
               });

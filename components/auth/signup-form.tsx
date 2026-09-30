@@ -1,5 +1,6 @@
 "use client";
 
+import { useFormStatus } from "react-dom";
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -11,9 +12,11 @@ import { signupAction } from "@/lib/auth/actions";
 export function SignupForm({
   errorMessage,
   infoMessage,
+  showEmailExists,
 }: {
   errorMessage: string | null;
   infoMessage: string | null;
+  showEmailExists?: boolean;
 }) {
   const t = useTranslations("auth");
   const [showPassword, setShowPassword] = useState(false);
@@ -29,7 +32,7 @@ export function SignupForm({
     const confirmPassword = String(data.get("confirmPassword") ?? "");
     const next: Record<string, string> = {};
 
-    if (!/^[a-z0-9]{3,}$/.test(username)) {
+    if (!/^[a-z0-9-]{3,}$/.test(username)) {
       next.username = t("usernameInvalid");
     }
     if (!fullName) {
@@ -39,7 +42,7 @@ export function SignupForm({
       next.email = t("errors.missing_fields");
     }
     if (password.length < 8) {
-      next.password = t("passwordTooShort");
+      next.password = t("weakPassword");
     }
     if (password !== confirmPassword) {
       next.confirmPassword = t("errors.password_mismatch");
@@ -79,6 +82,7 @@ export function SignupForm({
         name="username"
         autoComplete="username"
         placeholder={t("usernamePlaceholder")}
+        helperText={t("usernameHint")}
         required
         error={errors.username}
       />
@@ -125,11 +129,10 @@ export function SignupForm({
       {errorMessage ? (
         <Toast tone="danger" role="alert">
           {errorMessage}
+          {showEmailExists ? ` ${t("emailExists")}` : ""}
         </Toast>
       ) : null}
-      <Button type="submit" className="w-full">
-        {t("createAccount")}
-      </Button>
+      <SignupSubmit label={t("createAccount")} pendingLabel={t("submitting")} />
       <button
         type="button"
         disabled
@@ -146,5 +149,22 @@ export function SignupForm({
         </Link>
       </p>
     </form>
+  );
+}
+
+function SignupSubmit({ label, pendingLabel }: { label: string; pendingLabel: string }) {
+  const { pending } = useFormStatus();
+
+  return (
+    <div className="space-y-2">
+      {pending ? (
+        <p className="text-sm text-muted" role="status" aria-live="polite">
+          {pendingLabel}
+        </p>
+      ) : null}
+      <Button type="submit" className="w-full" loading={pending} disabled={pending} aria-busy={pending}>
+        {pending ? pendingLabel : label}
+      </Button>
+    </div>
   );
 }

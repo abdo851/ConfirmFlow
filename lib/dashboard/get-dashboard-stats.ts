@@ -1,5 +1,6 @@
 import "server-only";
 
+import { getAuthenticatedUser } from "@/lib/auth/session";
 import { createUserDatabaseClient } from "@/lib/database/user-client";
 import {
   computeDashboardStats,
@@ -13,10 +14,12 @@ export async function getDashboardStats(input: {
   date_range: DashboardDateRange;
 }): Promise<DashboardStats> {
   const db = await createUserDatabaseClient();
+  const sessionUser = await getAuthenticatedUser();
+  const ownerId = sessionUser?.id ?? input.owner_id;
   const { data, error } = await db
     .from("orders")
     .select("confirmation_status, received_at, confirmed_at, total_amount_minor")
-    .eq("owner_id", input.owner_id);
+    .eq("owner_id", ownerId);
 
   if (error) {
     throw new Error("Unable to load dashboard stats.");

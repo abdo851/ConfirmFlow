@@ -152,6 +152,7 @@ async function attemptMetaPurchaseSend(input: {
   }
 
   const client = new MetaCapiClient(input.transport ?? defaultMetaCapiTransport);
+  const requestPayload = client.buildPayload(validated.value);
   const url = client.buildEventsUrl(eligibility.connection.pixelId);
   logger.info("meta_delivery_http_request", {
     order_id: input.order.id,
@@ -181,6 +182,9 @@ async function attemptMetaPurchaseSend(input: {
     return {
       status: "sent",
       eventId: claimed.event_id,
+      payload: requestPayload,
+      httpStatus: sendResult.status,
+      responseSummary: pickResponseSummary(sendResult.body),
     };
   }
 
@@ -199,7 +203,20 @@ async function attemptMetaPurchaseSend(input: {
     status: "failed",
     eventId: claimed.event_id,
     message: failureMessage,
+    payload: requestPayload,
+    httpStatus: sendResult.status,
+    responseSummary: pickResponseSummary(sendResult.body),
   };
+}
+
+function pickResponseSummary(body: unknown): unknown {
+  if (!body || typeof body !== "object" || Array.isArray(body)) return null;
+  const source = body as Record<string, unknown>;
+  const summary: Record<string, unknown> = {};
+  if ("events_received" in source) summary.events_received = source.events_received;
+  if ("messages" in source) summary.messages = source.messages;
+  if ("error" in source) summary.error = source.error;
+  return Object.keys(summary).length > 0 ? summary : null;
 }
 
 export async function processMetaPurchaseDelivery(input: {

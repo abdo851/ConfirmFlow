@@ -118,6 +118,7 @@ export async function POST(
   }
 
   let delivery: PurchaseDeliveryOutcome | null = null;
+  // ads-only resend on already_confirmed; do NOT attach shipping here
   if (result.status === "confirmed" || result.status === "already_confirmed") {
     delivery = await runPurchaseDeliveryAfterConfirmation({
       orderId: result.orderId ?? orderId.trim(),

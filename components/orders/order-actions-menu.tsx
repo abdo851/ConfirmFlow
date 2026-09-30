@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -49,9 +49,10 @@ export function OrderActionsMenu({
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [menuStyle, setMenuStyle] = useState<{ top: number; left: number } | null>(null);
+  const [prompt, setPrompt] = useState<Extract<MenuKey, "rejected" | "archived"> | null>(null);
+  const [menuStyle, setMenuStyle] = useState<{ top: number; left: number; above: boolean } | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!open) {
       return;
     }
@@ -63,11 +64,31 @@ export function OrderActionsMenu({
       }
       const width = 224;
       const margin = 8;
+      const menuHeight = menuRef.current?.offsetHeight ?? 380;
       const rtl = document.documentElement.dir === "rtl";
       const rawLeft = rtl ? rect.left : rect.right - width;
       const left = Math.min(Math.max(margin, rawLeft), window.innerWidth - width - margin);
-      const top = rect.bottom + margin;
-      setMenuStyle({ top, left });
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      const above = spaceBelow < menuHeight + margin && spaceAbove > spaceBelow;
+      const top = above
+        ? Math.max(margin, rect.top - menuHeight - margin)
+        : Math.min(rect.bottom + margin, window.innerHeight - menuHeight - margin);
+      setMenuStyle({ top, left, above });
+    }
+
+    place();
+    const frame = requestAnimationFrame(place);
+    window.addEventListener("resize", place);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("resize", place);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) {
+      return;
     }
 
     function onPointer(event: MouseEvent) {
@@ -86,16 +107,13 @@ export function OrderActionsMenu({
       setOpen(false);
     }
 
-    place();
     document.addEventListener("mousedown", onPointer);
     document.addEventListener("keydown", onKey);
     window.addEventListener("scroll", onScroll, true);
-    window.addEventListener("resize", place);
     return () => {
       document.removeEventListener("mousedown", onPointer);
       document.removeEventListener("keydown", onKey);
       window.removeEventListener("scroll", onScroll, true);
-      window.removeEventListener("resize", place);
     };
   }, [open]);
 
@@ -119,6 +137,11 @@ export function OrderActionsMenu({
     if (!enabled(key)) {
       return;
     }
+    if (key === "rejected" || key === "archived") {
+      setPrompt(key);
+      setOpen(false);
+      return;
+    }
     setPending(true);
     setError(null);
     try {
@@ -131,16 +154,30 @@ export function OrderActionsMenu({
         onConfirmed?.(result.confirmedAt);
         router.refresh();
         setOpen(false);
-        return;
       }
+    } catch {
+      setError(t("errors.unexpected"));
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function applyPrompt() {
+    if (!prompt) {
+      return;
+    }
+    const key = prompt;
+    setPending(true);
+    setError(null);
+    try {
       if (key === "rejected") {
         await rejectOrderAction(orderId);
       }
       if (key === "archived") {
         await archiveOrderAction(orderId);
       }
+      setPrompt(null);
       router.refresh();
-      setOpen(false);
     } catch {
       setError(t("errors.unexpected"));
     } finally {
@@ -174,7 +211,9 @@ export function OrderActionsMenu({
           id={menuId}
           role="menu"
           style={{ top: menuStyle.top, left: menuStyle.left }}
-          className="fixed z-[80] w-56 rounded-2xl border border-line bg-surface p-1 shadow-large"
+          className={`fixed z-[80] w-56 rounded-2xl border border-line bg-surface p-1 shadow-large ${
+            menuStyle.above ? "orders-pop-above" : "orders-pop-below"
+          }`}
         >
           {ITEMS.map((key) => {
             const soon = COMING_SOON.has(key);
@@ -203,6 +242,31 @@ export function OrderActionsMenu({
           )
         : null}
       {error ? <p className="mt-1 max-w-56 text-xs text-rose-700">{error}</p> : null}
+      {prompt
+        ? createPortal(
+            <div className="fixed inset-0 z-[90] flex items-end justify-center bg-slate-950/40 p-4 sm:items-center">
+              <div
+                role="dialog"
+                aria-modal="true"
+                className="w-full max-w-sm rounded-2xl border border-line bg-surface p-5 shadow-large"
+              >
+                <h2 className="text-base font-semibold">{t("statusConfirm.title")}</h2>
+                <p className="mt-2 text-sm leading-6 text-muted">
+                  {t("statusConfirm.body", { status: t(`actionsMenu.${prompt}`) })}
+                </p>
+                <div className="mt-5 flex flex-wrap justify-end gap-2">
+                  <Button type="button" variant="outline" onClick={() => setPrompt(null)} disabled={pending}>
+                    {t("statusConfirm.cancel")}
+                  </Button>
+                  <Button type="button" loading={pending} onClick={() => void applyPrompt()}>
+                    {t("statusConfirm.confirm")}
+                  </Button>
+                </div>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }

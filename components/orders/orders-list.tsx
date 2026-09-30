@@ -1,29 +1,44 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { Card } from "@/components/ui/card";
 import { Toast } from "@/components/ui/toast";
 import { applyOrderConfirmation } from "@/lib/orders/confirm-client";
 import { OrderActionsMenu } from "./order-actions-menu";
+import { OrdersPagination } from "./orders-pagination";
+import { OrdersToolbar } from "./orders-toolbar";
 import {
   formatMoneyMinor,
   formatOrderCustomerContact,
   formatOrderDisplayIdentifier,
 } from "@/lib/orders/format";
-import type { MerchantOrderListItem } from "@/lib/orders/types";
+import {
+  ORDER_TABS,
+  ordersListHref,
+  ordersQueryHasFilters,
+  type OrderTab,
+  type ResolvedOrdersListQuery,
+} from "@/lib/orders/list-query";
+import type { MerchantOrderListItem, OrderProvider } from "@/lib/orders/types";
+import type { OrderProductOption } from "@/lib/orders/products";
 import { EmptyState } from "@/components/ui/empty-state";
 import { OrderStatusBadge } from "./order-status-badge";
 
 interface OrdersListProps {
   initialOrders: MerchantOrderListItem[];
+  total: number;
+  page: number;
+  query: ResolvedOrdersListQuery;
+  products: OrderProductOption[];
 }
 
-const TABS = ["all", "new", "confirmed", "rejected", "archived"] as const;
-type OrderTab = (typeof TABS)[number];
-const PAGE_SIZE = 8;
+const STORE_LOGO: Record<OrderProvider, string> = {
+  woocommerce: "/brands/woocommerce.svg",
+  youcan: "/brands/youcan.svg",
+  shopify: "/brands/shopify.svg",
+};
 
 function matchesTab(status: MerchantOrderListItem["confirmationStatus"], tab: OrderTab) {
   if (tab === "all") {
@@ -32,229 +47,218 @@ function matchesTab(status: MerchantOrderListItem["confirmationStatus"], tab: Or
   if (tab === "new") {
     return status === "pending";
   }
-  if (tab === "confirmed") {
-    return status === "confirmed";
-  }
-  if (tab === "rejected") {
-    return status === "rejected";
-  }
-  if (tab === "archived") {
-    return status === "archived";
-  }
-  return false;
+  return status === tab;
 }
 
-function statusToTab(status: string | null): OrderTab {
-  if (status === "confirmed" || status === "rejected" || status === "archived") {
-    return status;
-  }
-  if (status === "pending") {
-    return "new";
-  }
-  return "all";
-}
-
-export function OrdersList({ initialOrders }: OrdersListProps) {
+export function OrdersList(props: OrdersListProps) {
   return (
     <Suspense fallback={null}>
-      <OrdersListBody initialOrders={initialOrders} />
+      <OrdersListBody {...props} />
     </Suspense>
   );
 }
 
-function OrdersListBody({ initialOrders }: OrdersListProps) {
+function StoreMark({ provider }: { provider: OrderProvider | null }) {
   const t = useTranslations("orders");
-  const searchParams = useSearchParams();
-  const status = searchParams.get("status");
+  if (!provider) {
+    return null;
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5 text-xs text-muted">
+      <span
+        aria-hidden
+        className="size-4 shrink-0 bg-contain bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${STORE_LOGO[provider]})` }}
+      />
+      <span>{t(`stores.${provider}`)}</span>
+    </span>
+  );
+}
+
+function OrdersListBody({ initialOrders, total, page, query, products }: OrdersListProps) {
+  const t = useTranslations("orders");
   const [orders, setOrders] = useState(initialOrders);
   const [successOrderId, setSuccessOrderId] = useState<string | null>(null);
-  const [tab, setTab] = useState<OrderTab>(statusToTab(status));
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const router = useRouter();
+  const hasFilters = ordersQueryHasFilters(query);
 
   useEffect(() => {
-    setTab(statusToTab(status));
-    setVisibleCount(PAGE_SIZE);
-  }, [status]);
+    setOrders(initialOrders);
+    setSuccessOrderId(null);
+  }, [initialOrders]);
 
-  const filtered = orders.filter((order) => matchesTab(order.confirmationStatus, tab));
-  const visible = filtered.slice(0, visibleCount);
-
-  if (orders.length === 0) {
-    return (
-      <Card title={t("emptyTitle")} description={t("emptyDescription")}>
-        <EmptyState title={t("emptyTitle")} description={t("emptyDescription")} />
-      </Card>
-    );
-  }
+  const visible = orders.filter((order) => matchesTab(order.confirmationStatus, query.tab));
 
   return (
-    <div className="space-y-4">
-      <div className="flex gap-2 overflow-x-auto pb-1" role="tablist">
-        {TABS.map((item) => {
-          const count =
-            item === "all"
-              ? orders.length
-              : orders.filter((order) => matchesTab(order.confirmationStatus, item)).length;
-          const active = tab === item;
+    <div className="space-y-5">
+      <OrdersToolbar query={query} products={products} />
+
+      <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label={t("tabs.label")}>
+        {ORDER_TABS.map((item) => {
+          const active = query.tab === item;
           return (
-            <button
+            <Link
               key={item}
-              type="button"
+              href={ordersListHref(query, { tab: item, page: 1 })}
               role="tab"
               aria-selected={active}
-              className={`pressable inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl px-3 text-sm font-medium ${
+              className={`pressable inline-flex min-h-11 shrink-0 items-center rounded-xl px-3 text-sm font-medium transition-colors duration-200 ${
                 active ? "tab-active" : "border border-line bg-surface text-foreground"
               }`}
-              onClick={() => {
-                setTab(item);
-                setVisibleCount(PAGE_SIZE);
-              }}
             >
               {t(`tabs.${item}`)}
-              <span className={`rounded-full px-1.5 text-xs ${active ? "bg-white/20" : "bg-surface-muted"}`}>
-                {count}
-              </span>
-            </button>
+            </Link>
           );
         })}
       </div>
 
-      {visible.length === 0 ? (
-        <EmptyState title={t("filterEmpty")} description={t("emptyDescription")} />
+      {total === 0 && !hasFilters ? (
+        <Card title={t("emptyTitle")} description={t("emptyDescription")}>
+          <EmptyState title={t("emptyTitle")} description={t("emptyDescription")} />
+        </Card>
       ) : null}
 
-      <div className="grid gap-3 md:hidden">
-        {visible.map((order) => {
-          const customer = formatOrderCustomerContact(order);
+      {total === 0 && hasFilters ? (
+        <EmptyState title={t("filterEmptyTitle")} description={t("filterEmptyDescription")} />
+      ) : null}
 
-          return (
-            <article
-              key={order.id}
-              className="cursor-pointer rounded-2xl border border-line bg-surface p-4 shadow-soft"
-              onClick={() => router.push(`/dashboard/orders/${order.id}`)}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <Link
-                  href={`/dashboard/orders/${order.id}`}
-                  className="text-sm font-semibold underline"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  {formatOrderDisplayIdentifier(order)}
-                </Link>
-                <OrderStatusBadge status={order.confirmationStatus} />
-              </div>
-              <dl className="mt-3 space-y-2 text-sm">
-                <div className="flex justify-between gap-3">
-                  <dt className="text-muted">{t("columns.customer")}</dt>
-                  <dd>{customer ?? t("customerUnavailable")}</dd>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="text-muted">{t("columns.total")}</dt>
-                  <dd>{formatMoneyMinor(order.totalAmountMinor, order.currency)}</dd>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="text-muted">{t("columns.received")}</dt>
-                  <dd>{new Date(order.receivedAt).toLocaleString()}</dd>
-                </div>
-              </dl>
-              <div className="mt-4">
-                <OrderActionsMenu
-                  orderId={order.id}
-                  confirmationStatus={order.confirmationStatus}
-                  onConfirmed={(confirmedAt) => {
-                    setOrders((current) => applyOrderConfirmation(current, order.id, confirmedAt));
-                    setSuccessOrderId(order.id);
-                  }}
-                />
-                {successOrderId === order.id ? <Toast tone="success">{t("confirmSuccess")}</Toast> : null}
-              </div>
-            </article>
-          );
-        })}
-      </div>
+      {total > 0 && visible.length === 0 ? (
+        <EmptyState title={t("filterEmptyTitle")} description={t("filterEmptyDescription")} />
+      ) : null}
 
-      <div className="hidden overflow-x-auto rounded-2xl border border-line bg-surface shadow-soft md:block">
-        <table className="min-w-full divide-y divide-line">
-          <thead className="sticky top-0 bg-surface-muted">
-            <tr>
-              <th className="px-4 py-3 text-start text-xs font-semibold tracking-wide text-muted uppercase">
-                {t("columns.order")}
-              </th>
-              <th className="px-4 py-3 text-start text-xs font-semibold tracking-wide text-muted uppercase">
-                {t("columns.customer")}
-              </th>
-              <th className="px-4 py-3 text-start text-xs font-semibold tracking-wide text-muted uppercase">
-                {t("columns.total")}
-              </th>
-              <th className="px-4 py-3 text-start text-xs font-semibold tracking-wide text-muted uppercase">
-                {t("columns.received")}
-              </th>
-              <th className="px-4 py-3 text-start text-xs font-semibold tracking-wide text-muted uppercase">
-                {t("columns.status")}
-              </th>
-              <th className="px-4 py-3 text-start text-xs font-semibold tracking-wide text-muted uppercase">
-                {t("columns.action")}
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-line">
-            {visible.map((order) => {
-              const customer = formatOrderCustomerContact(order);
-
-              return (
-                <tr
-                  key={order.id}
-                  className="cursor-pointer transition-colors duration-150 hover:bg-surface-muted/70"
-                  onClick={() => router.push(`/dashboard/orders/${order.id}`)}
-                >
-                  <td className="px-4 py-4 text-sm font-medium">
+      {visible.length > 0 ? (
+        <div className="animate-fade-in grid gap-3 md:hidden">
+          {visible.map((order) => {
+            const customer = formatOrderCustomerContact(order);
+            return (
+              <article
+                key={order.id}
+                className="cursor-pointer rounded-2xl border border-line bg-surface p-4 shadow-soft transition-colors duration-200 hover:bg-indigo-50/40"
+                onClick={() => router.push(`/dashboard/orders/${order.id}`)}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="space-y-1">
                     <Link
                       href={`/dashboard/orders/${order.id}`}
-                      className="underline"
+                      className="text-sm font-semibold underline"
                       onClick={(event) => event.stopPropagation()}
                     >
                       {formatOrderDisplayIdentifier(order)}
                     </Link>
-                  </td>
-                  <td className="px-4 py-4 text-sm text-muted">
-                    {customer ?? t("customerUnavailable")}
-                  </td>
-                  <td className="px-4 py-4 text-sm">
-                    {formatMoneyMinor(order.totalAmountMinor, order.currency)}
-                  </td>
-                  <td className="px-4 py-4 text-sm text-muted">
-                    {new Date(order.receivedAt).toLocaleString()}
-                  </td>
-                  <td className="px-4 py-4">
-                    <OrderStatusBadge status={order.confirmationStatus} />
-                  </td>
-                  <td className="px-4 py-4">
-                    <OrderActionsMenu
-                      orderId={order.id}
-                      confirmationStatus={order.confirmationStatus}
-                      onConfirmed={(confirmedAt) => {
-                        setOrders((current) => applyOrderConfirmation(current, order.id, confirmedAt));
-                        setSuccessOrderId(order.id);
-                      }}
-                    />
-                    {successOrderId === order.id ? <Toast tone="success">{t("confirmSuccess")}</Toast> : null}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-      {filtered.length > visible.length ? (
-        <button
-          type="button"
-          className="pressable min-h-11 rounded-xl border border-line px-4 text-sm font-medium"
-          onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
-        >
-          {t("loadMore")}
-        </button>
+                    <StoreMark provider={order.provider} />
+                  </div>
+                  <OrderStatusBadge status={order.confirmationStatus} />
+                </div>
+                <dl className="mt-3 space-y-2 text-sm">
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-muted">{t("columns.customer")}</dt>
+                    <dd>{customer ?? t("customerUnavailable")}</dd>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-muted">{t("columns.total")}</dt>
+                    <dd>{formatMoneyMinor(order.totalAmountMinor, order.currency)}</dd>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-muted">{t("columns.received")}</dt>
+                    <dd>{new Date(order.receivedAt).toLocaleString()}</dd>
+                  </div>
+                </dl>
+                <div className="mt-4">
+                  <OrderActionsMenu
+                    orderId={order.id}
+                    confirmationStatus={order.confirmationStatus}
+                    onConfirmed={(confirmedAt) => {
+                      setOrders((current) => applyOrderConfirmation(current, order.id, confirmedAt));
+                      setSuccessOrderId(order.id);
+                    }}
+                  />
+                  {successOrderId === order.id ? <Toast tone="success">{t("confirmSuccess")}</Toast> : null}
+                </div>
+              </article>
+            );
+          })}
+        </div>
       ) : null}
+
+      {visible.length > 0 ? (
+        <div className="animate-fade-in hidden max-h-[min(70vh,52rem)] overflow-auto rounded-2xl border border-line bg-surface shadow-soft md:block">
+          <table className="min-w-full border-separate border-spacing-0">
+            <thead className="sticky top-0 z-10">
+              <tr>
+                {(
+                  [
+                    ["order", t("columns.order")],
+                    ["customer", t("columns.customer")],
+                    ["total", t("columns.total")],
+                    ["received", t("columns.received")],
+                    ["status", t("columns.status")],
+                    ["action", t("columns.action")],
+                  ] as const
+                ).map(([key, label]) => (
+                  <th
+                    key={key}
+                    className="border-b border-line bg-surface-muted px-4 py-3.5 text-start text-xs font-semibold tracking-wide text-muted uppercase"
+                  >
+                    {label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {visible.map((order, index) => {
+                const customer = formatOrderCustomerContact(order);
+                return (
+                  <tr
+                    key={order.id}
+                    className={`data-row cursor-pointer transition-colors duration-200 hover:bg-indigo-50/70 dark:hover:bg-white/5 ${
+                      index % 2 === 1 ? "bg-slate-50/80 dark:bg-white/[0.03]" : "bg-surface"
+                    }`}
+                    onClick={() => router.push(`/dashboard/orders/${order.id}`)}
+                  >
+                    <td className="border-b border-line/80 px-4 py-4 text-sm font-medium">
+                      <div className="flex flex-col gap-1">
+                        <Link
+                          href={`/dashboard/orders/${order.id}`}
+                          className="underline"
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          {formatOrderDisplayIdentifier(order)}
+                        </Link>
+                        <StoreMark provider={order.provider} />
+                      </div>
+                    </td>
+                    <td className="border-b border-line/80 px-4 py-4 text-sm text-muted">
+                      {customer ?? t("customerUnavailable")}
+                    </td>
+                    <td className="border-b border-line/80 px-4 py-4 text-sm">
+                      {formatMoneyMinor(order.totalAmountMinor, order.currency)}
+                    </td>
+                    <td className="border-b border-line/80 px-4 py-4 text-sm text-muted">
+                      {new Date(order.receivedAt).toLocaleString()}
+                    </td>
+                    <td className="border-b border-line/80 px-4 py-4">
+                      <OrderStatusBadge status={order.confirmationStatus} />
+                    </td>
+                    <td className="border-b border-line/80 px-4 py-4">
+                      <OrderActionsMenu
+                        orderId={order.id}
+                        confirmationStatus={order.confirmationStatus}
+                        onConfirmed={(confirmedAt) => {
+                          setOrders((current) => applyOrderConfirmation(current, order.id, confirmedAt));
+                          setSuccessOrderId(order.id);
+                        }}
+                      />
+                      {successOrderId === order.id ? <Toast tone="success">{t("confirmSuccess")}</Toast> : null}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
+
+      {total > 0 ? <OrdersPagination query={query} total={total} page={page} /> : null}
     </div>
   );
 }

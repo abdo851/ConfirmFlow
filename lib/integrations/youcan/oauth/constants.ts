@@ -1,4 +1,5 @@
-export const YOUCAN_OAUTH_DEFAULT_SCOPES = "read-orders,read-products";
+export const YOUCAN_OAUTH_DEFAULT_SCOPES =
+  "read-orders,read-products,read-rest-hooks,edit-rest-hooks";
 
 export const YOUCAN_OAUTH_STATE_COOKIE = "youcan_oauth_state";
 export const YOUCAN_CONNECTING_COOKIE = "youcan_connecting";

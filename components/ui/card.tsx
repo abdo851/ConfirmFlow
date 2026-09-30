@@ -21,7 +21,7 @@ export function Card({
 }: CardProps) {
   return (
     <section
-      className={`rounded-2xl border border-line p-4 shadow-soft sm:p-6 ${
+      className={`rounded-2xl border border-line p-6 shadow-soft ${
         backdrop
           ? "bg-white/80 backdrop-blur-xl dark:bg-slate-950/75"
           : "bg-surface"

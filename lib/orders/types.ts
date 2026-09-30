@@ -5,6 +5,14 @@
 
 export type OrderProvider = "shopify" | "youcan" | "woocommerce";
 
+export interface OrderLineItem {
+  name: string | null;
+  quantity: number | null;
+  sku: string | null;
+  imageUrl?: string | null;
+  productId?: string | null;
+}
+
 /** Confirmation lifecycle states for Confirma orders. */
 export type OrderConfirmationStatus = "pending" | "confirmed" | "rejected" | "archived";
 
@@ -18,6 +26,10 @@ export interface ConfirmaOrderInput {
   customerEmail: string | null;
   /** Stored for future confirmation workflows (WhatsApp/SMS). */
   customerPhone: string | null;
+  customerName?: string | null;
+  city?: string | null;
+  addressLine?: string | null;
+  lineItems?: OrderLineItem[] | null;
   currency: string;
   subtotalAmountMinor: number;
   totalAmountMinor: number;
@@ -40,6 +52,7 @@ export interface MerchantOrderListItem {
   id: string;
   orderNumber: string | null;
   externalOrderId: string;
+  provider: OrderProvider | null;
   customerEmail: string | null;
   customerPhone: string | null;
   currency: string;

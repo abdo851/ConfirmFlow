@@ -1,26 +1,47 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { OrdersList } from "@/components/orders";
+import { BackButton } from "@/components/ui/back-button";
 import { ExportOrdersButton } from "@/components/orders/export-orders-button";
+import { SectionHelp } from "@/components/dashboard/section-help";
 import { getOrdersForAuthenticatedUser } from "@/lib/orders/get-orders-for-user";
+import { getOrderProductsForAuthenticatedUser } from "@/lib/orders/get-order-products";
+import { parseOrdersListSearchParams } from "@/lib/orders/list-query";
+import { getVideoForPlacement } from "@/lib/videos/queries";
 
 export default async function DashboardOrdersPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale } = await params;
+  const raw = (await searchParams) ?? {};
+  const query = parseOrdersListSearchParams(raw);
   const t = await getTranslations("orders");
-  const result = await getOrdersForAuthenticatedUser();
+  const common = await getTranslations("common");
+  const result = await getOrdersForAuthenticatedUser({
+    provider: query.provider,
+    status: query.status,
+    from: query.from,
+    to: query.to,
+    productName: query.productName,
+    productSku: query.productSku,
+    page: query.page,
+  });
 
   if (!result) {
     return redirect({ href: "/login", locale });
   }
 
+  const products = await getOrderProductsForAuthenticatedUser({ provider: query.provider });
+  const ordersVideo = await getVideoForPlacement("orders");
   const { orders } = result;
 
   return (
-    <div className="animate-fade-in space-y-6 sm:space-y-8">
+    <div className="dash-stagger animate-fade-in space-y-8">
+      <BackButton href="/dashboard" label={common("back")} />
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl leading-[1.15] font-semibold tracking-tight sm:text-3xl">
@@ -30,9 +51,18 @@ export default async function DashboardOrdersPage({
             {t("pageDescription")}
           </p>
         </div>
-        <ExportOrdersButton />
+        <div className="flex items-center gap-2">
+          <SectionHelp video={ordersVideo} />
+          <ExportOrdersButton />
+        </div>
       </div>
-      <OrdersList initialOrders={orders} />
+      <OrdersList
+        initialOrders={orders}
+        total={result.total}
+        page={result.page}
+        query={query}
+        products={products}
+      />
     </div>
   );
 }

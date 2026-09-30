@@ -5,6 +5,7 @@
   "emptyDescription": "Orders from your connected store will appear here after they are received.",
   "columns": {
     "order": "Order",
+    "store": "Store",
     "customer": "Customer",
     "total": "Total",
     "received": "Received",
@@ -36,6 +37,7 @@
     "confirmed": "Confirmed"
   },
   "tabs": {
+    "label": "Status",
     "all": "All",
     "new": "New",
     "review": "In review",
@@ -43,6 +45,47 @@
     "rejected": "Rejected",
     "archived": "Archived"
   },
+  "stores": {
+    "label": "Store",
+    "all": "All stores",
+    "woocommerce": "WooCommerce",
+    "youcan": "YouCan",
+    "shopify": "Shopify",
+    "comingSoon": "Coming soon"
+  },
+  "dates": {
+    "label": "Date range",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "last7": "Last 7 days",
+    "last30": "Last 30 days",
+    "month": "This month",
+    "custom": "Custom range",
+    "clear": "Clear",
+    "apply": "Apply",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month"
+  },
+  "pagination": {
+    "label": "Orders pages",
+    "showing": "Showing {from}–{to} of {total} orders",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "products": {
+    "label": "Product",
+    "search": "Search products",
+    "empty": "No products yet",
+    "clear": "Clear"
+  },
+  "statusConfirm": {
+    "title": "Change order status?",
+    "body": "This updates the order to {status}.",
+    "confirm": "Update status",
+    "cancel": "Cancel"
+  },
+  "filterEmptyTitle": "No orders match your filters",
+  "filterEmptyDescription": "Try another store, status, or date range.",
   "filterEmpty": "No orders in this status.",
   "loadMore": "Load more",
   "errors": {
@@ -54,7 +97,7 @@
   },
   "actionsMenu": {
     "label": "Actions",
-    "soon": "قريباً",
+    "soon": "Coming soon",
     "current": "Current",
     "pending": "In review",
     "confirmed": "Confirmed",

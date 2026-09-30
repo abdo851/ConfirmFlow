@@ -8,6 +8,7 @@
     "persistence_failed": "تعذر حفظ اتصال YouCan. يرجى المحاولة مرة أخرى.",
     "webhook_registration_failed": "تم ربط YouCan، لكن فشل تسجيل webhook.",
     "store_slug_mismatch": "متجر YouCan المصرّح به لا يطابق المعرّف الذي أدخلته.",
+    "store_limit": "هذا الحساب مرتبط بثلاثة متاجر YouCan بالفعل. اقطع اتصال أحدها قبل إضافة متجر آخر.",
     "unauthorized": "غير مصرح",
     "statusReadFailed": "تعذر قراءة حالة اتصال YouCan."
   },
@@ -18,6 +19,7 @@
     "token_exchange_failed": "فشل تبادل رمز Shopify.",
     "configuration": "إعداد OAuth لـ Shopify غير صحيح.",
     "persistence_failed": "تعذر حفظ اتصال Shopify. يرجى المحاولة مرة أخرى.",
+    "store_limit": "هذا الحساب مرتبط بثلاثة متاجر Shopify بالفعل. اقطع اتصال أحدها قبل إضافة متجر آخر.",
     "unauthorized": "غير مصرح",
     "statusReadFailed": "تعذر قراءة حالة اتصال Shopify."
   }

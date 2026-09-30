@@ -39,7 +39,8 @@
   "woocommerceReasons": {
     "invalid_store": "Enter a valid WooCommerce store URL.",
     "callback_failed": "WooCommerce did not finish authorization.",
-    "invalid_state": "Authorization could not be verified. Please try again."
+    "invalid_state": "Authorization could not be verified. Please try again.",
+    "store_limit": "This account already has 3 WooCommerce stores. Disconnect one before adding another."
   },
   "storeProvider": "Store provider",
   "storeProviderLabel": "Store provider: {provider}",
@@ -93,6 +94,7 @@
   },
   "activeNow": "Active",
   "comingSoon": "Coming soon",
+  "shopifyLockedHint": "Shopify is coming soon.",
   "comingSoonSubtitle": "We are adding this platform soon.",
   "teamTitle": "Team",
   "waitlistNote": "Interested? Join the waitlist",

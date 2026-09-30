@@ -39,7 +39,8 @@
   "woocommerceReasons": {
     "invalid_store": "أدخل عنوان متجر WooCommerce صالحاً.",
     "callback_failed": "لم يكتمل تفويض WooCommerce.",
-    "invalid_state": "تعذر التحقق من التفويض. يرجى المحاولة مرة أخرى."
+    "invalid_state": "تعذر التحقق من التفويض. يرجى المحاولة مرة أخرى.",
+    "store_limit": "هذا الحساب مرتبط بثلاثة متاجر WooCommerce بالفعل. اقطع اتصال أحدها قبل إضافة متجر آخر."
   },
   "storeProvider": "مزود المتجر",
   "storeProviderLabel": "مزود المتجر: {provider}",
@@ -93,6 +94,7 @@
   },
   "activeNow": "نشط",
   "comingSoon": "قريباً",
+  "shopifyLockedHint": "Shopify قريباً.",
   "comingSoonSubtitle": "نعمل على إضافة هذه المنصة قريباً",
   "teamTitle": "الفريق",
   "waitlistNote": "هل أنت مهتم بهذه المنصة؟ انضم إلى قائمة الانتظار",

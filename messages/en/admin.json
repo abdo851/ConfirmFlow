@@ -72,12 +72,22 @@
     "cancel": "Cancel",
     "saved": "Saved.",
     "failed": "Could not save that video.",
+    "actions": "Actions",
     "placements": {
-      "landing_hero": "Landing hero",
-      "landing_below_hero": "Below the hero",
-      "onboarding_top": "Onboarding top",
-      "dashboard_top": "Dashboard top",
-      "global": "Global"
+      "overview": "Overview",
+      "orders": "Orders",
+      "analytics": "Analytics",
+      "connections": "Connections",
+      "shipping": "Shipping Companies",
+      "tracking": "Tracking",
+      "marketing": "Marketing",
+      "wallet": "Wallet",
+      "workflow": "Workflow",
+      "global": "Global",
+      "landing_hero": "Landing Hero",
+      "landing_below_hero": "Landing Below Hero",
+      "onboarding_top": "Onboarding Top",
+      "dashboard_top": "Dashboard Top"
     }
   }
 }

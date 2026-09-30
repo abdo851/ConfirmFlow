@@ -7,7 +7,7 @@ export default async function MarketingPage() {
   const nav = await getTranslations("navigation.sidebar");
 
   return (
-    <DashboardSection title={pages("marketingTitle")} description={pages("marketingDescription")}>
+    <DashboardSection title={pages("marketingTitle")} description={pages("marketingDescription")} helpPlacement="marketing">
       <NavCards
         items={[
           { href: "/dashboard/marketing/campaigns", title: nav("campaigns"), description: pages("comingSoon"), soon: true },
