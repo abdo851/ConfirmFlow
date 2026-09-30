@@ -39,6 +39,7 @@
     "directTitle": "Direct Integration Available",
     "soonTitle": "Coming Soon",
     "soonNote": "These providers will be available soon via new partnerships.",
+    "adminReviewNote": "You are an admin — you can review this page in the admin panel",
     "company": "Company",
     "logo": "Logo",
     "status": "Status",
@@ -55,6 +56,7 @@
     "coliixConnectSuccess": "Coliix API key saved.",
     "coliixConnectFailed": "Unable to connect Coliix.",
     "comingSoon": "Coming Soon",
+    "carrierSoonMessage": "This carrier is coming soon",
     "settings": "Settings",
     "confirmationTitle": "Confirmation Provider",
     "confirmationBody": "Connect your confirmation provider. Confirma will send confirmed orders automatically.",
@@ -74,6 +76,57 @@
       "forcelog": "National shipping through an API",
       "colis-swift": "Fast shipping for online stores"
     }
+  },
+  "customCarrier": {
+    "title": "Add Your Own Carrier",
+    "subtitle": "If your carrier is not in the list, you can connect it yourself via webhook or API.",
+    "recommended": "Recommended",
+    "optionWebhookTitle": "Webhook",
+    "optionWebhookBody": "We'll send confirmed order details to your webhook URL. You can forward it to your carrier using Zapier, Make, or your own server.",
+    "optionApiTitle": "Generic API",
+    "optionApiBody": "If your carrier has an API, enter the base URL and API key, and we'll call it directly on confirmation.",
+    "optionManualTitle": "Manual export",
+    "optionManualBody": "If you're not technical, you can export confirmed orders as CSV and upload them manually to your carrier dashboard.",
+    "exportConfirmed": "Open confirmed orders",
+    "newConnection": "New connection",
+    "companyName": "Company name",
+    "typeWebhook": "Webhook",
+    "typeApi": "API",
+    "webhookUrl": "Webhook URL",
+    "signingSecret": "Signing secret",
+    "signingSecretHint": "Optional. Used to sign the payload.",
+    "baseUrl": "Base URL",
+    "apiKey": "API key",
+    "apiKeyHint": "Stored encrypted. Leave blank when editing to keep the current key.",
+    "authType": "Auth type",
+    "authBearer": "Bearer",
+    "authHeader": "X-API-Key header",
+    "authBasic": "Basic Auth",
+    "shipmentPath": "Create shipment path",
+    "active": "Active",
+    "testConnection": "Test connection",
+    "testing": "Testing",
+    "testOk": "The address responded.",
+    "testFailed": "The address did not respond.",
+    "httpsOnly": "Use an https address.",
+    "save": "Save",
+    "saving": "Saving",
+    "saved": "Saved.",
+    "saveFailed": "Could not save this carrier.",
+    "listTitle": "Your carriers",
+    "empty": "No custom carriers yet.",
+    "statusActive": "Active",
+    "statusInactive": "Inactive",
+    "created": "Added",
+    "edit": "Edit",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "delete": "Delete",
+    "deleteTitle": "Delete this carrier?",
+    "deleteBody": "Confirmed orders will no longer be sent to it.",
+    "deleteConfirm": "Delete",
+    "cancel": "Cancel",
+    "unavailable": "Saving is unavailable until the carrier table is installed."
   },
   "workflow": {
     "title": "How orders flow in Confirma",
@@ -261,5 +314,57 @@
         "pixelInvalid": "Pixel id should be numbers only."
       }
     }
+  },
+  "adsEvents": {
+    "title": "Ad Events",
+    "subtitle": "Every Purchase event sent to Meta, TikTok, and Google for confirmed orders.",
+    "tabs": {
+      "all": "All",
+      "meta": "Meta",
+      "tiktok": "TikTok",
+      "google": "Google",
+      "comingSoon": "Coming Soon"
+    },
+    "stats": {
+      "sent": "Sent",
+      "failed": "Failed",
+      "lastSent": "Last sent",
+      "noFailures": "No failures"
+    },
+    "table": {
+      "time": "Time",
+      "order": "Order ID",
+      "event": "Event Name",
+      "platform": "Platform",
+      "status": "Status",
+      "http": "HTTP Status",
+      "error": "Error"
+    },
+    "status": {
+      "sent": "Sent",
+      "failed": "Failed",
+      "skipped": "Skipped"
+    },
+    "empty": "No events yet. Confirm an order to see activity.",
+    "filters": {
+      "status": "Status",
+      "dateRange": "Date range",
+      "last24h": "Last 24h",
+      "last7d": "Last 7 days",
+      "last30d": "Last 30 days",
+      "all": "All"
+    },
+    "modal": {
+      "payload": "Payload",
+      "response": "Response",
+      "close": "Close"
+    },
+    "comingSoon": {
+      "snapchat": "Snapchat",
+      "pinterest": "Pinterest",
+      "x": "X"
+    },
+    "prev": "Previous",
+    "next": "Next"
   }
 }

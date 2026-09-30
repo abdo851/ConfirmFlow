@@ -39,6 +39,7 @@
     "directTitle": "شركات متوفرة للربط المباشر",
     "soonTitle": "شركات قريباً",
     "soonNote": "هذه الشركات ستتوفر قريباً عبر شراكات جديدة.",
+    "adminReviewNote": "أنت أدمن — يمكنك مراجعة هذه الصفحة من لوحة الأدمن",
     "company": "الشركة",
     "logo": "الشعار",
     "status": "الحالة",
@@ -55,6 +56,7 @@
     "coliixConnectSuccess": "تم حفظ مفتاح Coliix.",
     "coliixConnectFailed": "تعذر ربط Coliix.",
     "comingSoon": "قريباً",
+    "carrierSoonMessage": "هذه الشركة قريبًا",
     "settings": "إعدادات",
     "confirmationTitle": "شركة التأكيد",
     "confirmationBody": "اربط شركة التأكيد الخاصة بك — سيتولى النظام إرسال الطلبات المؤكدة تلقائياً.",
@@ -74,6 +76,57 @@
       "forcelog": "شحن وطني عبر واجهة API",
       "colis-swift": "شحن سريع لمتاجر التجارة الإلكترونية"
     }
+  },
+  "customCarrier": {
+    "title": "أضف شركة الشحن الخاصة بك",
+    "subtitle": "إذا كانت شركتك غير موجودة في القائمة، يمكنك ربطها بنفسك عبر Webhook أو API.",
+    "recommended": "موصى به",
+    "optionWebhookTitle": "Webhook",
+    "optionWebhookBody": "سنرسل تفاصيل الطلب المؤكد إلى رابط Webhook خاص بك. يمكنك تحويله إلى شركة الشحن باستخدام Zapier أو Make أو سيرفرك الخاص.",
+    "optionApiTitle": "واجهة عامة",
+    "optionApiBody": "إذا كانت شركتك توفر API، أدخل العنوان الأساسي ومفتاح API، وسنتصل بها مباشرة عند التأكيد.",
+    "optionManualTitle": "تصدير يدوي",
+    "optionManualBody": "إذا لم تكن تقنياً، يمكنك تصدير الطلبات المؤكدة كملف CSV ورفعها يدوياً إلى لوحة شركتك.",
+    "exportConfirmed": "فتح الطلبات المؤكدة",
+    "newConnection": "ربط جديد",
+    "companyName": "اسم الشركة",
+    "typeWebhook": "Webhook",
+    "typeApi": "API",
+    "webhookUrl": "رابط Webhook",
+    "signingSecret": "سر التوقيع",
+    "signingSecretHint": "اختياري. يُستخدم لتوقيع البيانات المرسلة.",
+    "baseUrl": "العنوان الأساسي",
+    "apiKey": "مفتاح API",
+    "apiKeyHint": "يُحفظ مشفراً. اتركه فارغاً عند التعديل للإبقاء على المفتاح الحالي.",
+    "authType": "نوع المصادقة",
+    "authBearer": "Bearer",
+    "authHeader": "ترويسة X-API-Key",
+    "authBasic": "Basic Auth",
+    "shipmentPath": "مسار إنشاء الشحنة",
+    "active": "مفعّل",
+    "testConnection": "اختبار الاتصال",
+    "testing": "جارٍ الاختبار",
+    "testOk": "استجاب العنوان.",
+    "testFailed": "لم يستجب العنوان.",
+    "httpsOnly": "استخدم عنوان https.",
+    "save": "حفظ",
+    "saving": "جارٍ الحفظ",
+    "saved": "تم الحفظ.",
+    "saveFailed": "تعذر حفظ شركة الشحن.",
+    "listTitle": "شركاتك",
+    "empty": "لا توجد شركات شحن مخصصة بعد.",
+    "statusActive": "مفعّل",
+    "statusInactive": "متوقف",
+    "created": "أُضيفت",
+    "edit": "تعديل",
+    "deactivate": "إيقاف",
+    "activate": "تفعيل",
+    "delete": "حذف",
+    "deleteTitle": "حذف شركة الشحن؟",
+    "deleteBody": "لن تُرسل الطلبات المؤكدة إليها بعد ذلك.",
+    "deleteConfirm": "حذف",
+    "cancel": "إلغاء",
+    "unavailable": "الحفظ غير متاح حتى يُثبَّت جدول شركات الشحن."
   },
   "workflow": {
     "title": "مسار الطلبات في Confirma",
@@ -261,5 +314,57 @@
         "pixelInvalid": "معرّف البيكسل يجب أن يكون أرقاماً فقط."
       }
     }
+  },
+  "adsEvents": {
+    "title": "أحداث الإعلانات",
+    "subtitle": "كل حدث Purchase أُرسل إلى Meta وTikTok وGoogle للطلبات المؤكدة.",
+    "tabs": {
+      "all": "الكل",
+      "meta": "Meta",
+      "tiktok": "TikTok",
+      "google": "Google",
+      "comingSoon": "قريبًا"
+    },
+    "stats": {
+      "sent": "أُرسل",
+      "failed": "فشل",
+      "lastSent": "آخر إرسال",
+      "noFailures": "لا توجد إخفاقات"
+    },
+    "table": {
+      "time": "الوقت",
+      "order": "رقم الطلب",
+      "event": "اسم الحدث",
+      "platform": "المنصة",
+      "status": "الحالة",
+      "http": "حالة HTTP",
+      "error": "الخطأ"
+    },
+    "status": {
+      "sent": "أُرسل",
+      "failed": "فشل",
+      "skipped": "تم التخطي"
+    },
+    "empty": "لا توجد أحداث بعد. أكّد طلبًا لترى النشاط.",
+    "filters": {
+      "status": "الحالة",
+      "dateRange": "الفترة",
+      "last24h": "آخر 24 ساعة",
+      "last7d": "آخر 7 أيام",
+      "last30d": "آخر 30 يوماً",
+      "all": "الكل"
+    },
+    "modal": {
+      "payload": "البيانات",
+      "response": "الرد",
+      "close": "إغلاق"
+    },
+    "comingSoon": {
+      "snapchat": "Snapchat",
+      "pinterest": "Pinterest",
+      "x": "X"
+    },
+    "prev": "السابق",
+    "next": "التالي"
   }
 }

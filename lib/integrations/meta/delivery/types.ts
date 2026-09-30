@@ -15,6 +15,9 @@ export interface MetaPurchaseDeliveryOutcome {
   status: MetaPurchaseDeliveryOutcomeStatus;
   eventId?: string;
   message?: string;
+  payload?: unknown;
+  httpStatus?: number;
+  responseSummary?: unknown;
 }
 
 export interface MetaConversionDeliveryRecord {

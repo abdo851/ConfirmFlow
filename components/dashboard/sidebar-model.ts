@@ -24,6 +24,7 @@ export const sidebarGroups: SidebarGroup[] = [
     ],
   },
   { key: "analytics", href: "/dashboard/analytics", items: [] },
+  { key: "adEvents", href: "/dashboard/ads-events", items: [] },
   {
     key: "connections",
     href: "/dashboard/connections",
@@ -34,6 +35,7 @@ export const sidebarGroups: SidebarGroup[] = [
     ],
   },
   { key: "shipping", href: "/dashboard/shipping", items: [] },
+  { key: "customCarrier", href: "/dashboard/shipping/custom", items: [] },
   { key: "workflow", href: "/dashboard/workflow", items: [] },
   {
     key: "tracking",
@@ -72,6 +74,7 @@ export const sidebarGroups: SidebarGroup[] = [
       { labelKey: "cms", href: "/dashboard/admin/content" },
       { labelKey: "policies", href: "/dashboard/admin/policies" },
       { labelKey: "users", href: "/dashboard/admin/users" },
+      { labelKey: "shipping", href: "/dashboard/admin/shipping" },
       { labelKey: "generalSettings", href: "/dashboard/admin/settings" },
       { labelKey: "videos", href: "/dashboard/admin/videos" },
     ],
@@ -95,6 +98,13 @@ export function visibleSidebarGroups(isAdmin: boolean): SidebarGroup[] {
 export function groupIsActive(group: SidebarGroup, pathname: string): boolean {
   if (group.href === "/dashboard") {
     return pathname === "/dashboard";
+  }
+
+  if (
+    group.href === "/dashboard/shipping" &&
+    (pathname === "/dashboard/shipping/custom" || pathname.startsWith("/dashboard/shipping/custom/"))
+  ) {
+    return false;
   }
 
   return pathname === group.href || pathname.startsWith(`${group.href}/`);

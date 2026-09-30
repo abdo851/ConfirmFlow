@@ -13,6 +13,9 @@ export interface GooglePurchaseDeliveryOutcome {
   status: "sent" | "pending" | "failed" | "not_eligible" | "in_progress";
   eventId?: string;
   message?: string;
+  payload?: unknown;
+  httpStatus?: number;
+  responseSummary?: unknown;
 }
 
 interface DeliveryRow {
@@ -182,7 +185,13 @@ export async function processGooglePurchaseDelivery(input: {
       .eq("id", current.id);
 
     logger.info("google_delivery_success", { order_id: row.id, event_id: current.event_id });
-    return { status: "sent", eventId: current.event_id };
+    return {
+      status: "sent",
+      eventId: current.event_id,
+      payload,
+      httpStatus: sendResult.status,
+      responseSummary: pickResponseSummary(sendResult.body),
+    };
   }
 
   const message = "GA4 Purchase delivery failed.";
@@ -197,7 +206,24 @@ export async function processGooglePurchaseDelivery(input: {
     .eq("id", current.id);
 
   logger.error("google_delivery_failed", { order_id: row.id, status: sendResult.status });
-  return { status: "failed", eventId: current.event_id, message };
+  return {
+    status: "failed",
+    eventId: current.event_id,
+    message,
+    payload,
+    httpStatus: sendResult.status,
+    responseSummary: pickResponseSummary(sendResult.body),
+  };
+}
+
+function pickResponseSummary(body: unknown): unknown {
+  if (!body || typeof body !== "object" || Array.isArray(body)) return null;
+  const source = body as Record<string, unknown>;
+  const summary: Record<string, unknown> = {};
+  if ("events_received" in source) summary.events_received = source.events_received;
+  if ("messages" in source) summary.messages = source.messages;
+  if ("error" in source) summary.error = source.error;
+  return Object.keys(summary).length > 0 ? summary : null;
 }
 
 export async function dispatchGooglePurchaseDelivery(
