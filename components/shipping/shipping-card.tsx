@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import type { ShippingProvider } from "@/lib/shipping/data";
@@ -10,6 +13,8 @@ export function ShippingCard({
   connectLabel,
   connectedLabel,
   settingsLabel,
+  soonMessage,
+  allowDetail = true,
   connected = false,
 }: {
   provider: ShippingProvider;
@@ -19,17 +24,23 @@ export function ShippingCard({
   connectLabel: string;
   connectedLabel: string;
   settingsLabel: string;
+  soonMessage?: string;
+  allowDetail?: boolean;
   connected?: boolean;
 }) {
   const name = locale === "ar" ? provider.nameAr : provider.nameEn;
+  const [soonNotice, setSoonNotice] = useState(false);
+  const locked = !allowDetail && !connected;
 
   return (
     <article className="relative flex flex-col rounded-2xl bg-white p-5 shadow-soft transition duration-200 hover:-translate-y-0.5 hover:shadow-medium dark:bg-slate-950">
       <span
         className={
-          provider.integrationType === "direct"
-            ? "absolute top-4 start-4 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200"
-            : "absolute top-4 start-4 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+          soonMessage
+            ? "absolute top-4 start-4 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+            : provider.integrationType === "direct"
+              ? "absolute top-4 start-4 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200"
+              : "absolute top-4 start-4 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300"
         }
       >
         {statusLabel}
@@ -70,6 +81,14 @@ export function ShippingCard({
               <span className="absolute top-0.5 end-0.5 size-6 rounded-full bg-white" />
             </button>
           </div>
+        ) : locked ? (
+          <button
+            type="button"
+            onClick={() => setSoonNotice(true)}
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground transition duration-200 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:brightness-95"
+          >
+            {connectLabel}
+          </button>
         ) : (
           <Link
             href={`/dashboard/shipping/${provider.slug}`}
@@ -78,6 +97,7 @@ export function ShippingCard({
             {connectLabel}
           </Link>
         )}
+        {soonNotice && soonMessage ? <p className="mt-2 text-center text-sm text-muted">{soonMessage}</p> : null}
       </div>
     </article>
   );
