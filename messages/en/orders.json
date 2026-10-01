@@ -76,7 +76,9 @@
     "label": "Product",
     "search": "Search products",
     "empty": "No products yet",
-    "clear": "Clear"
+    "clear": "Clear",
+    "copy": "Copy product name",
+    "copied": "Copied"
   },
   "statusConfirm": {
     "title": "Change order status?",

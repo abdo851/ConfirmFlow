@@ -60,4 +60,6 @@ export interface MerchantOrderListItem {
   confirmationStatus: OrderConfirmationStatus;
   confirmedAt: string | null;
   receivedAt: string;
+  productName?: string | null;
+  productSku?: string | null;
 }

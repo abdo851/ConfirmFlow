@@ -3,6 +3,7 @@ import "server-only";
 import { getAuthenticatedUser } from "@/lib/auth/session";
 import { createUserDatabaseClient } from "@/lib/database/user-client";
 import { ORDERS_PAGE_SIZE } from "./list-query";
+import { readStoredLineItem } from "./products";
 import type {
   MerchantOrderListItem,
   OrderConfirmationStatus,
@@ -10,7 +11,7 @@ import type {
 } from "./types";
 
 const ORDER_LIST_COLUMNS =
-  "id, owner_id, provider, order_number, external_order_id, customer_email, customer_phone, currency, total_amount_minor, confirmation_status, confirmed_at, received_at";
+  "id, owner_id, provider, order_number, external_order_id, customer_email, customer_phone, currency, total_amount_minor, confirmation_status, confirmed_at, received_at, line_items";
 
 const EXPORT_BATCH = 500;
 const EXPORT_CAP = 10000;
@@ -47,6 +48,7 @@ interface OrderListRow {
   confirmation_status: OrderConfirmationStatus;
   confirmed_at: string | null;
   received_at: string;
+  line_items?: unknown;
 }
 
 interface OrdersFilter {
@@ -78,7 +80,16 @@ function asProvider(value: string | null): OrderProvider | null {
   return null;
 }
 
+function firstProduct(lineItems: unknown): { productName: string | null; productSku: string | null } {
+  const first = Array.isArray(lineItems) ? readStoredLineItem(lineItems[0]) : null;
+  return {
+    productName: first?.name ?? null,
+    productSku: first?.sku ?? null,
+  };
+}
+
 function mapRow(row: OrderListRow): MerchantOrderListItem {
+  const product = firstProduct(row.line_items);
   return {
     id: row.id,
     orderNumber: row.order_number,
@@ -91,6 +102,8 @@ function mapRow(row: OrderListRow): MerchantOrderListItem {
     confirmationStatus: row.confirmation_status,
     confirmedAt: row.confirmed_at,
     receivedAt: row.received_at,
+    productName: product.productName,
+    productSku: product.productSku,
   };
 }
 
@@ -123,7 +136,7 @@ function scopedQuery(db: OrdersDb, userId: string, request: OrdersListRequest): 
     if (request.productSku) {
       match.sku = request.productSku;
     }
-    query = query.contains("line_items", [match]);
+    query = query.contains("line_items", JSON.stringify([match]));
   }
 
   return query.order("received_at", { ascending: false });

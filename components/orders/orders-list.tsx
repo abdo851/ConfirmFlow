@@ -58,6 +58,44 @@ export function OrdersList(props: OrdersListProps) {
   );
 }
 
+function ProductNameCopy({ name }: { name: string }) {
+  const t = useTranslations("orders");
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) {
+      return;
+    }
+    const id = window.setTimeout(() => setCopied(false), 2000);
+    return () => window.clearTimeout(id);
+  }, [copied]);
+
+  return (
+    <span className="inline-flex min-w-0 max-w-full items-center gap-1">
+      <span className="truncate text-sm">{name}</span>
+      <button
+        type="button"
+        className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted hover:text-foreground"
+        aria-label={t("products.copy")}
+        onClick={(event) => {
+          event.stopPropagation();
+          void navigator.clipboard.writeText(name).then(() => setCopied(true));
+        }}
+      >
+        <svg viewBox="0 0 24 24" className="size-3.5" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.8">
+          <rect x="8" y="8" width="11" height="11" rx="2" />
+          <path d="M5 15V5h10" />
+        </svg>
+      </button>
+      {copied ? (
+        <span role="status" className="text-xs text-muted motion-safe:transition-opacity motion-safe:duration-200">
+          {t("products.copied")}
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
 function StoreMark({ provider }: { provider: OrderProvider | null }) {
   const t = useTranslations("orders");
   if (!provider) {
@@ -158,6 +196,14 @@ function OrdersListBody({ initialOrders, total, page, query, products }: OrdersL
                     <dt className="text-muted">{t("columns.total")}</dt>
                     <dd>{formatMoneyMinor(order.totalAmountMinor, order.currency)}</dd>
                   </div>
+                  {order.productName ? (
+                    <div className="flex justify-between gap-3">
+                      <dt className="text-muted">{t("products.label")}</dt>
+                      <dd className="min-w-0">
+                        <ProductNameCopy name={order.productName} />
+                      </dd>
+                    </div>
+                  ) : null}
                   <div className="flex justify-between gap-3">
                     <dt className="text-muted">{t("columns.received")}</dt>
                     <dd>{new Date(order.receivedAt).toLocaleString()}</dd>
@@ -228,7 +274,12 @@ function OrdersListBody({ initialOrders, total, page, query, products }: OrdersL
                       </div>
                     </td>
                     <td className="border-b border-line/80 px-4 py-4 text-sm text-muted">
-                      {customer ?? t("customerUnavailable")}
+                      <div>{customer ?? t("customerUnavailable")}</div>
+                      {order.productName ? (
+                        <div className="mt-1">
+                          <ProductNameCopy name={order.productName} />
+                        </div>
+                      ) : null}
                     </td>
                     <td className="border-b border-line/80 px-4 py-4 text-sm">
                       {formatMoneyMinor(order.totalAmountMinor, order.currency)}
