@@ -13,11 +13,20 @@ export default async function ShippingPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations("dashboard.shipping");
+  const isAdmin = await readSidebarIsAdmin();
+  if (!isAdmin) {
+    return (
+      <div className="flex min-h-[50vh] flex-col items-center justify-center px-6 text-center">
+        <h1 className="text-2xl font-semibold tracking-tight">{t("comingSoonTitle")}</h1>
+        <p className="mt-2 max-w-md text-sm text-muted">{t("comingSoonBody")}</p>
+        <Link href="/dashboard" className="mt-6 inline-flex min-h-11 items-center text-sm font-medium text-primary">
+          {t("backToDashboard")}
+        </Link>
+      </div>
+    );
+  }
   const common = await getTranslations("common");
-  const [shippingVideo, isAdmin] = await Promise.all([
-    getVideoForPlacement("shipping"),
-    readSidebarIsAdmin(),
-  ]);
+  const shippingVideo = await getVideoForPlacement("shipping");
 
   return (
     <div className="dash-stagger animate-fade-in space-y-10">

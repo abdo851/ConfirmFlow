@@ -2,7 +2,7 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
-import { requireDashboardAdmin } from "@/components/dashboard/require-admin";
+import { readSidebarIsAdmin } from "@/components/dashboard/read-sidebar-role";
 import { ShippingConnectForm } from "@/components/shipping/shipping-connect-form";
 import { getStoreConnectionState } from "@/lib/connections/store-connection";
 import { getShippingProvider } from "@/lib/shipping/data";
@@ -13,7 +13,19 @@ export default async function ShippingConnectPage({
   params: Promise<{ locale: string; slug: string }>;
 }) {
   const { locale, slug } = await params;
-  await requireDashboardAdmin(locale);
+  const isAdmin = await readSidebarIsAdmin();
+  if (!isAdmin) {
+    const t = await getTranslations("dashboard.shipping");
+    return (
+      <div className="flex min-h-[50vh] flex-col items-center justify-center px-6 text-center">
+        <h1 className="text-2xl font-semibold tracking-tight">{t("comingSoonTitle")}</h1>
+        <p className="mt-2 max-w-md text-sm text-muted">{t("comingSoonBody")}</p>
+        <Link href="/dashboard" className="mt-6 inline-flex min-h-11 items-center text-sm font-medium text-primary">
+          {t("backToDashboard")}
+        </Link>
+      </div>
+    );
+  }
   const provider = getShippingProvider(slug);
   if (!provider) {
     notFound();
@@ -37,14 +49,9 @@ export default async function ShippingConnectPage({
           <>
             <p className="mt-6 text-sm leading-6">{t("storeWillBeLinked", { url: storeUrl })}</p>
             <ShippingConnectForm
-              providerSlug={provider.slug}
               apiKeyLabel={t("apiKey")}
-              publicKeyLabel={t("publicKey")}
-              secretKeyLabel={t("secretKey")}
               connectLabel={t("connect")}
               comingSoon={t("comingSoon")}
-              successLabel={provider.slug === "coliix" ? t("coliixConnectSuccess") : t("connectSuccess")}
-              errorLabel={provider.slug === "coliix" ? t("coliixConnectFailed") : t("connectFailed")}
             />
           </>
         ) : (

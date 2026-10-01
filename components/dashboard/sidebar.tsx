@@ -291,6 +291,8 @@ export function DashboardSidebar({
                     pathname={pathname}
                     search={search}
                     label={t(group.key)}
+                    isAdmin={isAdmin}
+                    shippingNotice={t("shippingComingSoon")}
                     onToggle={() => toggle(group.key)}
                     childLabel={(key) => t(key)}
                   />
@@ -350,6 +352,8 @@ function GroupRow({
   pathname,
   search,
   label,
+  isAdmin,
+  shippingNotice,
   onToggle,
   childLabel,
 }: {
@@ -359,19 +363,26 @@ function GroupRow({
   pathname: string;
   search: string;
   label: string;
+  isAdmin: boolean;
+  shippingNotice: string;
   onToggle: () => void;
   childLabel: (key: string) => string;
 }) {
   const active = groupIsActive(group, pathname);
-  const link = (
-    <Link
-      href={group.href}
-      prefetch
-      aria-current={active ? "page" : undefined}
-      className={`group relative inline-flex min-h-12 min-w-0 flex-1 items-center gap-3 rounded-xl px-3 text-sm font-medium transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-        collapsed ? "justify-center" : ""
-      } ${active ? "bg-indigo-50 text-primary dark:bg-indigo-950/50" : "text-muted hover:bg-surface-muted hover:text-foreground"}`}
-    >
+  const lockShipping = group.key === "shipping" && !isAdmin;
+  const [shippingNoticeAt, setShippingNoticeAt] = useState(0);
+  useEffect(() => {
+    if (!shippingNoticeAt) {
+      return;
+    }
+    const id = window.setTimeout(() => setShippingNoticeAt(0), 4000);
+    return () => window.clearTimeout(id);
+  }, [shippingNoticeAt]);
+  const itemClass = `group relative inline-flex min-h-12 min-w-0 flex-1 items-center gap-3 rounded-xl px-3 text-sm font-medium transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+    collapsed ? "justify-center" : ""
+  } ${active ? "bg-indigo-50 text-primary dark:bg-indigo-950/50" : "text-muted hover:bg-surface-muted hover:text-foreground"}`;
+  const itemBody = (
+    <>
       {active ? (
         <span aria-hidden className="absolute inset-y-2 start-0 w-1 rounded-full bg-primary" />
       ) : null}
@@ -384,6 +395,15 @@ function GroupRow({
       </span>
       {collapsed ? <span className="sr-only">{label}</span> : <span className="truncate">{label}</span>}
       {!collapsed && comingSoonHrefs.has(group.href) ? <ComingSoonBadge /> : null}
+    </>
+  );
+  const link = lockShipping ? (
+    <button type="button" className={`${itemClass} w-full border-0 bg-transparent text-start`} onClick={() => setShippingNoticeAt(Date.now())}>
+      {itemBody}
+    </button>
+  ) : (
+    <Link href={group.href} prefetch aria-current={active ? "page" : undefined} className={itemClass}>
+      {itemBody}
     </Link>
   );
 
@@ -412,6 +432,9 @@ function GroupRow({
           </button>
         ) : null}
       </div>
+      {lockShipping && shippingNoticeAt ? (
+        <p className="px-3 pt-1 text-start text-xs text-muted">{shippingNotice}</p>
+      ) : null}
       {!collapsed ? (
         <div className={`accordion-panel ${expanded ? "is-open" : ""}`}>
           <ul className="ms-4 space-y-1 border-s border-line py-1 ps-2">
