@@ -9,6 +9,8 @@ interface StatCardProps {
   icon: ReactNode;
   trend?: string;
   tone?: "indigo" | "teal" | "amber" | "emerald";
+  series?: number[];
+  enterIndex?: number;
 }
 
 const toneClasses = {
@@ -29,21 +31,56 @@ function StatFigure({ value }: { value: string }) {
   );
 }
 
-export function StatCard({ label, value, icon, trend, tone = "indigo" }: StatCardProps) {
+function MiniSeries({ values }: { values: number[] }) {
+  const width = 120;
+  const height = 28;
+  const peak = Math.max(...values, 1);
+  const step = values.length === 1 ? 0 : width / (values.length - 1);
+  const points = values.map((value, index) => {
+    const x = values.length === 1 ? width / 2 : index * step;
+    const y = height - 2 - (value / peak) * (height - 6);
+    return `${x},${y}`;
+  });
+
   return (
-    <article className="hover-lift rounded-2xl border border-line bg-surface p-6 shadow-soft">
-      <div className="flex items-start justify-between gap-3">
-        <span className={`inline-flex size-10 items-center justify-center rounded-xl ${toneClasses[tone]}`}>
-          {icon}
-        </span>
-        {trend ? (
-          <span className="rounded-full bg-surface-muted px-2 py-1 text-xs font-medium text-muted">
-            {trend}
+    <svg viewBox={`0 0 ${width} ${height}`} className="mt-4 h-8 w-full text-indigo-600" aria-hidden>
+      <polyline fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" points={points.join(" ")} />
+    </svg>
+  );
+}
+
+export function StatCard({
+  label,
+  value,
+  icon,
+  trend,
+  tone = "indigo",
+  series,
+  enterIndex,
+}: StatCardProps) {
+  return (
+    <article
+      className={`hover-lift relative overflow-hidden rounded-2xl border border-line bg-surface p-6 shadow-soft ${
+        enterIndex === undefined ? "" : "animate-fade-in"
+      }`}
+      style={enterIndex === undefined ? undefined : { animationDelay: `${enterIndex * 60}ms` }}
+    >
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-b from-indigo-500/10 to-teal-500/10" />
+      <div className="relative">
+        <div className="flex items-start justify-between gap-3">
+          <span className={`inline-flex size-10 items-center justify-center rounded-xl ${toneClasses[tone]}`}>
+            {icon}
           </span>
-        ) : null}
+          {trend ? (
+            <span className="rounded-full bg-surface-muted px-2 py-1 text-xs font-medium text-muted">
+              {trend}
+            </span>
+          ) : null}
+        </div>
+        <StatFigure value={value} />
+        {series && series.length > 0 ? <MiniSeries values={series} /> : null}
+        <p className="mt-2 text-sm leading-6 text-muted">{label}</p>
       </div>
-      <StatFigure value={value} />
-      <p className="mt-2 text-sm leading-6 text-muted">{label}</p>
     </article>
   );
 }

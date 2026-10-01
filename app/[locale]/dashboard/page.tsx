@@ -95,11 +95,16 @@ export default async function DashboardPage({
     ? series[series.length - 1].new + series[series.length - 1].confirmed
     : 0;
   const rising = seriesEnd >= seriesStart;
-  const cards = [
-    { label: t("stats.new"), value: String(stats.new_orders), tone: "indigo" as const },
-    { label: t("stats.confirmed"), value: String(stats.confirmed_orders), tone: "teal" as const },
-    { label: t("stats.rejected"), value: String(stats.rejected_orders), tone: "amber" as const },
-    { label: t("stats.archived"), value: String(stats.archived_orders), tone: "emerald" as const },
+  const cards: Array<{
+    label: string;
+    value: string;
+    tone: "indigo" | "teal" | "amber" | "emerald";
+    series?: number[];
+  }> = [
+    { label: t("stats.new"), value: String(stats.new_orders), tone: "indigo", series: series.map((point) => point.new) },
+    { label: t("stats.confirmed"), value: String(stats.confirmed_orders), tone: "teal", series: series.map((point) => point.confirmed) },
+    { label: t("stats.rejected"), value: String(stats.rejected_orders), tone: "amber" },
+    { label: t("stats.archived"), value: String(stats.archived_orders), tone: "emerald" },
   ];
 
   return (
@@ -139,7 +144,7 @@ export default async function DashboardPage({
       </section>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {cards.map((card) => (
+        {cards.map((card, index) => (
           <StatCard
             key={card.label}
             label={card.label}
@@ -147,6 +152,8 @@ export default async function DashboardPage({
             tone={card.tone}
             trend={rising ? t("trendUp") : t("trendDown")}
             icon={<StatIcon />}
+            series={card.series}
+            enterIndex={index}
           />
         ))}
       </div>
