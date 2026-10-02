@@ -72,6 +72,7 @@ function ProductNameCopy({ name }: { name: string }) {
 
   return (
     <span className="inline-flex min-w-0 max-w-full items-center gap-1">
+      <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-teal-600" />
       <span className="truncate text-sm">{name}</span>
       <button
         type="button"
