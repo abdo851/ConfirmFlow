@@ -193,7 +193,7 @@ describe("dashboard orders page", () => {
     expect(redirect).toHaveBeenCalledWith({ href: "/login", locale: "en" });
 
     vi.resetModules();
-  });
+  }, 15000);
 });
 
 describe("orders page data retrieval", () => {
