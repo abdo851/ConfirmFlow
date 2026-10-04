@@ -1,0 +1,160 @@
+CONFIRMA — PROJECT RULES FOR CURSOR
+
+═══════════════════════════════════════════════════════════════
+FOUNDATION — NEVER REBUILD, NEVER BYPASS
+These are the load-bearing walls of the project.
+Read before every task. Do NOT change any of these without
+an explicit written request from the owner.
+═══════════════════════════════════════════════════════════════
+
+1. CONFIRMATION PIPELINE — lib/confirmation/**
+   - State machine: pending → confirmed | rejected | archived.
+   - Reverse transitions are forbidden (confirmed → pending is illegal).
+   - confirm-order.ts is the ONLY entry point for confirmation.
+   - purchase-delivery.ts orchestrates ad delivery (Meta, TikTok, Google).
+   - NEVER add shipping calls to the confirm route.
+   - NEVER call ad delivery from anywhere except the confirm route.
+   - Each ad platform is wrapped in its own try/catch.
+     A failure in one MUST NOT block the others.
+
+2. AUTH & SESSION — lib/auth/**
+   - getAuthenticatedUser() is the ONLY way to identify a user.
+   - NEVER trust user id from request body, query string, or URL.
+   - NEVER expose SUPABASE_SERVICE_ROLE_KEY to the client.
+   - Google OAuth uses lib/auth/google-oauth.ts.
+
+3. RLS & DATA ISOLATION
+   - Every query MUST be scoped by owner_id = auth.uid()
+     OR by a trusted store row the user owns.
+   - Service-role writes MUST include owner_id from a trusted source
+     (session, verified webhook, or store lookup). NEVER from client input.
+   - Adding a new table: enable RLS, add SELECT policy, scope writes.
+
+4. ORDER PIPELINE
+   - Flow: Store webhook → HMAC verify → normalize → persist.
+   - NEVER skip HMAC verification for WooCommerce or YouCan webhooks.
+   - NEVER persist an order without owner_id from the store row.
+   - Normalizers live in lib/integrations/<provider>/orders/normalize.ts.
+
+5. AD DELIVERY
+   - Meta, TikTok, Google deliver ONLY after a confirmed status change.
+   - Every send is logged to ad_events_log (payload + status + http_status).
+   - NEVER send an ad event for a pending or rejected order.
+   - NEVER retry automatically. The merchant retries manually.
+
+6. INTEGRATION BOUNDARIES
+   - Each integration has its own client, secrets, and base URL.
+   - NEVER cross-import between integrations.
+   - Custom carrier webhook header: X-Confirma-Signature.
+     This name is FROZEN. Renaming breaks downstream carriers.
+   - Secrets are encrypted with SHIPPING_SESSION_SECRET or
+     YOUCAN_SESSION_SECRET. NEVER log decrypted secrets.
+
+7. DATABASE SCHEMA
+   - Migrations are IMMUTABLE once applied. Never edit an applied file.
+   - New changes = new migration file.
+   - NEVER drop a column, table, or RLS policy without explicit request.
+   - NEVER rename an existing table or column.
+   - database/migrations/ and supabase/migrations/ MUST stay in sync.
+
+8. EVENT MODEL (foundation for COD Network and future services)
+   - The system is built around EVENTS, not around providers.
+   - Events: ORDER_CONFIRMED, ORDER_DELIVERED, ORDER_CANCELLED.
+   - Event source can be: MANUAL, COD_NETWORK, SERVICE_B, SERVICE_C.
+   - The Event Router decides the destination, NOT the source.
+   - Manual confirmation and automated confirmation MUST use the SAME router.
+   - NEVER write "if provider === cod-network" in business logic.
+   - Every provider is an Adapter. Each adapter declares its Capabilities.
+
+9. PRODUCT IDENTITY (foundation for mapping)
+   - Internal product has: id, name, sku, variant.
+   - External IDs are stored per integration (YouCan ID, COD Network ID,
+     Meta Content ID, TikTok Content ID, Google Item ID).
+   - Auto-map first. Ask the user ONLY when auto-map fails.
+   - NEVER request product mapping during onboarding.
+   - Mapping UI appears ONLY when an integration reports it needs it.
+
+10. ADVERTISING DESTINATIONS
+    - Meta = active. TikTok = reserved. Google = reserved.
+    - Adding a new destination = new Adapter file + registry entry.
+    - NEVER add a destination that bypasses the Event Router.
+
+11. PAYMENTS (when added)
+    - Webhook signature verification is MANDATORY.
+    - Idempotency keys are MANDATORY.
+    - NEVER store raw card data.
+
+12. RENAMING (Confirma → Onafirm)
+    - User-visible text: replace freely.
+    - X-Confirma-Signature: FROZEN. Do NOT rename.
+    - Storage keys (confirma-*): FROZEN unless a migration plan exists.
+    - Salt strings (confirma-*-token): FROZEN. Renaming breaks decryption.
+    - Env variable names: change ONLY if no running service depends on them.
+
+═══════════════════════════════════════════════════════════════
+
+These rules apply to EVERY task unless the user explicitly overrides them.
+Read this file fully before touching anything.
+
+SECRETS & ENVIRONMENT — NEVER TOUCH
+- .env, .env.local, .env.*, any variant
+- *.key, *.pem, *.p12, *.jks, *.keystore
+- Any file containing: secret, token, apikey, private
+- .vercel/, .supabase/
+
+DATABASE & MIGRATIONS — NEVER TOUCH
+- database/**, supabase/**
+- Any *.sql file
+- Any migration file
+
+DEPENDENCIES & BUILD — NEVER TOUCH
+- node_modules/, .next/, dist/, build/, coverage/, .turbo/
+- package-lock.json, yarn.lock, pnpm-lock.yaml
+
+CONFIG — NEVER TOUCH WITHOUT EXPLICIT APPROVAL
+- tsconfig.json, next.config.*, tailwind.config.*, postcss.config.*
+- eslint.config.*, .eslintrc*, .prettierrc*, vitest.config.*, playwright.config.*
+
+BUSINESS LOGIC — NEVER TOUCH WITHOUT EXPLICIT APPROVAL
+- lib/auth/**, lib/confirmation/**, lib/billing/**
+- lib/dashboard/**, lib/integrations/**, lib/orders/**, lib/connections/**
+- lib/webhooks/**, app/api/**
+
+UNTRACKED INTEGRATIONS — LEAVE ALONE
+- lib/integrations/shipping/sendit/**
+- lib/integrations/shipping/coliix/**
+- app/api/integrations/shipping/**
+- Any file under scripts/
+- Any *REPORT*.md
+- Any *.md at repo root
+
+GIT OPERATIONS — STRICT RULES
+- NEVER use --force or --force-with-lease
+- NEVER rebase, amend, reset, cherry-pick, merge, or stash (unless explicitly asked)
+- NEVER run git add -A, git add ., or git add -u
+- ALWAYS use explicit file paths in git add
+- NEVER switch branches without explicit permission
+- NEVER push any branch except the one currently checked out
+- NEVER add a Co-authored-by trailer or any trailer not explicitly requested
+- ALWAYS run `git diff --cached --name-only` before every commit and verify only expected files are staged
+- If a commit or push fails — STOP, report, wait. Do NOT improvise.
+
+UI RULES
+- Respect prefers-reduced-motion (use motion-safe: or media query)
+- Use RTL-safe logical properties (start/end), NEVER left/right
+- Match existing rounded corners, shadows, spacing, and typography scale
+- Keep the indigo/teal palette
+- All new user-facing strings MUST be added to BOTH messages/en/*.json AND messages/ar/*.json
+
+AFTER EVERY CODE CHANGE
+- Run: npx tsc --noEmit  — must pass with zero errors
+- Run: npm run lint       — must pass (7 Ameex warnings are OK)
+- Run: npm test           — must remain 347/347
+- If any test fails — REVERT the change, report, wait
+
+COMMUNICATION
+- If a task is unclear — STOP and ask. Do NOT improvise.
+- If a file is not in the allowed list — do NOT stage it. Report and wait.
+- Smallest possible diff. No refactoring. No reformatting. No renames.
+- No new dependencies without explicit approval.
+- When reporting back, list: files changed, before/after, tsc/lint/test results, and any file you intentionally did NOT touch.
