@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
@@ -95,6 +96,15 @@ const icons: Record<string, ReactNode> = {
       <circle cx="17" cy="17" r="2.2" />
       <path d="M9 11.2 15 8.2M9 12.8l6 3" />
     </Icon>
+  ),
+  codSeller: (
+    <Image
+      src="/shipping/cod-network.svg"
+      alt=""
+      width={20}
+      height={20}
+      unoptimized
+    />
   ),
   shipping: (
     <Icon>
