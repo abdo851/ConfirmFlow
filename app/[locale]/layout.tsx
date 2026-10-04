@@ -25,7 +25,7 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  title: "Confirma",
+  title: "Onafirm",
   description: "Order confirmation and conversion tracking platform",
 };
 

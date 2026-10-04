@@ -50,7 +50,6 @@ export function DashboardShell({
       </Suspense>
       <div className="flex h-screen min-h-0 min-w-0 flex-col overflow-hidden">
         <header className="z-30 shrink-0 border-b border-line bg-white/95 dark:bg-slate-950/95">
-          <DashboardAnnouncement />
           <div className="flex items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
             <div className="flex min-w-0 flex-1 items-center gap-2">
               <button
@@ -69,6 +68,7 @@ export function DashboardShell({
               <p className="min-w-0 truncate text-sm font-semibold tracking-tight sm:text-base">{pageTitle}</p>
             </div>
             <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+              <DashboardAnnouncement />
               <LanguageSwitcher />
               <Link href="/dashboard" prefetch className="hidden min-h-11 items-center text-sm text-muted sm:inline-flex">
                 {rootNav("dashboard")}

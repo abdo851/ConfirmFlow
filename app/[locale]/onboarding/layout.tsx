@@ -17,7 +17,7 @@ export default async function OnboardingLayout({
         <nav className="mx-auto flex max-w-4xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <Link href="/" className="inline-flex min-h-11 items-center gap-2 text-base font-semibold tracking-tight">
             <span className="inline-flex size-9 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground">
-              C
+              O
             </span>
             {brand("brand")}
           </Link>

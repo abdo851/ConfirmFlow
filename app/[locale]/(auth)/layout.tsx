@@ -50,7 +50,7 @@ export default async function AuthLayout({
         <div className="mb-6 flex w-full max-w-md items-center justify-between self-center">
           <Link href="/" className="inline-flex min-h-11 items-center gap-2 font-semibold lg:invisible">
             <span className="inline-flex size-9 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground">
-              C
+              O
             </span>
             {brand("brand")}
           </Link>

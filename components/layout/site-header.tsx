@@ -50,7 +50,7 @@ export function SiteHeader({ signedIn = false }: { signedIn?: boolean }) {
       <nav className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
         <Link href="/" className="inline-flex min-h-11 items-center gap-2">
           <span className="inline-flex size-9 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground shadow-soft">
-            C
+            O
           </span>
           <span className="text-base font-semibold tracking-tight">
             {brand("brand")}

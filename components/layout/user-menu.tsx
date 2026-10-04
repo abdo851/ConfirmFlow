@@ -136,7 +136,7 @@ export function UserMenu({
         onClick={() => setOpen((current) => !current)}
       >
         <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
-          C
+          O
         </span>
         {variant === "card" && !collapsed ? (
           <span className="min-w-0 flex-1">

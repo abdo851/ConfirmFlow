@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { DashboardVideoBar } from "@/components/marketing/dashboard-video-bar";
+import { AdPlacement } from "@/components/ads/ad-placement";
 import { ContentBlockFeed } from "@/components/content/content-block-feed";
 import { getVideoForPlacement } from "@/lib/videos/queries";
 import { OnboardingOverviewSteps, OnboardingStepNav, SetupChecklist } from "@/components/onboarding";
@@ -29,6 +30,7 @@ export default async function OnboardingPage({
           dismissLabel={dashboard("videoDismiss")}
         />
       ) : null}
+      <AdPlacement placement="onboarding_top" />
       <BackButton href="/dashboard" label={common("back")} />
       <div className="mb-8">
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{t("title")}</h1>
