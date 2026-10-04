@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { forwardOrderToCodeNetworkSeller } from "@/lib/integrations/cod-network-seller/forwarder";
 import { createDatabaseClient } from "@/lib/database/client";
 import type { ConfirmationStatus } from "./types";
 import type { ConfirmOrderActor, ConfirmOrderResult } from "./types";
@@ -61,6 +62,10 @@ export async function confirmOrder(input: {
   }
 
   if (updated) {
+    void forwardOrderToCodeNetworkSeller({
+      ownerId: input.actor.userId,
+      orderId: input.orderId,
+    }).catch(() => {});
     return {
       status: "confirmed",
       orderId: updated.id,

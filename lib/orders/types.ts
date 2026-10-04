@@ -11,6 +11,7 @@ export interface OrderLineItem {
   sku: string | null;
   imageUrl?: string | null;
   productId?: string | null;
+  price?: number | null;
 }
 
 /** Confirmation lifecycle states for Confirma orders. */
@@ -29,6 +30,8 @@ export interface ConfirmaOrderInput {
   customerName?: string | null;
   city?: string | null;
   addressLine?: string | null;
+  country?: string | null;
+  area?: string | null;
   lineItems?: OrderLineItem[] | null;
   currency: string;
   subtotalAmountMinor: number;
