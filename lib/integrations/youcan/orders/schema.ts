@@ -43,6 +43,32 @@ export const youCanOrderWebhookSchema = z.object({
     })
     .passthrough()
     .optional(),
+  variants: z
+    .array(
+      z
+        .object({
+          id: z.string().optional(),
+          price: z.number().optional(),
+          quantity: z.number().optional(),
+          variant: z
+            .object({
+              id: z.string().optional(),
+              sku: z.string().nullable().optional(),
+              product: z
+                .object({
+                  id: z.string().optional(),
+                  name: z.string().optional(),
+                  thumbnail: z.string().optional(),
+                })
+                .passthrough()
+                .optional(),
+            })
+            .passthrough()
+            .optional(),
+        })
+        .passthrough(),
+    )
+    .optional(),
 });
 
 export const youCanWebhookEnvelopeSchema = z.object({

@@ -40,6 +40,7 @@ export async function persistOrder(
       customer_name: order.customerName,
       city: order.city,
       address_line: order.addressLine,
+      line_items: order.lineItems,
       currency: order.currency.toUpperCase(),
       subtotal_amount_minor: order.subtotalAmountMinor,
       total_amount_minor: order.totalAmountMinor,

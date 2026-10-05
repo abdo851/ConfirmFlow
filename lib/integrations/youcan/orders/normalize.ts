@@ -12,8 +12,10 @@ type YouCanOrderExtras = {
     first_line?: string | null;
   } | null;
   variants?: Array<{
+    price?: number | null;
     quantity?: number | null;
     variant?: {
+      id?: string | null;
       sku?: string | null;
       product?: {
         name?: string | null;
@@ -133,7 +135,13 @@ function resolveLineItems(payload: YouCanOrderWebhookPayload): OrderLineItem[] |
     return {
       name: normalizeOptionalString(product?.name ?? null),
       quantity: typeof item.quantity === "number" ? item.quantity : null,
-      sku: normalizeOptionalString(item.variant?.sku ?? null),
+      sku: normalizeOptionalString(
+        item.variant?.sku ??
+        item.variant?.product?.name ??
+        item.variant?.id ??
+        null
+      ),
+      price: typeof item.price === "number" ? item.price : null,
       imageUrl:
         safeProductImageUrl(product?.thumbnail) ??
         safeProductImageUrl(
