@@ -76,7 +76,8 @@ function resolveCustomerPhone(payload: YouCanOrderWebhookPayload): string | null
     normalizeOptionalString(payload.customer?.phone ?? null) ??
     normalizeOptionalString(payload.phone ?? null) ??
     normalizeOptionalString(payload.custom_fields?.customerPhone ?? null) ??
-    normalizeOptionalString(payload.extra_fields?.phone ?? null)
+    normalizeOptionalString(payload.extra_fields?.phone ?? null) ??
+    normalizeOptionalString(payload.shipping?.address?.phone ?? null)
   );
 }
 
@@ -86,33 +87,46 @@ function joinName(first: string | null, last: string | null): string | null {
 }
 
 function resolveCustomerName(payload: YouCanOrderWebhookPayload): string | null {
+  const address = payload.shipping?.address;
   return (
     joinName(
       normalizeOptionalString(payload.customer?.first_name ?? null),
       normalizeOptionalString(payload.customer?.last_name ?? null),
     ) ??
     normalizeOptionalString(payload.custom_fields?.customerName ?? null) ??
-    normalizeOptionalString(payload.extra_fields?.name ?? null)
+    normalizeOptionalString(payload.extra_fields?.name ?? null) ??
+    normalizeOptionalString(address?.full_name ?? null) ??
+    joinName(
+      normalizeOptionalString(address?.first_name ?? null),
+      normalizeOptionalString(address?.last_name ?? null),
+    )
   );
 }
 
 function resolveCity(payload: YouCanOrderWebhookPayload): string | null {
   const shipping = youCanExtras(payload).shipping;
+  const customer = payload.customer as { city?: string | null } | null | undefined;
   return (
     normalizeOptionalString(shipping?.city ?? null) ??
     normalizeOptionalString(payload.custom_fields?.customerCity ?? null) ??
-    normalizeOptionalString(payload.extra_fields?.["المدينة"] ?? null)
+    normalizeOptionalString(payload.extra_fields?.["المدينة"] ?? null) ??
+    normalizeOptionalString(payload.shipping?.address?.city ?? null) ??
+    normalizeOptionalString(customer?.city ?? null)
   );
 }
 
 function resolveAddressLine(payload: YouCanOrderWebhookPayload): string | null {
   const shipping = youCanExtras(payload).shipping;
+  const address = payload.shipping?.address;
   return (
     normalizeOptionalString(shipping?.address ?? null) ??
     normalizeOptionalString(shipping?.address_line ?? null) ??
     normalizeOptionalString(shipping?.first_line ?? null) ??
     normalizeOptionalString(payload.custom_fields?.customerAddress ?? null) ??
-    normalizeOptionalString(payload.extra_fields?.address ?? null)
+    normalizeOptionalString(payload.extra_fields?.address ?? null) ??
+    normalizeOptionalString(address?.address ?? null) ??
+    normalizeOptionalString(address?.first_line ?? null) ??
+    normalizeOptionalString(address?.second_line ?? null)
   );
 }
 

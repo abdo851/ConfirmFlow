@@ -22,7 +22,7 @@ export const youCanOrderWebhookSchema = z.object({
   currency: z.string().trim().min(3).max(3),
   store_id: z.string().optional(),
   created_at: z.string().optional(),
-  customer: youCanCustomerSchema.optional(),
+  customer: youCanCustomerSchema.nullish(),
   email: z.string().nullable().optional(),
   phone: z.string().nullable().optional(),
   custom_fields: z
@@ -33,7 +33,7 @@ export const youCanOrderWebhookSchema = z.object({
       customerAddress: z.string().optional(),
       customerCity: z.string().optional(),
     })
-    .optional(),
+    .nullish(),
   extra_fields: z
     .object({
       name: z.string().optional(),
@@ -42,7 +42,7 @@ export const youCanOrderWebhookSchema = z.object({
       "المدينة": z.string().optional(),
     })
     .passthrough()
-    .optional(),
+    .nullish(),
   variants: z
     .array(
       z
@@ -69,6 +69,28 @@ export const youCanOrderWebhookSchema = z.object({
         .passthrough(),
     )
     .optional(),
+  shipping: z
+    .object({
+      address: z
+        .object({
+          first_name: z.string().optional(),
+          last_name: z.string().optional(),
+          full_name: z.string().optional(),
+          phone: z.string().nullable().optional(),
+          city: z.string().optional(),
+          address: z.string().optional(),
+          first_line: z.string().nullable().optional(),
+          second_line: z.string().nullable().optional(),
+          region: z.string().optional(),
+          state: z.string().optional(),
+          country: z.string().optional(),
+          country_name: z.string().optional(),
+        })
+        .passthrough()
+        .optional(),
+    })
+    .passthrough()
+    .nullish(),
 });
 
 export const youCanWebhookEnvelopeSchema = z.object({
