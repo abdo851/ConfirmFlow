@@ -228,13 +228,25 @@ export async function forwardOrderToCodeNetworkSeller(input: {
         });
         return { status: "duplicate" };
       }
+      const err = error as {
+        httpStatus?: number;
+        responseBody?: unknown;
+        responseText?: string;
+        message?: string;
+      };
+      const httpStatus = typeof err.httpStatus === "number" ? err.httpStatus : null;
+      const responseSummary =
+        err.responseBody ?? (err.responseText ? { raw: err.responseText } : null);
+      const detailedMessage = typeof err.message === "string" ? err.message : "unknown_error";
       await writeLog(db, {
         owner_id: input.ownerId,
         order_id: input.orderId,
         provider_id: PROVIDER_ID,
         status: "failed",
-        error_message: message.slice(0, 500),
+        http_status: httpStatus,
+        error_message: detailedMessage.slice(0, 500),
         payload_summary: payloadSummary,
+        response_summary: responseSummary,
       });
       return { status: "failed" };
     }

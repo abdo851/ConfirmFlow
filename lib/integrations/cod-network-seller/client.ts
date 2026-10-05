@@ -4,7 +4,12 @@ const DEFAULT_BASE_URL = "https://api.cod.network";
 const PREFIX = "/v2/seller";
 const TIMEOUT_MS = 10_000;
 
-type SellerError = Error & { code?: string };
+type SellerError = Error & {
+  code?: string;
+  httpStatus?: number;
+  responseBody?: unknown;
+  responseText?: string;
+};
 
 function readCode(body: unknown): string | undefined {
   if (!body || typeof body !== "object" || !("code" in body)) return undefined;
@@ -51,6 +56,9 @@ async function requestJson(url: string, token: string, init: { method: string; b
     if (!response.ok) {
       const error = new Error(`cod_network_seller_http_${response.status}`) as SellerError;
       if (code) error.code = code;
+      error.httpStatus = response.status;
+      error.responseBody = body ?? text;
+      error.responseText = text;
       throw error;
     }
     if (isRecord(body) && body.status === "error") {
