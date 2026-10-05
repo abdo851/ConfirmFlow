@@ -25,6 +25,24 @@ export const youCanOrderWebhookSchema = z.object({
   customer: youCanCustomerSchema.optional(),
   email: z.string().nullable().optional(),
   phone: z.string().nullable().optional(),
+  custom_fields: z
+    .object({
+      customerName: z.string().optional(),
+      customerPhone: z.string().optional(),
+      customerPhone2: z.string().optional().nullable(),
+      customerAddress: z.string().optional(),
+      customerCity: z.string().optional(),
+    })
+    .optional(),
+  extra_fields: z
+    .object({
+      name: z.string().optional(),
+      phone: z.string().optional(),
+      address: z.string().optional(),
+      "المدينة": z.string().optional(),
+    })
+    .passthrough()
+    .optional(),
 });
 
 export const youCanWebhookEnvelopeSchema = z.object({

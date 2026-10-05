@@ -4,6 +4,32 @@ import { safeProductImageUrl } from "@/lib/orders/products";
 import type { NormalizedWebhookEvent } from "@/lib/webhooks/ingestion";
 import type { YouCanOrderWebhookPayload } from "./schema";
 
+type YouCanOrderExtras = {
+  shipping?: {
+    city?: string | null;
+    address?: string | null;
+    address_line?: string | null;
+    first_line?: string | null;
+  } | null;
+  variants?: Array<{
+    quantity?: number | null;
+    variant?: {
+      sku?: string | null;
+      product?: {
+        name?: string | null;
+        id?: string | number | null;
+        thumbnail?: unknown;
+        image?: unknown;
+      } | null;
+      image?: unknown;
+    } | null;
+  }> | null;
+};
+
+function youCanExtras(payload: YouCanOrderWebhookPayload): YouCanOrderExtras {
+  return payload as YouCanOrderExtras;
+}
+
 function normalizeOptionalString(value: string | null | undefined): string | null {
   if (typeof value !== "string") {
     return null;
@@ -46,7 +72,9 @@ function resolveCustomerEmail(payload: YouCanOrderWebhookPayload): string | null
 function resolveCustomerPhone(payload: YouCanOrderWebhookPayload): string | null {
   return (
     normalizeOptionalString(payload.customer?.phone ?? null) ??
-    normalizeOptionalString(payload.phone ?? null)
+    normalizeOptionalString(payload.phone ?? null) ??
+    normalizeOptionalString(payload.custom_fields?.customerPhone ?? null) ??
+    normalizeOptionalString(payload.extra_fields?.phone ?? null)
   );
 }
 
@@ -56,30 +84,43 @@ function joinName(first: string | null, last: string | null): string | null {
 }
 
 function resolveCustomerName(payload: YouCanOrderWebhookPayload): string | null {
-  return joinName(
-    normalizeOptionalString(payload.customer?.first_name ?? null),
-    normalizeOptionalString(payload.customer?.last_name ?? null),
+  return (
+    joinName(
+      normalizeOptionalString(payload.customer?.first_name ?? null),
+      normalizeOptionalString(payload.customer?.last_name ?? null),
+    ) ??
+    normalizeOptionalString(payload.custom_fields?.customerName ?? null) ??
+    normalizeOptionalString(payload.extra_fields?.name ?? null)
   );
 }
 
 function resolveCity(payload: YouCanOrderWebhookPayload): string | null {
-  return normalizeOptionalString(payload.shipping?.city ?? null);
+  const shipping = youCanExtras(payload).shipping;
+  return (
+    normalizeOptionalString(shipping?.city ?? null) ??
+    normalizeOptionalString(payload.custom_fields?.customerCity ?? null) ??
+    normalizeOptionalString(payload.extra_fields?.["المدينة"] ?? null)
+  );
 }
 
 function resolveAddressLine(payload: YouCanOrderWebhookPayload): string | null {
+  const shipping = youCanExtras(payload).shipping;
   return (
-    normalizeOptionalString(payload.shipping?.address ?? null) ??
-    normalizeOptionalString(payload.shipping?.address_line ?? null) ??
-    normalizeOptionalString(payload.shipping?.first_line ?? null)
+    normalizeOptionalString(shipping?.address ?? null) ??
+    normalizeOptionalString(shipping?.address_line ?? null) ??
+    normalizeOptionalString(shipping?.first_line ?? null) ??
+    normalizeOptionalString(payload.custom_fields?.customerAddress ?? null) ??
+    normalizeOptionalString(payload.extra_fields?.address ?? null)
   );
 }
 
 function resolveLineItems(payload: YouCanOrderWebhookPayload): OrderLineItem[] | null {
-  if (!payload.variants?.length) {
+  const variants = youCanExtras(payload).variants;
+  if (!variants?.length) {
     return null;
   }
 
-  return payload.variants.map((item) => {
+  return variants.map((item) => {
     const product = item.variant?.product as
       | {
           name?: string | null;
