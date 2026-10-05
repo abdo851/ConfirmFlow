@@ -166,7 +166,7 @@ export async function forwardOrderToCodeNetworkSeller(input: {
       full_name: order.customerName ?? "",
       phone: order.customerPhone ?? "",
       country,
-      address: order.addressLine ?? "",
+      address: order.addressLine || order.city || order.area || "N/A",
       city: order.city ?? "",
       area,
       pay_mode: "cod",
@@ -246,8 +246,6 @@ export async function forwardOrderToCodeNetworkSeller(input: {
 function missingField(body: CodeNetworkSellerCreateOrderInput): string | null {
   if (!body.full_name.trim()) return "full_name";
   if (!body.phone.trim()) return "phone";
-  if (!body.address.trim()) return "address";
-  if (!body.city.trim()) return "city";
   if (body.items.length === 0) return "items";
   if (body.items.some((item) => !item.sku.trim())) return "items.sku";
   return null;
