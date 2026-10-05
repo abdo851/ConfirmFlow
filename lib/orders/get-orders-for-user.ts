@@ -11,7 +11,7 @@ import type {
 } from "./types";
 
 const ORDER_LIST_COLUMNS =
-  "id, owner_id, provider, order_number, external_order_id, customer_email, customer_phone, currency, total_amount_minor, confirmation_status, confirmed_at, received_at, line_items";
+  "id, owner_id, provider, order_number, external_order_id, customer_email, customer_phone, customer_name, currency, total_amount_minor, confirmation_status, confirmed_at, received_at, line_items";
 
 const EXPORT_BATCH = 500;
 const EXPORT_CAP = 10000;
@@ -43,6 +43,7 @@ interface OrderListRow {
   external_order_id: string;
   customer_email: string | null;
   customer_phone: string | null;
+  customer_name: string | null;
   currency: string;
   total_amount_minor: number;
   confirmation_status: OrderConfirmationStatus;
@@ -97,6 +98,7 @@ function mapRow(row: OrderListRow): MerchantOrderListItem {
     provider: asProvider(row.provider),
     customerEmail: row.customer_email,
     customerPhone: row.customer_phone,
+    customerName: row.customer_name ?? null,
     currency: row.currency,
     totalAmountMinor: row.total_amount_minor,
     confirmationStatus: row.confirmation_status,

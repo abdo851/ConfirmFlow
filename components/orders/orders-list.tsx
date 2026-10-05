@@ -11,7 +11,6 @@ import { OrdersPagination } from "./orders-pagination";
 import { OrdersToolbar } from "./orders-toolbar";
 import {
   formatMoneyMinor,
-  formatOrderCustomerContact,
   formatOrderDisplayIdentifier,
 } from "@/lib/orders/format";
 import {
@@ -168,7 +167,6 @@ function OrdersListBody({ initialOrders, total, page, query, products }: OrdersL
       {visible.length > 0 ? (
         <div className="animate-fade-in grid gap-3 md:hidden">
           {visible.map((order) => {
-            const customer = formatOrderCustomerContact(order);
             return (
               <article
                 key={order.id}
@@ -191,7 +189,14 @@ function OrdersListBody({ initialOrders, total, page, query, products }: OrdersL
                 <dl className="mt-3 space-y-2 text-sm">
                   <div className="flex justify-between gap-3">
                     <dt className="text-muted">{t("columns.customer")}</dt>
-                    <dd>{customer ?? t("customerUnavailable")}</dd>
+                    <dd className="text-end">
+                      <div>
+                        {order.customerName ?? order.customerPhone ?? t("customerUnavailable")}
+                      </div>
+                      {order.customerName && order.customerPhone ? (
+                        <div className="text-xs text-muted">{order.customerPhone}</div>
+                      ) : null}
+                    </dd>
                   </div>
                   <div className="flex justify-between gap-3">
                     <dt className="text-muted">{t("columns.total")}</dt>
@@ -253,7 +258,6 @@ function OrdersListBody({ initialOrders, total, page, query, products }: OrdersL
             </thead>
             <tbody>
               {visible.map((order, index) => {
-                const customer = formatOrderCustomerContact(order);
                 return (
                   <tr
                     key={order.id}
@@ -275,7 +279,12 @@ function OrdersListBody({ initialOrders, total, page, query, products }: OrdersL
                       </div>
                     </td>
                     <td className="border-b border-line/80 px-4 py-4 text-sm text-muted">
-                      <div>{customer ?? t("customerUnavailable")}</div>
+                      <div>
+                        {order.customerName ?? order.customerPhone ?? t("customerUnavailable")}
+                      </div>
+                      {order.customerName && order.customerPhone ? (
+                        <div className="text-xs text-muted">{order.customerPhone}</div>
+                      ) : null}
                       {order.productName ? (
                         <div className="mt-1">
                           <ProductNameCopy name={order.productName} />

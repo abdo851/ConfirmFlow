@@ -47,8 +47,9 @@ export function formatOrderDisplayIdentifier(input: {
 }
 
 export function formatOrderCustomerContact(input: {
+  customerName?: string | null;
   customerEmail: string | null;
   customerPhone: string | null;
 }): string | null {
-  return input.customerEmail ?? input.customerPhone;
+  return input.customerName ?? input.customerEmail ?? input.customerPhone;
 }

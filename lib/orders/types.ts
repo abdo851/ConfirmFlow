@@ -58,6 +58,7 @@ export interface MerchantOrderListItem {
   provider: OrderProvider | null;
   customerEmail: string | null;
   customerPhone: string | null;
+  customerName?: string | null;
   currency: string;
   totalAmountMinor: number;
   confirmationStatus: OrderConfirmationStatus;
