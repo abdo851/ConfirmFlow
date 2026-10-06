@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
+import { AnimatedHero } from "@/components/marketing/animated-hero";
 import { CinematicReveal } from "@/components/marketing/cinematic-reveal";
 import { DashboardPreview } from "@/components/marketing/dashboard-preview";
 import { ExampleBlock } from "@/components/marketing/example-block";
@@ -10,6 +11,7 @@ import { LandingHeading } from "@/components/marketing/landing-heading";
 import { PlatformRow } from "@/components/marketing/platform-row";
 import { StatsBoard } from "@/components/marketing/stats-board";
 import { StickyCta } from "@/components/marketing/sticky-cta";
+import { AdPlacement } from "@/components/ads/ad-placement";
 import { VideoEmbed } from "@/components/marketing/video-embed";
 import { getVideoForPlacement } from "@/lib/videos/queries";
 import { Button } from "@/components/ui/button";
@@ -103,6 +105,7 @@ export default async function LandingPage() {
     { question: t("faq6q"), answer: t("faq6a") },
   ];
   const heroVideo = await getVideoForPlacement("landing_hero");
+  const belowHeroVideo = await getVideoForPlacement("landing_below_hero");
 
   return (
     <div className="landing-canvas animate-fade-in pb-24 md:pb-0">
@@ -115,26 +118,31 @@ export default async function LandingPage() {
           <p className="hero-rise mb-4 text-xs font-semibold tracking-[0.18em] text-secondary uppercase sm:text-sm">
             {t("tagline")}
           </p>
-          <h1 className="mx-auto max-w-4xl text-3xl leading-[1.1] font-bold tracking-tight text-balance sm:text-5xl lg:mx-0 lg:text-6xl">
-            <HeroWords text={t("heroLine1")} className="block" wordClassName="gradient-indigo" />
-            <HeroWords text={t("heroLine2")} className="mt-2 block" wordClassName="gradient-teal" />
-          </h1>
-          <p className="hero-rise mx-auto mt-6 max-w-2xl text-base leading-7 text-muted lg:mx-0">
-            {t("heroLine")}
-          </p>
-          <ul className="hero-rise mx-auto mt-6 max-w-xl space-y-2 text-start text-sm text-foreground lg:mx-0">
-            <li>✓ {t("heroTrust1")}</li>
-            <li>✓ {t("heroTrust2")}</li>
-            <li>✓ {t("heroTrust3")}</li>
-          </ul>
-          <div className="hero-rise mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center lg:justify-start">
-            <Button href="/signup" size="lg" className="cta-shimmer w-full sm:w-auto">
-              {t("ctaStart")}
-            </Button>
-            <Button variant="ghost" href="/login" size="lg" className="w-full sm:w-auto">
-              {nav("signIn")}
-            </Button>
-          </div>
+          <AnimatedHero
+            title={
+              <>
+                <HeroWords text={t("heroLine1")} className="block" wordClassName="gradient-indigo" />
+                <HeroWords text={t("heroLine2")} className="mt-2 block" wordClassName="gradient-teal" />
+              </>
+            }
+          >
+            <p className="hero-rise mx-auto mt-6 max-w-2xl text-base leading-7 text-muted lg:mx-0">
+              {t("heroLine")}
+            </p>
+            <ul className="hero-rise mx-auto mt-6 max-w-xl space-y-2 text-start text-sm text-foreground lg:mx-0">
+              <li>✓ {t("heroTrust1")}</li>
+              <li>✓ {t("heroTrust2")}</li>
+              <li>✓ {t("heroTrust3")}</li>
+            </ul>
+            <div className="hero-rise mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center lg:justify-start">
+              <Button href="/signup" size="lg" className="cta-shimmer w-full sm:w-auto">
+                {t("ctaStart")}
+              </Button>
+              <Button variant="ghost" href="/login" size="lg" className="w-full sm:w-auto">
+                {nav("signIn")}
+              </Button>
+            </div>
+          </AnimatedHero>
           </div>
           <DashboardPreview
             title={t("dashboardTitle")}
@@ -145,6 +153,7 @@ export default async function LandingPage() {
           {heroVideo ? <div className="lg:col-span-2"><VideoEmbed video={heroVideo} variant="hero" /></div> : null}
         </div>
         <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+          <AdPlacement placement="landing_hero" />
           <ExampleBlock
             label={t("exampleLabel")}
             title={t("exampleTitle")}
@@ -162,6 +171,16 @@ export default async function LandingPage() {
           </div>
         </div>
       </section>
+
+      {belowHeroVideo ? (
+        <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
+          <VideoEmbed video={belowHeroVideo} variant="inline" />
+        </div>
+      ) : null}
+      <AdPlacement
+        placement="landing_below_hero"
+        className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"
+      />
 
       <section id="features" className="section-premium wash-plain px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         <div className="mx-auto max-w-7xl">
