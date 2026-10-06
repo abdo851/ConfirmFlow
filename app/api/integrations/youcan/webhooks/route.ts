@@ -7,21 +7,33 @@ const METHOD_NOT_ALLOWED = NextResponse.json(
 );
 
 export async function POST(request: Request) {
-  const rawBody = await request.text();
-  const headers = Object.fromEntries(request.headers.entries());
+  const startedAt = Date.now();
+  console.log("[youcan webhook] received");
 
-  const result = await ingestYouCanWebhook({ rawBody, headers });
+  try {
+    const rawBody = await request.text();
+    const headers = Object.fromEntries(request.headers.entries());
 
-  const body =
-    result.status === "rejected"
-      ? { error: result.message ?? "rejected" }
-      : {
-          status: result.status,
-          ...(result.eventId ? { eventId: result.eventId } : {}),
-          ...(result.orderId ? { orderId: result.orderId } : {}),
-        };
+    const result = await ingestYouCanWebhook({ rawBody, headers });
 
-  return NextResponse.json(body, { status: result.httpStatus });
+    const body =
+      result.status === "rejected"
+        ? { error: result.message ?? "rejected" }
+        : {
+            status: result.status,
+            ...(result.eventId ? { eventId: result.eventId } : {}),
+            ...(result.orderId ? { orderId: result.orderId } : {}),
+          };
+
+    console.log(`[youcan webhook] done in ${Date.now() - startedAt}ms`);
+    return NextResponse.json(body, { status: result.httpStatus });
+  } catch (error) {
+    console.error("[youcan webhook] failed:", error);
+    return NextResponse.json(
+      { ok: false, error: "internal" },
+      { status: 200 },
+    );
+  }
 }
 
 export async function GET() {

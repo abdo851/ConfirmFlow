@@ -14,6 +14,23 @@ import { normalizeYouCanWebhookEvent } from "./normalize";
 import { resolveOrBackfillYouCanStoreByStoreId } from "./resolve-store";
 import { classifyYouCanWebhookTopic } from "./topics";
 
+function withTimeout<T>(
+  promise: Promise<T>,
+  ms: number,
+  label: string,
+): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new Error(`timeout:${label}`)),
+      ms,
+    );
+    promise.then(
+      (v) => { clearTimeout(timer); resolve(v); },
+      (e) => { clearTimeout(timer); reject(e); },
+    );
+  });
+}
+
 export interface YouCanWebhookIngestionInput {
   rawBody: string;
   headers: Record<string, string>;
@@ -69,7 +86,19 @@ export async function ingestYouCanWebhook(
   }
 
   const db = await getDatabaseClient(input.db);
-  const store = await resolveOrBackfillYouCanStoreByStoreId(youcanStoreId, db);
+  console.log("[youcan webhook] step=resolve_store");
+  let store;
+  try {
+    store = await withTimeout(
+      resolveOrBackfillYouCanStoreByStoreId(youcanStoreId, db),
+      5000,
+      "resolve_store",
+    );
+    console.log("[youcan webhook] resolve_store ok");
+  } catch (e) {
+    console.error("[youcan webhook] resolve_store failed", e);
+    throw e;
+  }
 
   if (!store) {
     return rejection("rejected", 404, "unknown_store");
@@ -85,11 +114,23 @@ export async function ingestYouCanWebhook(
   const topicStatus = classifyYouCanWebhookTopic(normalizedEvent.topic);
 
   try {
-    const existingWebhookEventId = await findExistingWebhookEvent(db, {
-      storeId: normalizedEvent.storeId,
-      provider: normalizedEvent.provider,
-      externalEventId: normalizedEvent.externalEventId,
-    });
+    console.log("[youcan webhook] step=find_existing_event");
+    let existingWebhookEventId;
+    try {
+      existingWebhookEventId = await withTimeout(
+        findExistingWebhookEvent(db, {
+          storeId: normalizedEvent.storeId,
+          provider: normalizedEvent.provider,
+          externalEventId: normalizedEvent.externalEventId,
+        }),
+        5000,
+        "find_existing_event",
+      );
+      console.log("[youcan webhook] find_existing_event ok");
+    } catch (e) {
+      console.error("[youcan webhook] find_existing_event failed", e);
+      throw e;
+    }
 
     if (existingWebhookEventId) {
       return {
@@ -102,11 +143,23 @@ export async function ingestYouCanWebhook(
     let orderId: string | undefined;
 
     if (normalizedEvent.topic === YOUCAN_ORDER_CREATED_TOPIC) {
-      const orderResult = await processYouCanOrderCreateWebhook({
-        rawBody: input.rawBody,
-        normalizedEvent,
-        db,
-      });
+      console.log("[youcan webhook] step=process_order_create");
+      let orderResult;
+      try {
+        orderResult = await withTimeout(
+          processYouCanOrderCreateWebhook({
+            rawBody: input.rawBody,
+            normalizedEvent,
+            db,
+          }),
+          10000,
+          "process_order_create",
+        );
+        console.log("[youcan webhook] process_order_create ok");
+      } catch (e) {
+        console.error("[youcan webhook] process_order_create failed", e);
+        throw e;
+      }
 
       if (!orderResult.ok) {
         return rejection(
@@ -119,17 +172,29 @@ export async function ingestYouCanWebhook(
       orderId = orderResult.orderId;
     }
 
-    const persistResult = await persistWebhookEvent(db, {
-      storeId: normalizedEvent.storeId,
-      provider: normalizedEvent.provider,
-      externalEventId: normalizedEvent.externalEventId,
-      topic: normalizedEvent.topic,
-      shopDomain: normalizedEvent.shopDomain,
-      status: topicStatus,
-      payloadHash: normalizedEvent.payloadHash,
-      receivedAt: normalizedEvent.receivedAt,
-      processedAt: normalizedEvent.receivedAt,
-    });
+    console.log("[youcan webhook] step=persist_webhook_event");
+    let persistResult;
+    try {
+      persistResult = await withTimeout(
+        persistWebhookEvent(db, {
+          storeId: normalizedEvent.storeId,
+          provider: normalizedEvent.provider,
+          externalEventId: normalizedEvent.externalEventId,
+          topic: normalizedEvent.topic,
+          shopDomain: normalizedEvent.shopDomain,
+          status: topicStatus,
+          payloadHash: normalizedEvent.payloadHash,
+          receivedAt: normalizedEvent.receivedAt,
+          processedAt: normalizedEvent.receivedAt,
+        }),
+        5000,
+        "persist_webhook_event",
+      );
+      console.log("[youcan webhook] persist_webhook_event ok");
+    } catch (e) {
+      console.error("[youcan webhook] persist_webhook_event failed", e);
+      throw e;
+    }
 
     if (persistResult.outcome === "duplicate") {
       return {

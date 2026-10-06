@@ -76,8 +76,12 @@ export async function resolveOrBackfillYouCanStoreByStoreId(
   youcanStoreId: string,
   db: SupabaseClient,
 ): Promise<ResolvedYouCanStore | null> {
+  console.log(`[youcan webhook] resolve store_id=${youcanStoreId}`);
   const existing = await resolveYouCanStoreByStoreId(youcanStoreId, db);
   if (existing) {
+    console.log(
+      `[youcan webhook] store found id=${existing.storeId ?? "none"} owner=${existing.ownerId ?? "none"}`,
+    );
     return existing;
   }
 
@@ -86,7 +90,11 @@ export async function resolveOrBackfillYouCanStoreByStoreId(
     return null;
   }
 
-  return resolveYouCanStoreByStoreId(youcanStoreId, db);
+  const store = await resolveYouCanStoreByStoreId(youcanStoreId, db);
+  console.log(
+    `[youcan webhook] store found id=${store?.storeId ?? "none"} owner=${store?.ownerId ?? "none"}`,
+  );
+  return store;
 }
 
 export async function resolveYouCanStoreBySlug(
